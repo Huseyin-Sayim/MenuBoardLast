@@ -47,10 +47,10 @@ export const createScreen = async (data: {name: string, userId: string, width: n
 
 export const getScreenByDeviceId = async (deviceId: string) => {
   try {
-    return await prisma.screen.findUnique({
+    return await prisma.screen.findFirst({
       where: {
         deviceId: deviceId
-      },
+      }
     })
   } catch (error: any) {
     throw new Error('Ekran verisine erişilemedi: ', error.message)

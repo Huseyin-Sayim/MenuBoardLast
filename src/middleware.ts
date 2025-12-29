@@ -17,14 +17,11 @@ export default async function middleware (req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Eğer access token yoksa ama refresh token varsa, yeni access token oluştur
   if (!token && refreshToken) {
     try {
-      // Refresh token'ı verify et
       const refreshSecret = new TextEncoder().encode(process.env.REFRESH_TOKEN_SECRET);
       const { payload: refreshPayload } = await jose.jwtVerify(refreshToken, refreshSecret);
       
-      // Yeni access token oluştur
       const accessSecret = new TextEncoder().encode(process.env.ACCES_TOKEN_SECRET);
       const newAccessToken = await new jose.SignJWT({
         userId: (refreshPayload as any).userId,
@@ -36,15 +33,13 @@ export default async function middleware (req: NextRequest) {
         .setExpirationTime('15m')
         .sign(accessSecret);
 
-      token = newAccessToken; // Devam eden işlemler için token'ı güncelle
-      newTokenCreated = true; // Yeni token oluşturulduğunu işaretle
+      token = newAccessToken;
+      newTokenCreated = true;
     } catch (refreshError) {
-      // Refresh token geçersizse veya süresi dolmuşsa
       const errorResponse = NextResponse.json(
         { message: 'Yetkisiz erişim' },
         { status: 401 }
       );
-      // Refresh token'ı da temizle
       errorResponse.cookies.delete('accessToken');
       errorResponse.cookies.delete('refreshToken');
       return errorResponse;
@@ -73,11 +68,10 @@ export default async function middleware (req: NextRequest) {
 
     const response : NextResponse<any> = NextResponse.next();
 
-    // Eğer yeni access token oluşturulduysa (refresh token ile), cookie'ye set et
     if (newTokenCreated && token) {
       response.cookies.set('accessToken', token, {
-        expires: new Date(Date.now() + 15 * 60 * 1000), // 15 dakika (1/96 gün)
-        httpOnly: false, // Client-side erişim için false (js-cookie ile okunabilir olmalı)
+        expires: new Date(Date.now() + 15 * 60 * 1000),
+        httpOnly: false,
         secure: false,
         path: '/',
         sameSite: 'lax'
@@ -97,6 +91,6 @@ export const config = {
   matcher : [
     '/dashboard/:path*',
     '/api/users/:path*',
-    '/api/dashboard/:path*',
+    '/api/:path*',
   ]
 }
