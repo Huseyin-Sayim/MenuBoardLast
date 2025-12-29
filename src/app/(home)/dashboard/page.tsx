@@ -1,10 +1,10 @@
 import { TopChannels } from "@/components/Tables/top-channels";
 import { TopChannelsSkeleton } from "@/components/Tables/top-channels/skeleton";
-import { createTimeFrameExtractor } from "@/utils/timeframe-extractor";
 import { Suspense } from "react";
-import { OverviewCardsGroup } from "@/app/(home)/_components/overview-cards";
-import { OverviewCardsSkeleton } from "@/app/(home)/_components/overview-cards/skeleton";
 import { ImageSlider } from "@/app/(home)/_components/image-slider";
+import { MediaGallery } from "@/app/(home)/dashboard/media/_components/media-gallery";
+import { getFormattedMedia} from "@/services/mediaServices";
+import { cookies } from "next/headers";
 
 type PropsType = {
   searchParams: Promise<{
@@ -14,20 +14,30 @@ type PropsType = {
 
 export default async function Dashboard({ searchParams }: PropsType) {
   const { selected_time_frame } = await searchParams;
-  const extractTimeFrame = createTimeFrameExtractor(selected_time_frame);
 
+  const cookieStore = await cookies();
+  const userCookies = cookieStore.get('user')?.value;
+
+  if (!userCookies) {
+    return <div>Kullanıcı oturumu bulunamadı.</div>
+  }
+
+  const user = JSON.parse(userCookies) as {id: string};
+
+  const formattedData = await getFormattedMedia(user.id);
   return (
     <>
-      <Suspense fallback={<OverviewCardsSkeleton />}>
-        <OverviewCardsGroup />
-      </Suspense>
-
-      <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-9 2xl:gap-7.5">
-        {/* Ekranlar Tablosu */}
-        <div className="col-span-12 xl:col-span-6">
-          <Suspense fallback={<TopChannelsSkeleton />}>
-            <TopChannels showActions={false} />
-          </Suspense>
+      <div className=" mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-9 2xl:gap-7.5">
+        {/* Ekranlar Tablosu/Medya Tablosu */}
+        <div className="col-span-6 media-screen">
+          <div className="col-span-12 xl:col-span-6">
+            <Suspense fallback={<TopChannelsSkeleton />}>
+              <TopChannels showActions={false} />
+            </Suspense>
+          </div>
+          <div className="w-full mt-4 md:mt-6 2xl:mt-9">
+            <MediaGallery showActions={false} initialData={formattedData} gridCols="grid-cols-4" maxHeight="400px" disableClick={true} />
+          </div>
         </div>
 
         {/* Image Slider */}

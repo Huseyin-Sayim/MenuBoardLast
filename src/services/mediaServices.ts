@@ -76,3 +76,22 @@ export const updateMediaName = async (id: string, newName: string) => {
     throw new Error(`DB Güncellenemedi: ${error.message}`);
   }
 }
+
+export const getFormattedMedia = async (userId: string) => {
+  const rawData = await getMedia(userId); // Mevcut getMedia fonksiyonunu kullanır
+
+  return rawData.map((item) => {
+    const isVideo = ["mp4", "webm", "ogg", "mov"].includes(
+      item.extension.toLowerCase().replace(".", "")
+    );
+
+    return {
+      id: item.id,
+      name: item.name,
+      type: (isVideo ? "video" : "image") as "video" | "image",
+      url: item.url,
+      uploadedAt: item.createdAt.toLocaleDateString("tr-TR"),
+      duration: 0,
+    };
+  });
+};

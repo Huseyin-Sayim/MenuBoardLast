@@ -21,6 +21,7 @@ import {
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { getScreenName } from "@/services/screenServices";
 
 type MenuBoardDesign = {
   id: string;
@@ -213,6 +214,7 @@ export function EditView({
   onSave,
   onCancel,
 }: EditViewProps) {
+  const [displayName, setDisplayName] = useState<string>("Yükleniyor...");
   const [selectedDesign, setSelectedDesign] = useState(currentDesign);
   const [selectedStatus, setSelectedStatus] = useState<"Aktif" | "Pasif">(currentStatus);
   const [selectedLocation, setSelectedLocation] = useState<string>(currentLocation);
@@ -250,6 +252,23 @@ export function EditView({
 
   }, [playlist, screenName]);
 
+  useEffect(() => {
+    const fetchName = async () => {
+      try {
+
+      const data = await getScreenName(screenName)
+
+      if (data && data.name) {
+        setDisplayName(data.name)
+      }
+      } catch (err: any) {
+        throw new Error(`Screen name getirilirken hata oluştu: ${err.message}`)
+      }
+    }
+    if (screenName) {
+      fetchName()
+    }
+  }, [screenName]);
 
   const aspectRatio = calculateAspectRatio(screenWidth, screenHeight);
   const isPortrait = screenHeight > screenWidth;
@@ -342,11 +361,6 @@ export function EditView({
     setSelectedMediaId(newMedia.id);
   };
 
-  const filteredDesigns =
-    designCategory === "all"
-      ? designs
-      : designs.filter((d) => d.type === designCategory);
-
   const filteredMediaItems =
     mediaCategory === "all"
       ? mediaItems
@@ -358,6 +372,9 @@ export function EditView({
     // TODO: DB bağlandıktan sonra burada playlist sırasını API'ye kaydet
 
   };
+
+
+
 
   return (
     <div className="rounded-[10px] bg-white shadow-1 dark:bg-gray-dark dark:shadow-card">
@@ -402,20 +419,9 @@ export function EditView({
 
           {/* Ekran Konumu */}
           <div className="flex flex-col">
-            <label
-              htmlFor="location-input"
-              className="mb-3 text-lg font-semibold text-dark dark:text-white"
-            >
-              Ekran Konumu
-            </label>
-            <input
-              id="location-input"
-              type="text"
-              value={selectedLocation}
-              onChange={(e) => setSelectedLocation(e.target.value)}
-              placeholder="Örn: Giriş, Çıkış, Sağ Duvar..."
-              className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary placeholder:text-dark-6"
-            />
+            <p className="capitalize d-flex mb-3 text-lg font-semibold text-dark dark:text-white">
+             <span>Ekran Adı: </span><span className=" text-body-M text-primary font-bold"  >{displayName} </span>
+            </p>
           </div>
         </div>
 
@@ -427,145 +433,24 @@ export function EditView({
               type="button"
               onClick={() => setActiveTab("tasarim")}
               className={cn(
-                "rounded-t-lg border border-b-0 px-4 py-2 text-sm font-medium transition-all",
+                "w-32 -mr-4 rounded-t-lg border border-b-0 px-4 py-2 text-sm font-medium transition-all text-dark dark:text-white bg",
                 activeTab === "tasarim"
                   ? "text-dark dark:text-white bg-[#F3F3FE] dark:bg-dark-2"
-                  : "text-primary hover:bg-[#F3F3FE] dark:hover:bg-dark-2 dark:text-primary",
+                  :"dark:text-primary",
                 "border-[#b3b3b3] dark:border-stroke-dark"
               )}
               style={{
-                // Sağ kenarı medyaya doğru eğimli klasör görünümü
-                clipPath: "polygon(0 0, 97% 0, 88% 100%, 0 150%)",
+                clipPath: "polygon(0% 0%, 100% 0%, 92% 50%, 100% 100%, 0% 100%)"
               }}
             >
-              Tasarımlar
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("medya")}
-              className={cn(
-                " ml-auto mr-[-4px] rounded-t-lg border border-b-0 px-4 py-2 text-sm font-medium transition-all",
-                activeTab === "medya"
-                  ? "text-dark dark:text-white bg-[#F3F3FE] dark:bg-dark-2"
-                  : "text-primary hover:bg-[#F3F3FE] dark:hover:bg-dark-2 dark:text-primary",
-                "border-[#b3b3b3] dark:border-stroke-dark"
-              )}
-              style={{
-                // Sol kenarı tasarımlara doğru eğimli klasör görünümü
-                clipPath: "polygon(12% 0, 100% 0, 100% 100%, 0 100%)",
-              }}
-            >
-              Medya
+            Medya
             </button>
           </div>
 
           {/* Content kutusu */}
           <div
-            className="pt-5 flex-1 rounded-b-lg border border-t-0 p-4 bg-[#F3F3FE] border-[#b3b3b3] dark:bg-dark-2 dark:border-stroke-dark"
+            className="pt-5 flex-1 rounded-b-lg border border-t-0 p-4 bg-[#F3F3FE] border-[#b3b3b3] dark:bg-dark-2 dark:border-stroke-dark rounded-tr-lg"
           >
-            {activeTab === "tasarim" ? (
-              <>
-                {/* Tasarım kategorileri */}
-                <div className="flex gap-2 pb-3">
-                  <button
-                    type="button"
-                    onClick={() => setDesignCategory("all")}
-                    className={cn(
-                      "rounded-full px-3 py-1 text-xs font-medium transition-all",
-                      designCategory === "all"
-                        ? "bg-primary text-white"
-                        : "bg-white text-dark-4 hover:bg-gray-100 dark:bg-dark-3 dark:text-dark-6 dark:hover:bg-dark-3",
-                    )}
-                  >
-                    Tümü
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDesignCategory("image")}
-                    className={cn(
-                      "rounded-full px-3 py-1 text-xs font-medium transition-all",
-                      designCategory === "image"
-                        ? "bg-primary text-white"
-                        : "bg-white text-dark-4 hover:bg-gray-100 dark:bg-dark-3 dark:text-dark-6 dark:hover:bg-dark-3",
-                    )}
-                  >
-                    Fotoğraflar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDesignCategory("video")}
-                    className={cn(
-                      "rounded-full px-3 py-1 text-xs font-medium transition-all",
-                      designCategory === "video"
-                        ? "bg-primary text-white"
-                        : "bg-white text-dark-4 hover:bg-gray-100 dark:bg-dark-3 dark:text-dark-6 dark:hover:bg-dark-3",
-                    )}
-                  >
-                    Videolar
-                  </button>
-                </div>
-
-                <div className="pt-3 flex-1 space-y-3 max-h-[460px] pr-2 design-scrollbar mr-1">
-                {filteredDesigns.map((design) => (
-                  <div
-                    key={design.id}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => handleDesignSelect(design.id)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        handleDesignSelect(design.id);
-                      }
-                    }}
-                    className={cn(
-                      "w-full cursor-pointer rounded-lg border-2 p-4 text-left transition-all",
-                      design.id === selectedDesign
-                        ? "border-primary bg-primary/5 dark:bg-primary/10"
-                        : "border-stroke hover:border-primary/50 dark:border-stroke-dark dark:hover:border-primary/50",
-                    )}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-lg">
-                        <Image
-                          src={design.preview}
-                          alt={design.name}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium text-dark dark:text-white">
-                          {design.name}
-                        </h4>
-                        {design.id === selectedDesign && (
-                          <span className="text-sm text-primary">Aktif</span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-3">
-                        {purchasedDesignIds.includes(design.id) ? (
-                          <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                            Kütüphanede
-                          </span>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handlePurchaseDesign(design);
-                            }}
-                            className="rounded-full bg-primary px-3 py-1 text-xs font-medium text-white hover:bg-primary/90"
-                          >
-                            Satın Al
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                </div>
-              </>
-            ) : (
               <>
                 {/* Medya kategorileri */}
                 <div className="flex gap-2 pb-3 mt-1">
@@ -642,7 +527,6 @@ export function EditView({
                   </div>
                 </div>
               </>
-            )}
           </div>
         </div>
       </div>

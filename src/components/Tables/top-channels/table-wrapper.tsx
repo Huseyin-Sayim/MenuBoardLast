@@ -192,7 +192,7 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
               className="text-center text-base font-medium text-dark dark:text-white"
               key={screen.name + i}
             >
-              <TableCell className="flex min-w-fit items-center gap-3">
+              <TableCell className="capitalize flex min-w-fit items-center gap-3">
                 <div className="">{screen.name}</div>
               </TableCell>
 

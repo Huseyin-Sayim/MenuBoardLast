@@ -251,7 +251,7 @@ export function MediaEditView({
                     Tasarım Adı
                   </p>
                   {!isEditingName && (
-                    <p className="text-sm text-dark-4 dark:text-dark-6">
+                    <p className="capitalize text-sm text-dark-4 dark:text-dark-6">
                       {selectedItem.name}
                     </p>
                   )}
@@ -274,11 +274,11 @@ export function MediaEditView({
                     type="text"
                     value={editedName}
                     onChange={(e) => setEditedName(e.target.value)}
-                    className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-4 py-2.5 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
+                    className="capitalize w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-4 py-2.5 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
                     placeholder="Tasarım adını girin"
                     autoFocus
                   />
-                  <div className="flex items-center gap-2">
+                  <div className="capitalize flex items-center gap-2">
                     <button
                       onClick={() => {
                         if (editedName.trim() && editedName !== selectedItem.name) {
@@ -340,7 +340,7 @@ export function MediaEditView({
                   )}
                   onClick={() => !isSelected && onSelect(item)}
                 >
-                  <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-lg">
+                  <div className="capitalize relative h-20 w-32 shrink-0 overflow-hidden rounded-lg">
                     {item.type === "video" ? (
                       <>
                         <Image
@@ -348,7 +348,6 @@ export function MediaEditView({
                           alt={item.name}
                           fill
                           className="object-cover"
-                          style={{objectFit:"contain"}}
                         />
                         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                           <svg
@@ -370,7 +369,7 @@ export function MediaEditView({
                     )}
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-medium text-dark dark:text-white">
+                    <h4 className="capitalize font-medium text-dark dark:text-white">
                       {item.name}
                     </h4>
                     <p className="text-xs text-dark-4 dark:text-dark-6">

@@ -79,6 +79,37 @@
     background-color: #4B5563;
   }
 
+  /* Dashboard medya galeri için özel scrollbar */
+  .media-gallery-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  }
+
+  .media-gallery-scrollbar::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  .media-gallery-scrollbar::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  .media-gallery-scrollbar::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  .media-gallery-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 9999px;
+  }
+
+  .dark .media-gallery-scrollbar {
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  }
+
+  .dark .media-gallery-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
   
   .chat-height {
     @apply h-[calc(100vh_-_8.125rem)] lg:h-[calc(100vh_-_5.625rem)];

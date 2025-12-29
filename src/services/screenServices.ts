@@ -57,41 +57,6 @@ export const getScreenByDeviceId = async (deviceId: string) => {
   }
 }
 
-export const replaceScreenConfig = async (
-  screenId: string, 
-  configs: {mediaId: string, mediaIndex: number}[]
-) => {
-  try {
-    // Önce mevcut config'leri sil
-    await prisma.screenConfig.deleteMany({
-      where: {
-        screenId: screenId
-      }
-    });
-
-    // Yeni config'leri ekle
-    const createPromises = configs.map((config) =>
-      prisma.screenConfig.create({
-        data: {
-          screen: {
-            connect: { id: screenId }
-          },
-          Media: {
-            connect: { id: config.mediaId }
-          },
-          mediaIndex: config.mediaIndex
-        }
-      })
-    );
-
-    const results = await Promise.all(createPromises);
-    return results;
-    
-  } catch (error: any) {
-    throw new Error('Screen config güncellenemedi: ' + error.message);
-  }
-}
-
 export const updateScreenConfig = async (
   screenId: string, 
   configs: {mediaId: string, mediaIndex: number}[]
@@ -148,6 +113,21 @@ export const getScreenConfig = async (screenId:string) => {
     })
   } catch (err: any) {
     throw new Error('Screen config verisi getirilemedi: ',err.message)
+  }
+}
+
+export const getScreenName = async (id:string) => {
+  try {
+    return await prisma.screen.findUnique({
+      where: {
+        id:id
+      },
+      select: {
+        name:true
+      }
+    })
+  } catch (err : any) {
+    throw new Error(`Screen name getirilemedi: ${err.message}`)
   }
 }
 
