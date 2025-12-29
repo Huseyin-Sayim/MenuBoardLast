@@ -47,10 +47,10 @@ export const createScreen = async (data: {name: string, userId: string, width: n
 
 export const getScreenByDeviceId = async (deviceId: string) => {
   try {
-    return await prisma.screen.findUnique({
+    return await prisma.screen.findFirst({
       where: {
         deviceId: deviceId
-      },
+      }
     })
   } catch (error: any) {
     throw new Error('Ekran verisine erişilemedi: ', error.message)
@@ -148,6 +148,27 @@ export const getScreenConfig = async (screenId:string) => {
     })
   } catch (err: any) {
     throw new Error('Screen config verisi getirilemedi: ',err.message)
+  }
+}
+
+export const getScreenConfigByAndroid = async (screenId : string) => {
+  try {
+    const screenConfig = await prisma.screenConfig.findMany({
+      where : {
+        screenId: screenId
+      },
+      select: {
+        Media: true,
+        mediaIndex: true
+      }
+    })
+
+    console.log(screenConfig);
+
+    return screenConfig;
+    
+  } catch (error: any) {
+    throw new Error('Ekran ayarlarına erişilemedi: ', error.message)
   }
 }
 
