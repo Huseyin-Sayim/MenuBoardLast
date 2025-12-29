@@ -1,0 +1,43 @@
+# --- MEDYA VE UPLOADS ENGELLEME ---
+# Uploads klasörünü tamamen engelle
+public/uploads/**
+
+# Klasör yapılarını GitHub'da tutmak için .gitkeep istisnaları
+!public/uploads/images/.gitkeep
+!public/uploads/videos/.gitkeep
+
+# Genel medya uzantılarını her yerde engelle
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.flv
+*.wmv
+
+# --- STANDART BAĞIMLILIKLAR ---
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# --- NEXT.JS VE BUILD ---
+/.next/
+/out/
+/build
+/coverage
+next-env.d.ts
+*.tsbuildinfo
+
+# --- AYARLAR VE GÜVENLİK ---
+.env*.local
+.vercel
+*.pem
+.DS_Store
+
+# --- LOGLAR ---
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- PRISMA ---
+/src/generated/prisma
