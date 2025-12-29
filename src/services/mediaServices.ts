@@ -65,7 +65,6 @@ export const createMedia = async (formData: FormData, userId: string) =>   {
   }
 }
 
-
 export const updateMediaName = async (id: string, newName: string) => {
   try {
     return await prisma.media.update({
@@ -74,5 +73,20 @@ export const updateMediaName = async (id: string, newName: string) => {
     });
   } catch (error: any) {
     throw new Error(`DB Güncellenemedi: ${error.message}`);
+  }
+}
+
+export const deleteMedia = async (id: string) => {
+  try {
+    if (!id) {
+      throw new Error('Media verisi yok');
+    }
+    return await prisma.media.delete({
+      where: {
+        id: id
+      }
+    })
+  } catch (error: any) {
+    throw new Error('Media silinemedi: ', error.message)
   }
 }
