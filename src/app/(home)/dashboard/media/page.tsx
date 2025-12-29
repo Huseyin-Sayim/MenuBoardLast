@@ -28,7 +28,6 @@ export default async function MediaPage() {
       duration: 0,
     };
   });
-
   return (
     <>
       <Breadcrumb pageName="" />

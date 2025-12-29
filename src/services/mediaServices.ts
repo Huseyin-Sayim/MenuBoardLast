@@ -76,17 +76,21 @@ export const updateMediaName = async (id: string, newName: string) => {
   }
 }
 
-export const deleteMedia = async (id: string) => {
-  try {
-    if (!id) {
-      throw new Error('Media verisi yok');
-    }
-    return await prisma.media.delete({
-      where: {
-        id: id
-      }
-    })
-  } catch (error: any) {
-    throw new Error('Media silinemedi: ', error.message)
-  }
-}
+export const getFormattedMedia = async (userId: string) => {
+  const rawData = await getMedia(userId); // Mevcut getMedia fonksiyonunu kullanır
+
+  return rawData.map((item) => {
+    const isVideo = ["mp4", "webm", "ogg", "mov"].includes(
+      item.extension.toLowerCase().replace(".", "")
+    );
+
+    return {
+      id: item.id,
+      name: item.name,
+      type: (isVideo ? "video" : "image") as "video" | "image",
+      url: item.url,
+      uploadedAt: item.createdAt.toLocaleDateString("tr-TR"),
+      duration: 0,
+    };
+  });
+};

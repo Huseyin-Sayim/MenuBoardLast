@@ -6,7 +6,7 @@ import { getMedia } from "@/services/mediaServices";
 export async function TopChannels({ 
   className,
   showActions = true 
-}: { 
+}: {
   className?: string;
   showActions?: boolean;
 }) {

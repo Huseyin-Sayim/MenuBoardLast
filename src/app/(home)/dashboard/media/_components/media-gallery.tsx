@@ -67,9 +67,15 @@ function VideoDuration({ url, itemId }: { url: string; itemId: string }) {
 
 interface MediaGalleryProps {
   initialData : MediaItem[];
+  showActions?: boolean;
+  className?:string
+  gridCols?: string;
+  maxHeight?: string;
+  disableClick?: boolean;
 }
 
-export function MediaGallery({initialData} : MediaGalleryProps) {
+
+export function MediaGallery({showActions=true,className,initialData,gridCols = "grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10", maxHeight, disableClick = false} : MediaGalleryProps) {
   const [mediaItems, setMediaItems] = useState<MediaItem[]>(initialData);
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<"all" | "image" | "video">("all");
@@ -83,7 +89,9 @@ export function MediaGallery({initialData} : MediaGalleryProps) {
   };
 
   const handleItemClick = (item: MediaItem) => {
-    setSelectedItem(item);
+    if (!disableClick) {
+      setSelectedItem(item);
+    }
   };
 
   const handleClose = () => {
@@ -129,8 +137,8 @@ export function MediaGallery({initialData} : MediaGalleryProps) {
     );
   }
 
-  // Düzenleme modunda düzenleme ekranını göster
-  if (selectedItem) {
+  // Düzenleme modunda düzenleme ekranını göster (sadece click devre dışı değilse)
+  if (selectedItem && !disableClick) {
     return (
       <MediaEditView
         selectedItem={selectedItem}
@@ -150,32 +158,34 @@ export function MediaGallery({initialData} : MediaGalleryProps) {
       : mediaItems.filter((item) => item.type === selectedCategory);
 
   // Normal modda galeri görünümünü göster
-  return (
+  return  (
     <div className="rounded-[10px] bg-white shadow-1 dark:bg-gray-dark dark:shadow-card">
       <div className="border-b border-stroke px-7.5 py-4 dark:border-stroke-dark">
         <div className="flex items-center justify-between">
           <h2 className="text-body-2xlg font-bold text-dark dark:text-white">
             Medya
           </h2>
-          <button
-            onClick={handleUploadClick}
-            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-all hover:bg-primary/90 active:scale-95"
-          >
-            <svg
-              className="size-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+          {showActions && (
+            <button
+              onClick={handleUploadClick}
+              className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-all hover:bg-primary/90 active:scale-95"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            Yeni Medya Ekle
-          </button>
+              <svg
+                className="size-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Yeni Medya Ekle
+            </button>
+          )}
         </div>
       </div>
 
@@ -218,7 +228,7 @@ export function MediaGallery({initialData} : MediaGalleryProps) {
         </div>
       </div>
 
-      <div className="p-7.5">
+      <div className={cn("p-7.5", maxHeight && "overflow-y-auto media-gallery-scrollbar")} style={maxHeight ? { maxHeight } : undefined}>
         {filteredItems.length === 0 ? (
           <div className="py-12 text-center">
             <p className="text-dark-4 dark:text-dark-6">
@@ -230,7 +240,7 @@ export function MediaGallery({initialData} : MediaGalleryProps) {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-4 gap-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10">
+          <div className={`grid ${gridCols} gap-4`}>
             {filteredItems.map((item) => (
               <button
                 key={item.id}
@@ -270,8 +280,7 @@ export function MediaGallery({initialData} : MediaGalleryProps) {
 
                 {/* Bilgi Alanı */}
                 <div className="border-t border-stroke bg-white px-3 py-2 dark:border-stroke-dark dark:bg-gray-dark">
-                  <p className="truncate text-sm font-medium text-dark dark:text-white">
-                    {/* Eğer isim UUID ise (çok uzun ve tireliyse) daha düzgün bir şey göster */}
+                  <p className="capitalize truncate text-sm font-medium text-dark dark:text-white">
                     {item.name.length > 25 ? `Medya - ${item.id.slice(0, 4)}` : item.name}
                   </p>
                   <p className="text-xs text-dark-4 dark:text-dark-6">
