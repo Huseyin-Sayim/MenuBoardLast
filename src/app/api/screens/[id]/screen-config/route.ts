@@ -1,11 +1,11 @@
-import { getScreenConfig, getScreenConfigByAndroid } from "@/services/screenServices";
+import { getScreenConfig } from "@/services/screenServices";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request, {params} : {params: Promise<{id:string}>}) {
   try {
     const {id} = await params;
 
-    const data = await getScreenConfigByAndroid(id);
+    const data = await getScreenConfig(id);
 
     if (!data) {
       return NextResponse.json({
