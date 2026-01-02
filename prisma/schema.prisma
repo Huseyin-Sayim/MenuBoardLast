@@ -30,7 +30,7 @@ model User {
 model Screen {
   id           String         @id @default(uuid())
   name         String
-  deviceId     String         
+  deviceId     String
   userId       String
   user         User           @relation(fields: [userId], references: [id])
   width        Int
@@ -79,10 +79,11 @@ model Media {
 }
 
 model ScreenConfig {
-  id         String @id @default(uuid())
-  screenId   String
-  screen     Screen @relation(fields: [screenId], references: [id])
-  mediaId    String
-  mediaIndex Int
-  Media      Media  @relation(fields: [mediaId], references: [id])
+  id              String @id @default(uuid())
+  screenId        String
+  screen          Screen @relation(fields: [screenId], references: [id])
+  mediaId         String
+  mediaIndex      Int
+  displayDuration Int?
+  Media           Media  @relation(fields: [mediaId], references: [id])
 }

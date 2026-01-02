@@ -37,7 +37,7 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
   const [selectedScreenId, setSelectedScreenId] = useState<string>("");
   const [selectedScreenData, setSelectedScreenData] = useState<Screen | null>(null);
   const [screens, setScreens] = useState<Screen[]>(data);
-  const [initialPlaylist, setInitialPlaylist] = useState<Array<{ id: string; item: MediaItem | any; isDesign: boolean }>>([]);
+  const [initialPlaylist, setInitialPlaylist] = useState<Array<{ id: string; item: MediaItem | any; isDesign: boolean ; duration:number}>>([]);
 
   const handleEdit = async (screenId: string) => {
     const screen = screens.find((s) => s.id === screenId);
@@ -51,16 +51,15 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
         const result = await response.json();
         const configs = result.data || [];
         
-        // Config'leri playlist formatına dönüştür
         const playlistItems = configs.map((config: any) => {
-          // getScreenConfig Media'yı include ettiği için config.Media mevcut
           const mediaId = config.Media?.id || config.mediaId;
           const media = initialMedia.find(m => m.id === mediaId);
           if (media) {
             return {
               id: `media-${mediaId}`,
               item: media,
-              isDesign: false
+              isDesign: false,
+              duration: config.displayDuration ?? (media.type === 'video' ? 0 : 10)
             };
           }
           return null;
@@ -98,9 +97,12 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
       // API route üzerinden toplu güncelleme yap
       const configsToSave = screenConfig.map(config => ({
         mediaId: config.mediaId,
-        mediaIndex: config.mediaIndex
+        mediaIndex: config.mediaIndex,
+        duration:config.duration
       }));
-      
+
+      console.log("API'ye giden paket: ",configsToSave);
+
       const response = await fetch(`/api/screens/${selectedScreenId}/config`, {
         method: 'PUT',
         headers: {

@@ -47,7 +47,7 @@ export const createScreen = async (data: {name: string, userId: string, width: n
 
 export const getScreenByDeviceId = async (deviceId: string) => {
   try {
-    return await prisma.screen.findFirst({
+    return await prisma.screen.findMany({
       where: {
         deviceId: deviceId
       }
@@ -58,8 +58,8 @@ export const getScreenByDeviceId = async (deviceId: string) => {
 }
 
 export const updateScreenConfig = async (
-  screenId: string, 
-  configs: {mediaId: string, mediaIndex: number}[]
+  screenId: string,
+  configs: {mediaId: string, mediaIndex: number, duration:number}[]
 ) => {
   try {
     // Önce mevcut config'leri sil (veri yoksa hiçbir şey yapmaz, hata vermez)
@@ -84,14 +84,15 @@ export const updateScreenConfig = async (
           Media: {
             connect: { id: config.mediaId }
           },
-          mediaIndex: config.mediaIndex
+          mediaIndex: config.mediaIndex,
+          displayDuration: config.duration || 10
         }
       })
     );
 
     const results = await Promise.all(createPromises);
     return results;
-    
+
   } catch (error: any) {
     throw new Error('Screen config güncellenemedi: ' + error.message);
   }
