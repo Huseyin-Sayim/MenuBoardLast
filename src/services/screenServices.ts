@@ -12,7 +12,7 @@ export const getScreen = async (user_id: string) => {
       }
     })
   } catch (error: any) {
-    throw new Error('Ekran verisine erişilemedi: ', error.message)
+    throw new Error('Ekran verisine erişilemedi: ', error.messa.ge)
   }
 }
 
