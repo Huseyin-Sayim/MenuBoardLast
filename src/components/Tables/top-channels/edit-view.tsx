@@ -31,10 +31,17 @@ type MenuBoardDesign = {
   type: "image" | "video";
 };
 
+type PlaylistItemType = {
+  id: string;
+  item: MediaItem | MenuBoardDesign;
+  isDesign: boolean;
+  duration: number;
+}
+
 type EditViewProps = {
   screenName: string;
   initialMedia: MediaItem[];
-  initialPlaylist?: Array<{ id: string; item: MediaItem | MenuBoardDesign; isDesign: boolean }>;
+  initialPlaylist?: PlaylistItemType[];
   currentDesign?: string;
   currentStatus?: "Aktif" | "Pasif";
   currentLocation?: string;
@@ -86,10 +93,12 @@ type SortableItemProps = {
   id: string;
   item: MediaItem | MenuBoardDesign;
   isDesign?: boolean;
+  duration: number;
+  onDurationChange: (id:string,val:number) => void;
   onRemove: (id: string) => void;
 };
 
-function SortableItem({ id, item, isDesign, onRemove }: SortableItemProps) {
+function SortableItem({ id, item, isDesign,duration,onDurationChange, onRemove }: SortableItemProps) {
   const {
     attributes,
     listeners,
@@ -116,6 +125,8 @@ function SortableItem({ id, item, isDesign, onRemove }: SortableItemProps) {
   const type = isDesign
     ? (item as MenuBoardDesign).type
     : (item as MediaItem).type;
+
+  const isVideo = type === 'video';
 
   return (
     <div
@@ -151,13 +162,29 @@ function SortableItem({ id, item, isDesign, onRemove }: SortableItemProps) {
           className="object-cover"
         />
       </div>
-      <div className="w-24 shrink-0">
-        <p className="truncate text-xs font-medium text-dark dark:text-white">
-          {name}
-        </p>
-        <p className="text-[10px] text-dark-4 dark:text-dark-6">
-          {type === "video" ? "Video" : "Görsel"}
-        </p>
+      <div className="w-24 shrink-0 flex flex-col gap-1">
+        <p className="truncate text-xs font-medium text-dark dark:text-white">{name}</p>
+
+
+        <div className="flex items-center gap-1">
+          <input
+            type="number"
+            min="1"
+            disabled={isVideo}
+            value={duration}
+            onChange={(e) => {
+              const val = parseInt(e.target.value);
+              onDurationChange(id, isNaN(val) || val < 1 ? 1 : val);
+            }}
+            className={cn(
+              "w-14 rounded border px-1 py-0.5 text-xs outline-none focus:border-primary",
+              "border-stroke bg-gray-50 dark:border-stroke-dark dark:bg-dark-3 dark:text-white",
+              isVideo && "opacity-50 cursor-not-allowed bg-gray-200 dark:bg-dark-4"
+            )}
+            title={isVideo ? "Video süresi sabittir" : "Süreyi değiştir"}
+          />
+          <span className="text-[10px] text-dark-4">sn</span>
+        </div>
       </div>
       <button
         type="button"
@@ -200,6 +227,7 @@ export interface ScreenConfig {
   screenId: string;
   mediaId: string;
   mediaIndex: number
+  duration:number
 }
 
 export function EditView({
@@ -216,24 +244,42 @@ export function EditView({
 }: EditViewProps) {
   const [displayName, setDisplayName] = useState<string>("Yükleniyor...");
   const [selectedDesign, setSelectedDesign] = useState(currentDesign);
-  const [selectedStatus, setSelectedStatus] = useState<"Aktif" | "Pasif">(currentStatus);
-  const [selectedLocation, setSelectedLocation] = useState<string>(currentLocation);
+  const [selectedStatus, setSelectedStatus] = useState<"Aktif" | "Pasif">(
+    currentStatus,
+  );
+  const [selectedLocation, setSelectedLocation] =
+    useState<string>(currentLocation);
   // TODO: DB bağlandıktan sonra katalog tasarımlarını API'den çek
   const [designs, setDesigns] = useState(mockMenuBoardDesigns);
   const [activeTab, setActiveTab] = useState<"tasarim" | "medya">("tasarim");
   // TODO: DB bağlandıktan sonra kullanıcının satın aldığı medyaları API'den doldur
   const [mediaItems, setMediaItems] = useState<MediaItem[]>(initialMedia);
-  const [designCategory, setDesignCategory] = useState<"all" | "image" | "video">("all");
-  const [mediaCategory, setMediaCategory] = useState<"all" | "image" | "video">("all");
+  const [designCategory, setDesignCategory] = useState<
+    "all" | "image" | "video"
+  >("all");
+  const [mediaCategory, setMediaCategory] = useState<"all" | "image" | "video">(
+    "all",
+  );
   const [purchasedDesignIds, setPurchasedDesignIds] = useState<string[]>([]);
   const [selectedMediaId, setSelectedMediaId] = useState<string | null>(null);
-  const [readyScreenConfig, setReadyScreenConfig] = useState<ScreenConfig[]>([]);
+  const [readyScreenConfig, setReadyScreenConfig] = useState<ScreenConfig[]>(
+    [],
+  );
   // Playlist: Seçilen medyaların sıralı listesi
-  const [playlist, setPlaylist] = useState<Array<{ id: string; item: MediaItem | MenuBoardDesign; isDesign: boolean }>>(initialPlaylist);
-
+  const [playlist, setPlaylist] = useState<PlaylistItemType[]>(() => {
+    if (!initialPlaylist) return [];
+    return initialPlaylist.map((p) => ({
+      ...p,
+      duration: p.duration ?? (p.item.type === "video" ? 0 : 10),
+    }));
+  });
   // initialPlaylist prop'u değiştiğinde playlist state'ini güncelle (sadece playlist boşsa)
   useEffect(() => {
-    if (initialPlaylist && initialPlaylist.length > 0 && playlist.length === 0) {
+    if (
+      initialPlaylist &&
+      initialPlaylist.length > 0 &&
+      playlist.length === 0
+    ) {
       setPlaylist(initialPlaylist);
     }
   }, [initialPlaylist, playlist.length]);
@@ -242,44 +288,43 @@ export function EditView({
     const formattedConfig: ScreenConfig[] = playlist.map((item, index) => ({
       screenId: screenName,
       mediaId: item.item.id,
-      mediaIndex: index + 1
+      mediaIndex: index + 1,
+      duration: item.duration,
     }));
 
     console.log(playlist);
 
     console.log("Tertemiz Config:", formattedConfig);
     setReadyScreenConfig(formattedConfig);
-
   }, [playlist, screenName]);
 
   useEffect(() => {
     const fetchName = async () => {
       try {
+        const data = await getScreenName(screenName);
 
-      const data = await getScreenName(screenName)
-
-      if (data && data.name) {
-        setDisplayName(data.name)
-      }
+        if (data && data.name) {
+          setDisplayName(data.name);
+        }
       } catch (err: any) {
-        throw new Error(`Screen name getirilirken hata oluştu: ${err.message}`)
+        throw new Error(`Screen name getirilirken hata oluştu: ${err.message}`);
       }
-    }
+    };
     if (screenName) {
-      fetchName()
+      fetchName();
     }
   }, [screenName]);
 
   const aspectRatio = calculateAspectRatio(screenWidth, screenHeight);
   const isPortrait = screenHeight > screenWidth;
-  const maxHeight = isPortrait ? '400px' : 'none';
+  const maxHeight = isPortrait ? "400px" : "none";
 
   // DnD Kit sensors
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   const activeDesign = designs.find((d) => d.id === selectedDesign);
@@ -290,25 +335,39 @@ export function EditView({
     ? activeMedia.thumbnail || activeMedia.url
     : activeDesign?.preview;
 
-  const handleDesignSelect = (designId: string) => {
-    setSelectedDesign(designId);
-    setSelectedMediaId(null);
-    setDesigns((prev) =>
-      prev.map((d) => ({ ...d, isActive: d.id === designId }))
-    );
-    // Tasarımlar sekmesinden playlist'e ekleme yapılmaz
-    // Sadece önizleme için seçilir
+  // const handleDesignSelect = (designId: string) => {
+  //   setSelectedDesign(designId);
+  //   setSelectedMediaId(null);
+  //   setDesigns((prev) =>
+  //     prev.map((d) => ({ ...d, isActive: d.id === designId }))
+  //   );
+  //   // Tasarımlar sekmesinden playlist'e ekleme yapılmaz
+  //   // Sadece önizleme için seçilir
+  // };
+
+  const handleDurationChange = (id: string, newDuration: number) => {
+    setPlaylist((prev) => {
+      return prev.map((item) =>
+        item.id === id ? { ...item, duration: newDuration } : item,
+      );
+    });
   };
 
   const handleMediaSelect = (mediaId: string) => {
     setSelectedMediaId(mediaId);
-    // designId'yi de dolduralım ki kaydettiğimizde hangi içerik seçildiğini bilelim
     setSelectedDesign(`media-${mediaId}`);
 
-    // Playlist'e ekle (eğer yoksa)
     const media = mediaItems.find((m) => m.id === mediaId);
     if (media && !playlist.find((p) => p.id === `media-${mediaId}`)) {
-      setPlaylist((prev) => [...prev, { id: `media-${mediaId}`, item: media, isDesign: false }]);
+      setPlaylist((prev) => [
+        ...prev,
+        {
+          id: `media-${mediaId}`,
+          item: media,
+          isDesign: false,
+          duration: media.type === "video" ? 0 : 10,
+        },
+      ]);
     }
   };
 
@@ -328,38 +387,42 @@ export function EditView({
   const handleRemoveFromPlaylist = (id: string) => {
     setPlaylist((prev) => prev.filter((p) => p.id !== id));
     // Eğer kaldırılan item seçiliyse, seçimi temizle
-    if (selectedDesign === id || selectedDesign === `media-${id}` || selectedMediaId === id) {
+    if (
+      selectedDesign === id ||
+      selectedDesign === `media-${id}` ||
+      selectedMediaId === id
+    ) {
       setSelectedDesign(currentDesign);
       setSelectedMediaId(null);
     }
   };
 
   // Tasarımı satın alıp Medya sekmesine ekle
-  const handlePurchaseDesign = (design: MenuBoardDesign) => {
-    // Zaten satın alındıysa sadece Medya sekmesine geç
-    if (purchasedDesignIds.includes(design.id)) {
-      const existingMedia = mediaItems.find((m) => m.id === `design-${design.id}`);
-      setActiveTab("medya");
-      if (existingMedia) {
-        setSelectedMediaId(existingMedia.id);
-      }
-      return;
-    }
-
-    // TODO: DB bağlandıktan sonra burada satın alma API çağrısı yap
-    const newMedia: MediaItem = {
-      id: `design-${design.id}`, // DB tarafında gerçek id ile değiştirilecek
-      name: design.name,
-      type: "image",
-      url: design.preview,
-      uploadedAt: new Date().toISOString().slice(0, 10),
-    };
-
-    setMediaItems((prev) => [...prev, newMedia]);
-    setPurchasedDesignIds((prev) => [...prev, design.id]);
-    setActiveTab("medya");
-    setSelectedMediaId(newMedia.id);
-  };
+  // const handlePurchaseDesign = (design: MenuBoardDesign) => {
+  //   // Zaten satın alındıysa sadece Medya sekmesine geç
+  //   if (purchasedDesignIds.includes(design.id)) {
+  //     const existingMedia = mediaItems.find((m) => m.id === `design-${design.id}`);
+  //     setActiveTab("medya");
+  //     if (existingMedia) {
+  //       setSelectedMediaId(existingMedia.id);
+  //     }
+  //     return;
+  //   }
+  //
+  //   // TODO: DB bağlandıktan sonra burada satın alma API çağrısı yap
+  //   const newMedia: MediaItem = {
+  //     id: `design-${design.id}`, // DB tarafında gerçek id ile değiştirilecek
+  //     name: design.name,
+  //     type: "image",
+  //     url: design.preview,
+  //     uploadedAt: new Date().toISOString().slice(0, 10),
+  //   };
+  //
+  //   setMediaItems((prev) => [...prev, newMedia]);
+  //   setPurchasedDesignIds((prev) => [...prev, design.id]);
+  //   setActiveTab("medya");
+  //   setSelectedMediaId(newMedia.id);
+  // };
 
   const filteredMediaItems =
     mediaCategory === "all"
@@ -367,22 +430,20 @@ export function EditView({
       : mediaItems.filter((m) => m.type === mediaCategory);
 
   const handleSave = () => {
-
-    onSave(selectedDesign, selectedStatus, selectedLocation, playlist, readyScreenConfig);
-    // TODO: DB bağlandıktan sonra burada playlist sırasını API'ye kaydet
-
+    onSave(
+      selectedDesign,
+      selectedStatus,
+      selectedLocation,
+      playlist,
+      readyScreenConfig,
+    );
   };
-
-
-
 
   return (
     <div className="rounded-[10px] bg-white shadow-1 dark:bg-gray-dark dark:shadow-card">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-stroke px-7.5 py-4 dark:border-stroke-dark">
-        <h2 className="text-body-2xlg font-bold text-dark dark:text-white">
-
-        </h2>
+        <h2 className="text-body-2xlg font-bold text-dark dark:text-white"></h2>
       </div>
 
       {/* Content */}
@@ -393,16 +454,14 @@ export function EditView({
             <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
               Önizleme
             </h3>
-            <div 
-              className="flex-1 rounded-lg border-[1.5px] p-4 bg-[#F3F3FE] border-[#F3F3FE] dark:bg-dark-3 dark:border-dark-3"
-            >
-              <div 
-                className="relative w-full overflow-hidden rounded-lg bg-[#e5e5fb] dark:bg-dark-2 shadow-lg"
-                style={{ 
+            <div className="flex-1 rounded-lg border-[1.5px] border-[#F3F3FE] bg-[#F3F3FE] p-4 dark:border-dark-3 dark:bg-dark-3">
+              <div
+                className="relative w-full overflow-hidden rounded-lg bg-[#e5e5fb] shadow-lg dark:bg-dark-2"
+                style={{
                   aspectRatio: aspectRatio,
                   maxHeight: maxHeight,
-                  width: isPortrait ? 'auto' : '100%',
-                  margin: isPortrait ? '0 auto' : '0'
+                  width: isPortrait ? "auto" : "100%",
+                  margin: isPortrait ? "0 auto" : "0",
                 }}
               >
                 {previewImage && (
@@ -419,8 +478,11 @@ export function EditView({
 
           {/* Ekran Konumu */}
           <div className="flex flex-col">
-            <p className="capitalize d-flex mb-3 text-lg font-semibold text-dark dark:text-white">
-             <span>Ekran Adı: </span><span className=" text-body-M text-primary font-bold"  >{displayName} </span>
+            <p className="d-flex mb-3 text-lg font-semibold capitalize text-dark dark:text-white">
+              <span>Ekran Adı: </span>
+              <span className="text-body-M font-bold text-primary">
+                {displayName}{" "}
+              </span>
             </p>
           </div>
         </div>
@@ -428,105 +490,107 @@ export function EditView({
         {/* Sağ taraf - Tasarımlar / Medya sekmeleri */}
         <div className="flex flex-col">
           {/* Sekmeler */}
-          <div className="ml-[-4px] flex gap-2 px-1 ">
+          <div className="ml-[-4px] flex gap-2 px-1">
             <button
               type="button"
               onClick={() => setActiveTab("tasarim")}
               className={cn(
-                "w-32 -mr-4 rounded-t-lg border border-b-0 px-4 py-2 text-sm font-medium transition-all text-dark dark:text-white bg",
+                "bg -mr-4 w-32 rounded-t-lg border border-b-0 px-4 py-2 text-sm font-medium text-dark transition-all dark:text-white",
                 activeTab === "tasarim"
-                  ? "text-dark dark:text-white bg-[#F3F3FE] dark:bg-dark-2"
-                  :"dark:text-primary",
-                "border-[#b3b3b3] dark:border-stroke-dark"
+                  ? "bg-[#F3F3FE] text-dark dark:bg-dark-2 dark:text-white"
+                  : "dark:text-primary",
+                "border-[#b3b3b3] dark:border-stroke-dark",
               )}
               style={{
-                clipPath: "polygon(0% 0%, 100% 0%, 92% 50%, 100% 100%, 0% 100%)"
+                clipPath:
+                  "polygon(0% 0%, 100% 0%, 92% 50%, 100% 100%, 0% 100%)",
               }}
             >
-            Medya
+              Medya
             </button>
           </div>
 
           {/* Content kutusu */}
-          <div
-            className="pt-5 flex-1 rounded-b-lg border border-t-0 p-4 bg-[#F3F3FE] border-[#b3b3b3] dark:bg-dark-2 dark:border-stroke-dark rounded-tr-lg"
-          >
-              <>
-                {/* Medya kategorileri */}
-                <div className="flex gap-2 pb-3 mt-1">
-                  <button
-                    type="button"
-                    onClick={() => setMediaCategory("all")}
-                    className={cn(
-                      "rounded-full px-3 py-1 text-xs font-medium transition-all",
-                      mediaCategory === "all"
-                        ? "bg-primary text-white"
-                        : "bg-white text-dark-4 hover:bg-gray-100 dark:bg-dark-3 dark:text-dark-6 dark:hover:bg-dark-3",
-                    )}
-                  >
-                    Tümü
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setMediaCategory("image")}
-                    className={cn(
-                      "rounded-full px-3 py-1 text-xs font-medium transition-all",
-                      mediaCategory === "image"
-                        ? "bg-primary text-white"
-                        : "bg-white text-dark-4 hover:bg-gray-100 dark:bg-dark-3 dark:text-dark-6 dark:hover:bg-dark-3",
-                    )}
-                  >
-                    Fotoğraflar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setMediaCategory("video")}
-                    className={cn(
-                      "rounded-full px-3 py-1 text-xs font-medium transition-all",
-                      mediaCategory === "video"
-                        ? "bg-primary text-white"
-                        : "bg-white text-dark-4 hover:bg-gray-100 dark:bg-dark-3 dark:text-dark-6 dark:hover:bg-dark-3",
-                    )}
-                  >
-                    Videolar
-                  </button>
-                </div>
+          <div className="flex-1 rounded-b-lg rounded-tr-lg border border-t-0 border-[#b3b3b3] bg-[#F3F3FE] p-4 pt-5 dark:border-stroke-dark dark:bg-dark-2">
+            <>
+              {/* Medya kategorileri */}
+              <div className="mt-1 flex gap-2 pb-3">
+                <button
+                  type="button"
+                  onClick={() => setMediaCategory("all")}
+                  className={cn(
+                    "rounded-full px-3 py-1 text-xs font-medium transition-all",
+                    mediaCategory === "all"
+                      ? "bg-primary text-white"
+                      : "bg-white text-dark-4 hover:bg-gray-100 dark:bg-dark-3 dark:text-dark-6 dark:hover:bg-dark-3",
+                  )}
+                >
+                  Tümü
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMediaCategory("image")}
+                  className={cn(
+                    "rounded-full px-3 py-1 text-xs font-medium transition-all",
+                    mediaCategory === "image"
+                      ? "bg-primary text-white"
+                      : "bg-white text-dark-4 hover:bg-gray-100 dark:bg-dark-3 dark:text-dark-6 dark:hover:bg-dark-3",
+                  )}
+                >
+                  Fotoğraflar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMediaCategory("video")}
+                  className={cn(
+                    "rounded-full px-3 py-1 text-xs font-medium transition-all",
+                    mediaCategory === "video"
+                      ? "bg-primary text-white"
+                      : "bg-white text-dark-4 hover:bg-gray-100 dark:bg-dark-3 dark:text-dark-6 dark:hover:bg-dark-3",
+                  )}
+                >
+                  Videolar
+                </button>
+              </div>
 
-                <div className="mt-3 flex-1 max-h-[460px] pr-2 design-scrollbar">
-                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-3" style={{padding:'10px'}}>
-                    {filteredMediaItems.map((item: MediaItem) => (
-                      <button
-                        key={item.id}
-                        type="button"
-                        onClick={() => handleMediaSelect(item.id)}
-                        className={cn(
-                          "overflow-hidden rounded-lg border text-left transition-all",
-                          selectedMediaId === item.id
-                            ? "border-primary shadow-sm"
-                            : "border-stroke hover:border-primary/60 dark:border-stroke-dark",
-                        )}
-                      >
-                        <div className="relative aspect-video w-full bg-gray-2 dark:bg-dark-2">
-                          <Image
-                            src={item.thumbnail || item.url}
-                            alt={item.name}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                        <div className="border-t border-stroke bg-white px-3 py-2 dark:border-stroke-dark dark:bg-gray-dark">
-                          <p className="truncate text-sm font-medium text-dark dark:text-white">
-                            {item.name}
-                          </p>
-                          <p className="text-xs text-dark-4 dark:text-dark-6">
-                            {item.type === "video" ? "Video" : "Görsel"}
-                          </p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
+              <div className="design-scrollbar mt-3 max-h-[460px] flex-1 pr-2">
+                <div
+                  className="grid grid-cols-2 gap-4 sm:grid-cols-3"
+                  style={{ padding: "10px" }}
+                >
+                  {filteredMediaItems.map((item: MediaItem) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => handleMediaSelect(item.id)}
+                      className={cn(
+                        "overflow-hidden rounded-lg border text-left transition-all",
+                        selectedMediaId === item.id
+                          ? "border-primary shadow-sm"
+                          : "border-stroke hover:border-primary/60 dark:border-stroke-dark",
+                      )}
+                    >
+                      <div className="relative aspect-video w-full bg-gray-2 dark:bg-dark-2">
+                        <Image
+                          src={item.thumbnail || item.url}
+                          alt={item.name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="border-t border-stroke bg-white px-3 py-2 dark:border-stroke-dark dark:bg-gray-dark">
+                        <p className="truncate text-sm font-medium text-dark dark:text-white">
+                          {item.name}
+                        </p>
+                        <p className="text-xs text-dark-4 dark:text-dark-6">
+                          {item.type === "video" ? "Video" : "Görsel"}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
                 </div>
-              </>
+              </div>
+            </>
           </div>
         </div>
       </div>
@@ -536,9 +600,7 @@ export function EditView({
         <h3 className="mb-3 text-lg font-semibold text-dark dark:text-white">
           Oynatma Sırası
         </h3>
-        <div 
-          className="rounded-lg border border-stroke p-4 bg-[#F3F3FE] dark:bg-dark-2 dark:border-stroke-dark"
-        >
+        <div className="rounded-lg border border-stroke bg-[#F3F3FE] p-4 dark:border-stroke-dark dark:bg-dark-2">
           {playlist.length > 0 ? (
             <DndContext
               sensors={sensors}
@@ -549,13 +611,15 @@ export function EditView({
                 items={playlist.map((p) => p.id)}
                 strategy={horizontalListSortingStrategy}
               >
-                <div className="flex gap-3 overflow-x-auto pb-2 design-scrollbar">
+                <div className="design-scrollbar flex gap-3 overflow-x-auto pb-2">
                   {playlist.map((playlistItem) => (
                     <SortableItem
                       key={playlistItem.id}
                       id={playlistItem.id}
                       item={playlistItem.item}
                       isDesign={playlistItem.isDesign}
+                      duration={playlistItem.duration}
+                      onDurationChange={handleDurationChange}
                       onRemove={handleRemoveFromPlaylist}
                     />
                   ))}
@@ -565,7 +629,8 @@ export function EditView({
           ) : (
             <div className="py-8 text-center">
               <p className="text-sm text-dark-4 dark:text-dark-6">
-                Henüz medya eklenmedi. Tasarımlar veya Medya sekmesinden medya seçerek ekleyebilirsiniz.
+                Henüz medya eklenmedi. Tasarımlar veya Medya sekmesinden medya
+                seçerek ekleyebilirsiniz.
               </p>
             </div>
           )}
