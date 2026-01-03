@@ -13,24 +13,25 @@ enum Role {
 }
 
 model User {
-  id           String         @id @default(uuid())
-  name         String
-  email        String         @unique
-  phoneNumber  String         @unique
-  password     String
-  role         Role           @default(user)
-  BuyTemplate  BuyTemplate[]
-  RefreshToken RefreshToken[]
-  Screen       Screen[]
-  Media        Media[]
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+  id               String             @id @default(uuid())
+  name             String
+  email            String             @unique
+  phoneNumber      String             @unique
+  password         String
+  role             Role               @default(user)
+  BuyTemplate      BuyTemplate[]
+  RefreshToken     RefreshToken[]
+  Screen           Screen[]
+  Media            Media[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  DeviceScreenCode DeviceScreenCode[]
 }
 
 model Screen {
   id           String         @id @default(uuid())
   name         String
-  deviceId     String
+  deviceId     String         @unique
   userId       String
   user         User           @relation(fields: [userId], references: [id])
   createdAt    DateTime       @default(now())
@@ -84,4 +85,14 @@ model ScreenConfig {
   mediaIndex      Int
   displayDuration Int?
   Media           Media  @relation(fields: [mediaId], references: [id])
+}
+
+model DeviceScreenCode {
+  id       String @id @default(uuid())
+  deviceId String @unique
+  code     String @unique
+  width    Int
+  height   Int
+  userId   String
+  user     User   @relation(fields: [userId], references: [id])
 }
