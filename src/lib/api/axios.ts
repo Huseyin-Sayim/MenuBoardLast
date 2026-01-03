@@ -84,6 +84,7 @@ api.interceptors.request.use(
     const isPublicEndpoint =
       url.includes('/api/login') ||
       url.includes('/api/register') ||
+      url.includes('/api/check-db') ||
       url.includes('/api/refresh')
 
     if (!isPublicEndpoint) {
@@ -110,10 +111,19 @@ api.interceptors.response.use(
 
     if (error.response.status === 401 && !originalRequest._retry) {
 
-      if (originalRequest.url?.includes('/api/refresh')) {
-        clearTokens();
-        if (typeof window !== 'undefined') {
-          window.location.href = '/auth/sign-in';
+      // Public endpoint'ler için refresh token denenmemeli
+      const isPublicEndpoint = 
+        originalRequest.url?.includes('/api/login') ||
+        originalRequest.url?.includes('/api/register') ||
+        originalRequest.url?.includes('/api/check-db') ||
+        originalRequest.url?.includes('/api/refresh');
+
+      if (isPublicEndpoint) {
+        if (originalRequest.url?.includes('/api/refresh')) {
+          clearTokens();
+          if (typeof window !== 'undefined') {
+            window.location.href = '/auth/sign-in';
+          }
         }
         return Promise.reject(error);
       }

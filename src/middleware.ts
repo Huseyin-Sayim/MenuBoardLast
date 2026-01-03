@@ -11,7 +11,7 @@ export default async function middleware (req: NextRequest) {
   let token = headerToken || cookieToken;
   let newTokenCreated = false;
 
-  const publicPaths = ['/api/login', '/api/register', '/api/refresh', '/auth/sign-in', '/auth/sign-up', '/auth/forgot-password', '/api/check-db']
+  const publicPaths = ['/api/login', '/api/register','/api/check-db', '/api/refresh', '/auth/sign-in', '/auth/sign-up', '/auth/forgot-password']
 
   if (publicPaths.some(path => pathname.startsWith(path))) {
     return NextResponse.next();
