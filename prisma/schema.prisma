@@ -33,6 +33,8 @@ model Screen {
   name         String
   deviceId     String         @unique
   userId       String
+  width        Int
+  height       Int
   user         User           @relation(fields: [userId], references: [id])
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt

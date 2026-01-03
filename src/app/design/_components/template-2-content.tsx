@@ -1,6 +1,23 @@
 "use client";
 
-export default function Template2Content() {
+type Template2ContentProps = {
+  prices?: Record<string, string>;
+  onPriceClick?: (itemName: string, currentPrice: string) => void;
+  isEditable?: boolean;
+};
+
+export default function Template2Content({ prices, onPriceClick, isEditable = false }: Template2ContentProps = {}) {
+  const menuItems = [
+    { name: "Döner Tabağı", price: "₺75" },
+    { name: "Lahmacun", price: "₺25" },
+    { name: "Kebap Tabağı", price: "₺110" },
+    { name: "Ayran", price: "₺15" },
+    { name: "Türk Kahvesi", price: "₺20" },
+    { name: "Çay", price: "₺10" },
+  ].map(item => ({
+    ...item,
+    price: prices?.[item.name] || item.price,
+  }));
   return (
     <>
       <div className="template-2-container">
@@ -26,21 +43,63 @@ export default function Template2Content() {
                   <p className="item-desc">Taze döner, pilav ve salata</p>
                   <span className="item-badge">Popüler</span>
                 </div>
-                <div className="item-price">₺75</div>
+                {isEditable && onPriceClick ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPriceClick("Döner Tabağı", menuItems.find(m => m.name === "Döner Tabağı")?.price || "₺75");
+                    }}
+                    className="item-price"
+                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0 }}
+                  >
+                    {menuItems.find(m => m.name === "Döner Tabağı")?.price || "₺75"}
+                  </button>
+                ) : (
+                  <div className="item-price">{menuItems.find(m => m.name === "Döner Tabağı")?.price || "₺75"}</div>
+                )}
               </div>
               <div className="category-item">
                 <div className="item-content">
                   <h3 className="item-title">Lahmacun</h3>
                   <p className="item-desc">İnce hamur, özel harç</p>
                 </div>
-                <div className="item-price">₺25</div>
+                {isEditable && onPriceClick ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPriceClick("Lahmacun", menuItems.find(m => m.name === "Lahmacun")?.price || "₺25");
+                    }}
+                    className="item-price"
+                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0 }}
+                  >
+                    {menuItems.find(m => m.name === "Lahmacun")?.price || "₺25"}
+                  </button>
+                ) : (
+                  <div className="item-price">{menuItems.find(m => m.name === "Lahmacun")?.price || "₺25"}</div>
+                )}
               </div>
               <div className="category-item">
                 <div className="item-content">
                   <h3 className="item-title">Kebap Tabağı</h3>
                   <p className="item-desc">Adana, Urfa, Tavuk</p>
                 </div>
-                <div className="item-price">₺110</div>
+                {isEditable && onPriceClick ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPriceClick("Kebap Tabağı", menuItems.find(m => m.name === "Kebap Tabağı")?.price || "₺110");
+                    }}
+                    className="item-price"
+                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0 }}
+                  >
+                    {menuItems.find(m => m.name === "Kebap Tabağı")?.price || "₺110"}
+                  </button>
+                ) : (
+                  <div className="item-price">{menuItems.find(m => m.name === "Kebap Tabağı")?.price || "₺110"}</div>
+                )}
               </div>
             </div>
           </div>
@@ -56,21 +115,63 @@ export default function Template2Content() {
                   <h3 className="item-title">Ayran</h3>
                   <p className="item-desc">Ev yapımı ayran</p>
                 </div>
-                <div className="item-price">₺15</div>
+                {isEditable && onPriceClick ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPriceClick("Ayran", menuItems.find(m => m.name === "Ayran")?.price || "₺15");
+                    }}
+                    className="item-price"
+                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0 }}
+                  >
+                    {menuItems.find(m => m.name === "Ayran")?.price || "₺15"}
+                  </button>
+                ) : (
+                  <div className="item-price">{menuItems.find(m => m.name === "Ayran")?.price || "₺15"}</div>
+                )}
               </div>
               <div className="category-item">
                 <div className="item-content">
                   <h3 className="item-title">Türk Kahvesi</h3>
                   <p className="item-desc">Geleneksel pişirme</p>
                 </div>
-                <div className="item-price">₺20</div>
+                {isEditable && onPriceClick ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPriceClick("Türk Kahvesi", menuItems.find(m => m.name === "Türk Kahvesi")?.price || "₺20");
+                    }}
+                    className="item-price"
+                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0 }}
+                  >
+                    {menuItems.find(m => m.name === "Türk Kahvesi")?.price || "₺20"}
+                  </button>
+                ) : (
+                  <div className="item-price">{menuItems.find(m => m.name === "Türk Kahvesi")?.price || "₺20"}</div>
+                )}
               </div>
               <div className="category-item">
                 <div className="item-content">
                   <h3 className="item-title">Çay</h3>
                   <p className="item-desc">Taze demlenmiş</p>
                 </div>
-                <div className="item-price">₺10</div>
+                {isEditable && onPriceClick ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPriceClick("Çay", menuItems.find(m => m.name === "Çay")?.price || "₺10");
+                    }}
+                    className="item-price"
+                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0 }}
+                  >
+                    {menuItems.find(m => m.name === "Çay")?.price || "₺10"}
+                  </button>
+                ) : (
+                  <div className="item-price">{menuItems.find(m => m.name === "Çay")?.price || "₺10"}</div>
+                )}
               </div>
             </div>
           </div>
@@ -79,10 +180,12 @@ export default function Template2Content() {
 
       <style jsx>{`
         .template-2-container {
-          max-width: 1000px;
-          margin: 0 auto;
+          width: 100%;
+          height: 100%;
+          margin: 0;
           padding: 2rem;
           font-family: 'Georgia', serif;
+          overflow: auto;
         }
 
         .restaurant-header {

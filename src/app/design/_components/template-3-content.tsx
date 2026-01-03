@@ -1,6 +1,26 @@
 "use client";
 
-export default function Template3Content() {
+type Template3ContentProps = {
+  prices?: Record<string, string>;
+  onPriceClick?: (itemName: string, currentPrice: string) => void;
+  isEditable?: boolean;
+};
+
+export default function Template3Content({ prices, onPriceClick, isEditable = false }: Template3ContentProps = {}) {
+  const menuItems = [
+    { name: "Serpme Kahvaltı", price: "₺120" },
+    { name: "Menemen", price: "₺45" },
+    { name: "Omlet", price: "₺40" },
+    { name: "Mercimek Çorbası", price: "₺35" },
+    { name: "Izgara Köfte", price: "₺85" },
+    { name: "Salata Tabağı", price: "₺55" },
+    { name: "Balık Tava", price: "₺130" },
+    { name: "Kuzu Tandır", price: "₺150" },
+    { name: "Mantı", price: "₺65" },
+  ].map(item => ({
+    ...item,
+    price: prices?.[item.name] || item.price,
+  }));
   return (
     <>
       <div className="template-3-container">
@@ -16,17 +36,59 @@ export default function Template3Content() {
               <li className="minimal-list-item">
                 <span className="item-text">Serpme Kahvaltı</span>
                 <span className="item-dot"></span>
-                <span className="item-price">₺120</span>
+                {isEditable && onPriceClick ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPriceClick("Serpme Kahvaltı", menuItems.find(m => m.name === "Serpme Kahvaltı")?.price || "₺120");
+                    }}
+                    className="item-price"
+                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
+                  >
+                    {menuItems.find(m => m.name === "Serpme Kahvaltı")?.price || "₺120"}
+                  </button>
+                ) : (
+                  <span className="item-price">{menuItems.find(m => m.name === "Serpme Kahvaltı")?.price || "₺120"}</span>
+                )}
               </li>
               <li className="minimal-list-item">
                 <span className="item-text">Menemen</span>
                 <span className="item-dot"></span>
-                <span className="item-price">₺45</span>
+                {isEditable && onPriceClick ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPriceClick("Menemen", menuItems.find(m => m.name === "Menemen")?.price || "₺45");
+                    }}
+                    className="item-price"
+                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
+                  >
+                    {menuItems.find(m => m.name === "Menemen")?.price || "₺45"}
+                  </button>
+                ) : (
+                  <span className="item-price">{menuItems.find(m => m.name === "Menemen")?.price || "₺45"}</span>
+                )}
               </li>
               <li className="minimal-list-item">
                 <span className="item-text">Omlet</span>
                 <span className="item-dot"></span>
-                <span className="item-price">₺40</span>
+                {isEditable && onPriceClick ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPriceClick("Omlet", menuItems.find(m => m.name === "Omlet")?.price || "₺40");
+                    }}
+                    className="item-price"
+                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
+                  >
+                    {menuItems.find(m => m.name === "Omlet")?.price || "₺40"}
+                  </button>
+                ) : (
+                  <span className="item-price">{menuItems.find(m => m.name === "Omlet")?.price || "₺40"}</span>
+                )}
               </li>
             </ul>
           </section>
@@ -37,17 +99,59 @@ export default function Template3Content() {
               <li className="minimal-list-item">
                 <span className="item-text">Mercimek Çorbası</span>
                 <span className="item-dot"></span>
-                <span className="item-price">₺35</span>
+                {isEditable && onPriceClick ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPriceClick("Mercimek Çorbası", menuItems.find(m => m.name === "Mercimek Çorbası")?.price || "₺35");
+                    }}
+                    className="item-price"
+                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
+                  >
+                    {menuItems.find(m => m.name === "Mercimek Çorbası")?.price || "₺35"}
+                  </button>
+                ) : (
+                  <span className="item-price">{menuItems.find(m => m.name === "Mercimek Çorbası")?.price || "₺35"}</span>
+                )}
               </li>
               <li className="minimal-list-item">
                 <span className="item-text">Izgara Köfte</span>
                 <span className="item-dot"></span>
-                <span className="item-price">₺85</span>
+                {isEditable && onPriceClick ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPriceClick("Izgara Köfte", menuItems.find(m => m.name === "Izgara Köfte")?.price || "₺85");
+                    }}
+                    className="item-price"
+                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
+                  >
+                    {menuItems.find(m => m.name === "Izgara Köfte")?.price || "₺85"}
+                  </button>
+                ) : (
+                  <span className="item-price">{menuItems.find(m => m.name === "Izgara Köfte")?.price || "₺85"}</span>
+                )}
               </li>
               <li className="minimal-list-item">
                 <span className="item-text">Salata Tabağı</span>
                 <span className="item-dot"></span>
-                <span className="item-price">₺55</span>
+                {isEditable && onPriceClick ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPriceClick("Salata Tabağı", menuItems.find(m => m.name === "Salata Tabağı")?.price || "₺55");
+                    }}
+                    className="item-price"
+                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
+                  >
+                    {menuItems.find(m => m.name === "Salata Tabağı")?.price || "₺55"}
+                  </button>
+                ) : (
+                  <span className="item-price">{menuItems.find(m => m.name === "Salata Tabağı")?.price || "₺55"}</span>
+                )}
               </li>
             </ul>
           </section>
@@ -58,17 +162,59 @@ export default function Template3Content() {
               <li className="minimal-list-item">
                 <span className="item-text">Balık Tava</span>
                 <span className="item-dot"></span>
-                <span className="item-price">₺130</span>
+                {isEditable && onPriceClick ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPriceClick("Balık Tava", menuItems.find(m => m.name === "Balık Tava")?.price || "₺130");
+                    }}
+                    className="item-price"
+                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
+                  >
+                    {menuItems.find(m => m.name === "Balık Tava")?.price || "₺130"}
+                  </button>
+                ) : (
+                  <span className="item-price">{menuItems.find(m => m.name === "Balık Tava")?.price || "₺130"}</span>
+                )}
               </li>
               <li className="minimal-list-item">
                 <span className="item-text">Kuzu Tandır</span>
                 <span className="item-dot"></span>
-                <span className="item-price">₺150</span>
+                {isEditable && onPriceClick ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPriceClick("Kuzu Tandır", menuItems.find(m => m.name === "Kuzu Tandır")?.price || "₺150");
+                    }}
+                    className="item-price"
+                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
+                  >
+                    {menuItems.find(m => m.name === "Kuzu Tandır")?.price || "₺150"}
+                  </button>
+                ) : (
+                  <span className="item-price">{menuItems.find(m => m.name === "Kuzu Tandır")?.price || "₺150"}</span>
+                )}
               </li>
               <li className="minimal-list-item">
                 <span className="item-text">Mantı</span>
                 <span className="item-dot"></span>
-                <span className="item-price">₺65</span>
+                {isEditable && onPriceClick ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPriceClick("Mantı", menuItems.find(m => m.name === "Mantı")?.price || "₺65");
+                    }}
+                    className="item-price"
+                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
+                  >
+                    {menuItems.find(m => m.name === "Mantı")?.price || "₺65"}
+                  </button>
+                ) : (
+                  <span className="item-price">{menuItems.find(m => m.name === "Mantı")?.price || "₺65"}</span>
+                )}
               </li>
             </ul>
           </section>
@@ -93,11 +239,12 @@ export default function Template3Content() {
           flex-direction: column;
           justify-content: center;
           align-items: center;
-          max-width: 600px;
-          height: 94vh;
-          margin: 0 auto;
+          width: 100%;
+          height: 100%;
+          margin: 0;
           padding: 3rem 2rem;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          overflow: auto;
         }
 
         .minimal-header {

@@ -1,7 +1,13 @@
 "use client";
 
-export default function Template1Content() {
-  const burgers = [
+type Template1ContentProps = {
+  prices?: Record<number, string>;
+  onPriceClick?: (itemId: number, currentPrice: string) => void;
+  isEditable?: boolean;
+};
+
+export default function Template1Content({ prices, onPriceClick, isEditable = false }: Template1ContentProps = {}) {
+  const defaultBurgers = [
     { id: 1, name: "VEGGIE BURGER", price: "₺180", img: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop" },
     { id: 2, name: "ANGUS BEEF BURGER", price: "₺260", img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=400&auto=format&fit=crop" },
     { id: 3, name: "SURF AND TURF BURGER", price: "₺310", img: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?q=80&w=400&auto=format&fit=crop" },
@@ -9,6 +15,11 @@ export default function Template1Content() {
     { id: 5, name: "CHICKEN AIOLI BURGER", price: "₺210", img: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?q=80&w=400&auto=format&fit=crop" },
     { id: 6, name: "GROUND TURKEY BURGER", price: "₺195", img: "https://images.unsplash.com/photo-1521305916504-4a1121188589?q=80&w=400&auto=format&fit=crop" },
   ];
+
+  const burgers = defaultBurgers.map(burger => ({
+    ...burger,
+    price: prices?.[burger.id] || burger.price,
+  }));
 
   return (
     <>
@@ -48,7 +59,21 @@ export default function Template1Content() {
                 </div>
                 <div className="item-txt">
                   <h3>{b.name}</h3>
-                  <span className="price-pill">{b.price}</span>
+                  {isEditable && onPriceClick ? (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onPriceClick(b.id, b.price);
+                      }}
+                      className="price-pill"
+                      style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit' }}
+                    >
+                      {b.price}
+                    </button>
+                  ) : (
+                    <span className="price-pill">{b.price}</span>
+                  )}
                 </div>
               </div>
             ))}
@@ -64,19 +89,20 @@ export default function Template1Content() {
         :global(html, body) {
           margin: 0 !important;
           padding: 0 !important;
-          overflow: hidden !important;
           width: 100vw !important;
           height: 100vh !important;
           background: #000;
         }
 
         .fire-menu-container {
-          position: fixed;
+          position: absolute;
           inset: 0;
           display: grid;
           grid-template-columns: 42% 58%;
           font-family: 'Impact', 'Arial Black', sans-serif;
           color: white;
+          width: 100%;
+          height: 100%;
         }
 
         .bg-fire {

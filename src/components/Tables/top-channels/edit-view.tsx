@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { MEDIA_ITEMS, type MediaItem } from "@/app/(home)/dashboard/media/_components/media-gallery";
 import {
   DndContext,
@@ -22,6 +22,9 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { getScreenName } from "@/services/screenServices";
+import Template1Content from "@/app/design/_components/template-1-content";
+import Template2Content from "@/app/design/_components/template-2-content";
+import Template3Content from "@/app/design/_components/template-3-content";
 
 type MenuBoardDesign = {
   id: string;
@@ -29,6 +32,13 @@ type MenuBoardDesign = {
   preview: string;
   isActive: boolean;
   type: "image" | "video";
+};
+
+type Template = {
+  id: string;
+  name: string;
+  preview: string;
+  path: string;
 };
 
 type PlaylistItemType = {
@@ -89,6 +99,27 @@ const mockMenuBoardDesigns: MenuBoardDesign[] = [
   },
 ];
 
+const templates: Template[] = [
+  {
+    id: "template-1",
+    name: "Şablon 1",
+    preview: "/images/cover/cover-01.png",
+    path: "/design/template-1",
+  },
+  {
+    id: "template-2",
+    name: "Şablon 2",
+    preview: "/images/cover/cover-02.jpg",
+    path: "/design/template-2",
+  },
+  {
+    id: "template-3",
+    name: "Şablon 3",
+    preview: "/images/cover/cover-03.jpg",
+    path: "/design/template-3",
+  },
+];
+
 type SortableItemProps = {
   id: string;
   item: MediaItem | MenuBoardDesign;
@@ -114,6 +145,9 @@ function SortableItem({ id, item, isDesign,duration,onDurationChange, onRemove }
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const isTemplate = id.startsWith('template-');
+  const template = isTemplate ? templates.find(t => t.id === id.replace('template-', '')) : null;
+  
   const thumbnail = isDesign
     ? (item as MenuBoardDesign).preview
     : (item as MediaItem).thumbnail || (item as MediaItem).url;
@@ -154,37 +188,51 @@ function SortableItem({ id, item, isDesign,duration,onDurationChange, onRemove }
           />
         </svg>
       </div>
-      <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded">
-        <Image
-          src={thumbnail}
-          alt={name}
-          fill
-          className="object-cover"
-        />
+      <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded bg-gray-2 dark:bg-dark-2">
+        {isTemplate && template ? (
+          <iframe
+            src={template.path}
+            className="absolute inset-0 border-0"
+            style={{
+              transform: `scale(${Math.min(80 / 1920, 56 / 1080)})`,
+              transformOrigin: "top left",
+              width: "1920px",
+              height: "1080px",
+            }}
+            title={`${template.name} Önizleme`}
+            scrolling="no"
+          />
+        ) : (
+          <Image
+            src={thumbnail}
+            alt={name}
+            fill
+            className="object-cover"
+          />
+        )}
       </div>
       <div className="w-24 shrink-0 flex flex-col gap-1">
         <p className="truncate text-xs font-medium text-dark dark:text-white">{name}</p>
 
-
-        <div className="flex items-center gap-1">
-          <input
-            type="number"
-            min="1"
-            disabled={isVideo}
-            value={duration}
-            onChange={(e) => {
-              const val = parseInt(e.target.value);
-              onDurationChange(id, isNaN(val) || val < 1 ? 1 : val);
-            }}
-            className={cn(
-              "w-14 rounded border px-1 py-0.5 text-xs outline-none focus:border-primary",
-              "border-stroke bg-gray-50 dark:border-stroke-dark dark:bg-dark-3 dark:text-white",
-              isVideo && "opacity-50 cursor-not-allowed bg-gray-200 dark:bg-dark-4"
-            )}
-            title={isVideo ? "Video süresi sabittir" : "Süreyi değiştir"}
-          />
-          <span className="text-[10px] text-dark-4">sn</span>
-        </div>
+        {!isVideo && (
+          <div className="flex items-center gap-1">
+            <input
+              type="number"
+              min="1"
+              value={duration}
+              onChange={(e) => {
+                const val = parseInt(e.target.value);
+                onDurationChange(id, isNaN(val) || val < 1 ? 1 : val);
+              }}
+              className={cn(
+                "w-14 rounded border px-1 py-0.5 text-xs outline-none focus:border-primary",
+                "border-stroke bg-gray-50 dark:border-stroke-dark dark:bg-dark-3 dark:text-white"
+              )}
+              title="Süreyi değiştir"
+            />
+            <span className="text-[10px] text-dark-4">sn</span>
+          </div>
+        )}
       </div>
       <button
         type="button"
@@ -251,7 +299,11 @@ export function EditView({
     useState<string>(currentLocation);
   // TODO: DB bağlandıktan sonra katalog tasarımlarını API'den çek
   const [designs, setDesigns] = useState(mockMenuBoardDesigns);
-  const [activeTab, setActiveTab] = useState<"tasarim" | "medya">("tasarim");
+  const [activeTab, setActiveTab] = useState<"tasarim" | "medya" | "şablon">("medya");
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [templatePrices, setTemplatePrices] = useState<Record<string, Record<string | number, string>>>({});
+  const [editingPrice, setEditingPrice] = useState<{ templateId: string; itemId: string | number; currentPrice: string } | null>(null);
+  const [priceInputValue, setPriceInputValue] = useState<string>("");
   // TODO: DB bağlandıktan sonra kullanıcının satın aldığı medyaları API'den doldur
   const [mediaItems, setMediaItems] = useState<MediaItem[]>(initialMedia);
   const [designCategory, setDesignCategory] = useState<
@@ -318,6 +370,8 @@ export function EditView({
   const aspectRatio = calculateAspectRatio(screenWidth, screenHeight);
   const isPortrait = screenHeight > screenWidth;
   const maxHeight = isPortrait ? "400px" : "none";
+  const previewContainerRef = useRef<HTMLDivElement>(null);
+  const [previewScale, setPreviewScale] = useState<number>(1);
 
   // DnD Kit sensors
   const sensors = useSensors(
@@ -331,9 +385,55 @@ export function EditView({
   const activeMedia = selectedMediaId
     ? mediaItems.find((m) => m.id === selectedMediaId)
     : null;
-  const previewImage = activeMedia
-    ? activeMedia.thumbnail || activeMedia.url
-    : activeDesign?.preview;
+  const activeTemplate = selectedTemplate
+    ? templates.find((t) => t.id === selectedTemplate)
+    : null;
+  const previewImage = activeTemplate
+    ? activeTemplate.preview
+    : activeMedia
+      ? activeMedia.thumbnail || activeMedia.url
+      : activeDesign?.preview;
+
+  // Önizleme alanı boyutlarını hesapla ve ölçeklendirmeyi güncelle
+  useEffect(() => {
+    if (activeTemplate && previewContainerRef.current) {
+      const updateScale = () => {
+        const container = previewContainerRef.current;
+        if (!container) return;
+        
+        // Container'ın gerçek boyutlarını al (clientWidth/clientHeight padding'i otomatik çıkarır)
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
+        
+        // Güvenli margin için alan bırak (%3 - minimum margin)
+        const availableWidth = containerWidth * 0.97;
+        const availableHeight = containerHeight * 0.97;
+        
+        // Ölçeklendirmeyi hesapla - şablonun önizleme alanına tam sığması için
+        const scaleX = availableWidth / screenWidth;
+        const scaleY = availableHeight / screenHeight;
+        const scale = Math.min(scaleX, scaleY, 1);
+        
+        setPreviewScale(scale);
+      };
+      
+      // İlk hesaplama için kısa bir gecikme ekle (DOM'un render olması için)
+      const timeoutId = setTimeout(updateScale, 100);
+      
+      // Resize event listener ekle
+      const resizeObserver = new ResizeObserver(() => {
+        setTimeout(updateScale, 50);
+      });
+      resizeObserver.observe(previewContainerRef.current);
+      
+      return () => {
+        clearTimeout(timeoutId);
+        resizeObserver.disconnect();
+      };
+    } else {
+      setPreviewScale(1);
+    }
+  }, [activeTemplate, screenWidth, screenHeight]);
 
   // const handleDesignSelect = (designId: string) => {
   //   setSelectedDesign(designId);
@@ -366,6 +466,32 @@ export function EditView({
           item: media,
           isDesign: false,
           duration: media.type === "video" ? 0 : 10,
+        },
+      ]);
+    }
+  };
+
+  const handleTemplateSelect = (templateId: string) => {
+    setSelectedTemplate(templateId);
+    
+    const template = templates.find((t) => t.id === templateId);
+    if (template && !playlist.find((p) => p.id === `template-${templateId}`)) {
+      // Şablonu MenuBoardDesign formatına çevir
+      const templateAsDesign: MenuBoardDesign = {
+        id: template.id,
+        name: template.name,
+        preview: template.preview,
+        isActive: true,
+        type: "image", // Şablonlar görsel olarak kabul ediliyor
+      };
+      
+      setPlaylist((prev) => [
+        ...prev,
+        {
+          id: `template-${templateId}`,
+          item: templateAsDesign,
+          isDesign: true,
+          duration: 10, // Şablonlar için varsayılan süre
         },
       ]);
     }
@@ -456,21 +582,95 @@ export function EditView({
             </h3>
             <div className="flex-1 rounded-lg border-[1.5px] border-[#F3F3FE] bg-[#F3F3FE] p-4 dark:border-dark-3 dark:bg-dark-3">
               <div
-                className="relative w-full overflow-hidden rounded-lg bg-[#e5e5fb] shadow-lg dark:bg-dark-2"
+                ref={previewContainerRef}
+                className="relative w-full rounded-lg shadow-lg"
                 style={{
                   aspectRatio: aspectRatio,
                   maxHeight: maxHeight,
                   width: isPortrait ? "auto" : "100%",
                   margin: isPortrait ? "0 auto" : "0",
+                  backgroundColor: activeTemplate?.id === "template-1" ? "#000" : activeTemplate?.id === "template-2" ? "#faf8f5" : activeTemplate?.id === "template-3" ? "#ffffff" : "#e5e5fb",
+                  overflow: 'hidden',
                 }}
               >
-                {previewImage && (
-                  <Image
-                    src={previewImage}
-                    alt={activeMedia?.name || activeDesign?.name || "Önizleme"}
-                    fill
-                    className="object-contain"
-                  />
+                {activeTemplate ? (
+                  <div className="absolute inset-0 flex items-center justify-center" style={{ overflow: 'hidden' }}>
+                    <div 
+                      className="relative"
+                      style={{ 
+                        width: `${screenWidth}px`,
+                        height: `${screenHeight}px`,
+                        transform: `scale(${previewScale})`,
+                        transformOrigin: "center center",
+                      }}
+                    >
+                      <div 
+                        style={{ 
+                          position: 'relative', 
+                          width: `${screenWidth}px`, 
+                          height: `${screenHeight}px`, 
+                          overflow: 'visible',
+                        }}
+                      >
+                        {activeTemplate.id === "template-1" && (
+                          <Template1Content
+                            prices={templatePrices[activeTemplate.id] as Record<number, string>}
+                            onPriceClick={(itemId, currentPrice) => {
+                              setEditingPrice({ templateId: activeTemplate.id, itemId, currentPrice });
+                              setPriceInputValue(currentPrice.replace("₺", ""));
+                            }}
+                            isEditable={true}
+                          />
+                        )}
+                        {activeTemplate.id === "template-2" && (
+                          <Template2Content
+                            prices={templatePrices[activeTemplate.id] as Record<string, string>}
+                            onPriceClick={(itemName, currentPrice) => {
+                              setEditingPrice({ templateId: activeTemplate.id, itemId: itemName, currentPrice });
+                              setPriceInputValue(currentPrice.replace("₺", ""));
+                            }}
+                            isEditable={true}
+                          />
+                        )}
+                        {activeTemplate.id === "template-3" && (
+                          <Template3Content
+                            prices={templatePrices[activeTemplate.id] as Record<string, string>}
+                            onPriceClick={(itemName, currentPrice) => {
+                              setEditingPrice({ templateId: activeTemplate.id, itemId: itemName, currentPrice });
+                              setPriceInputValue(currentPrice.replace("₺", ""));
+                            }}
+                            isEditable={true}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : activeMedia ? (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    {activeMedia.type === "video" ? (
+                      <video
+                        src={activeMedia.url}
+                        className="max-w-full max-h-full"
+                        controls={false}
+                        autoPlay={false}
+                        muted
+                        style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
+                      />
+                    ) : (
+                      <Image
+                        src={activeMedia.thumbnail || activeMedia.url}
+                        alt={activeMedia.name}
+                        fill
+                        className="object-contain"
+                      />
+                    )}
+                  </div>
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <p className="text-center text-dark-4 dark:text-dark-6 text-sm font-medium">
+                      Lütfen bir şablon veya medya seçin
+                    </p>
+                  </div>
                 )}
               </div>
             </div>
@@ -487,110 +687,173 @@ export function EditView({
           </div>
         </div>
 
-        {/* Sağ taraf - Tasarımlar / Medya sekmeleri */}
+        {/* Sağ taraf - Tasarımlar / Medya / Şablon sekmeleri */}
         <div className="flex flex-col">
           {/* Sekmeler */}
-          <div className="ml-[-4px] flex gap-2 px-1">
+          <div className="ml-[-4px] flex justify-between gap-2 px-1">
             <button
               type="button"
-              onClick={() => setActiveTab("tasarim")}
+              onClick={() => setActiveTab("medya")}
               className={cn(
-                "bg -mr-4 w-32 rounded-t-lg border border-b-0 px-4 py-2 text-sm font-medium text-dark transition-all dark:text-white",
-                activeTab === "tasarim"
+                "bg-[#f9f9ff] bg -mr-4 w-32 rounded-t-lg border border-b-0 px-4 py-2 text-sm font-medium text-dark transition-all dark:text-white",
+                activeTab === "medya"
                   ? "bg-[#F3F3FE] text-dark dark:bg-dark-2 dark:text-white"
                   : "dark:text-primary",
                 "border-[#b3b3b3] dark:border-stroke-dark",
               )}
               style={{
                 clipPath:
-                  "polygon(0% 0%, 100% 0%, 92% 50%, 100% 100%, 0% 100%)",
+                  "polygon(0% 0%, 96% 0%, 90% 100%, 92% 100%, 0% 100%)"
               }}
             >
               Medya
             </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("şablon")}
+              className={cn(
+                "bg-[#f9f9ff] bg -ml-4 w-32 mr-[-4px] rounded-t-lg border border-b-0 px-4 py-2 text-sm font-medium text-dark transition-all dark:text-white",
+                activeTab === "şablon"
+                  ? "bg-[#F3F3FE] text-dark dark:bg-dark-2 dark:text-white"
+                  : "dark:text-primary",
+                "border-[#B3B3B3] dark:border-stroke-dark",
+              )}
+              style={{
+                clipPath:
+                  "polygon(8% 0%, 100% 0%, 100% 100%, 8% 100%, 0% 100%)",
+              }}
+            >
+              Şablon
+            </button>
           </div>
 
           {/* Content kutusu */}
-          <div className="flex-1 rounded-b-lg rounded-tr-lg border border-t-0 border-[#b3b3b3] bg-[#F3F3FE] p-4 pt-5 dark:border-stroke-dark dark:bg-dark-2">
-            <>
-              {/* Medya kategorileri */}
-              <div className="mt-1 flex gap-2 pb-3">
-                <button
-                  type="button"
-                  onClick={() => setMediaCategory("all")}
-                  className={cn(
-                    "rounded-full px-3 py-1 text-xs font-medium transition-all",
-                    mediaCategory === "all"
-                      ? "bg-primary text-white"
-                      : "bg-white text-dark-4 hover:bg-gray-100 dark:bg-dark-3 dark:text-dark-6 dark:hover:bg-dark-3",
-                  )}
-                >
-                  Tümü
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMediaCategory("image")}
-                  className={cn(
-                    "rounded-full px-3 py-1 text-xs font-medium transition-all",
-                    mediaCategory === "image"
-                      ? "bg-primary text-white"
-                      : "bg-white text-dark-4 hover:bg-gray-100 dark:bg-dark-3 dark:text-dark-6 dark:hover:bg-dark-3",
-                  )}
-                >
-                  Fotoğraflar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMediaCategory("video")}
-                  className={cn(
-                    "rounded-full px-3 py-1 text-xs font-medium transition-all",
-                    mediaCategory === "video"
-                      ? "bg-primary text-white"
-                      : "bg-white text-dark-4 hover:bg-gray-100 dark:bg-dark-3 dark:text-dark-6 dark:hover:bg-dark-3",
-                  )}
-                >
-                  Videolar
-                </button>
-              </div>
+          <div className="flex-1  border border-t-0 border-[#b3b3b3] bg-[#F3F3FE] p-4 pt-5 dark:border-stroke-dark dark:bg-dark-2">
+            {activeTab === "medya" ? (
+              <>
+                {/* Medya kategorileri */}
+                <div className="mt-1 flex gap-2 pb-3">
+                  <button
+                    type="button"
+                    onClick={() => setMediaCategory("all")}
+                    className={cn(
+                      "rounded-full px-3 py-1 text-xs font-medium transition-all",
+                      mediaCategory === "all"
+                        ? "bg-primary text-white"
+                        : "bg-white text-dark-4 hover:bg-gray-100 dark:bg-dark-3 dark:text-dark-6 dark:hover:bg-dark-3",
+                    )}
+                  >
+                    Tümü
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMediaCategory("image")}
+                    className={cn(
+                      "rounded-full px-3 py-1 text-xs font-medium transition-all",
+                      mediaCategory === "image"
+                        ? "bg-primary text-white"
+                        : "bg-white text-dark-4 hover:bg-gray-100 dark:bg-dark-3 dark:text-dark-6 dark:hover:bg-dark-3",
+                    )}
+                  >
+                    Fotoğraflar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMediaCategory("video")}
+                    className={cn(
+                      "rounded-full px-3 py-1 text-xs font-medium transition-all",
+                      mediaCategory === "video"
+                        ? "bg-primary text-white"
+                        : "bg-white text-dark-4 hover:bg-gray-100 dark:bg-dark-3 dark:text-dark-6 dark:hover:bg-dark-3",
+                    )}
+                  >
+                    Videolar
+                  </button>
+                </div>
 
+                <div className="design-scrollbar mt-3 max-h-[460px] flex-1 pr-2">
+                  <div
+                    className="grid grid-cols-2 gap-4 sm:grid-cols-3"
+                    style={{ padding: "10px" }}
+                  >
+                    {filteredMediaItems.map((item: MediaItem) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => handleMediaSelect(item.id)}
+                        className={cn(
+                          "overflow-hidden rounded-lg border text-left transition-all",
+                          selectedMediaId === item.id
+                            ? "border-primary shadow-sm"
+                            : "border-stroke hover:border-primary/60 dark:border-stroke-dark",
+                        )}
+                      >
+                        <div className="relative aspect-video w-full bg-gray-2 dark:bg-dark-2">
+                          <Image
+                            src={item.thumbnail || item.url}
+                            alt={item.name}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="border-t border-stroke bg-white px-3 py-2 dark:border-stroke-dark dark:bg-gray-dark">
+                          <p className="truncate text-sm font-medium text-dark dark:text-white">
+                            {item.name}
+                          </p>
+                          <p className="text-xs text-dark-4 dark:text-dark-6">
+                            {item.type === "video" ? "Video" : "Görsel"}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            ) : activeTab === "şablon" ? (
               <div className="design-scrollbar mt-3 max-h-[460px] flex-1 pr-2">
                 <div
                   className="grid grid-cols-2 gap-4 sm:grid-cols-3"
                   style={{ padding: "10px" }}
                 >
-                  {filteredMediaItems.map((item: MediaItem) => (
+                  {templates.map((template) => (
                     <button
-                      key={item.id}
+                      key={template.id}
                       type="button"
-                      onClick={() => handleMediaSelect(item.id)}
+                      onClick={() => handleTemplateSelect(template.id)}
                       className={cn(
                         "overflow-hidden rounded-lg border text-left transition-all",
-                        selectedMediaId === item.id
+                        selectedTemplate === template.id
                           ? "border-primary shadow-sm"
                           : "border-stroke hover:border-primary/60 dark:border-stroke-dark",
                       )}
                     >
-                      <div className="relative aspect-video w-full bg-gray-2 dark:bg-dark-2">
-                        <Image
-                          src={item.thumbnail || item.url}
-                          alt={item.name}
-                          fill
-                          className="object-cover"
+                      <div className="relative aspect-video w-full overflow-hidden bg-gray-2 dark:bg-dark-2">
+                        <iframe
+                          src={template.path}
+                          className="absolute inset-0 border-0"
+                          style={{
+                            transform: `scale(${Math.min(280 / screenWidth, 160 / screenHeight, 1)})`,
+                            transformOrigin: "top left",
+                            width: `${screenWidth}px`,
+                            height: `${screenHeight}px`,
+                          }}
+                          title={`${template.name} Önizleme`}
+                          scrolling="no"
                         />
                       </div>
                       <div className="border-t border-stroke bg-white px-3 py-2 dark:border-stroke-dark dark:bg-gray-dark">
                         <p className="truncate text-sm font-medium text-dark dark:text-white">
-                          {item.name}
+                          {template.name}
                         </p>
                         <p className="text-xs text-dark-4 dark:text-dark-6">
-                          {item.type === "video" ? "Video" : "Görsel"}
+                          Şablon
                         </p>
                       </div>
                     </button>
                   ))}
                 </div>
               </div>
-            </>
+            ) : null}
           </div>
         </div>
       </div>
@@ -655,6 +918,75 @@ export function EditView({
           Kaydet
         </button>
       </div>
+
+      {/* Fiyat Düzenleme Modal */}
+      {editingPrice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="rounded-lg bg-white p-6 shadow-lg dark:bg-gray-dark">
+            <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
+              Fiyat Güncelle
+            </h3>
+            <div className="mb-4">
+              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
+                Yeni Fiyat
+              </label>
+              <input
+                type="text"
+                value={priceInputValue}
+                onChange={(e) => setPriceInputValue(e.target.value)}
+                placeholder="Fiyat girin (örn: 180)"
+                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-4 py-2.5 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const newPrice = priceInputValue.trim() ? `₺${priceInputValue.trim()}` : editingPrice.currentPrice;
+                    setTemplatePrices((prev) => ({
+                      ...prev,
+                      [editingPrice.templateId]: {
+                        ...prev[editingPrice.templateId],
+                        [editingPrice.itemId]: newPrice,
+                      },
+                    }));
+                    setEditingPrice(null);
+                    setPriceInputValue("");
+                  } else if (e.key === "Escape") {
+                    setEditingPrice(null);
+                    setPriceInputValue("");
+                  }
+                }}
+              />
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  const newPrice = priceInputValue.trim() ? `₺${priceInputValue.trim()}` : editingPrice.currentPrice;
+                  setTemplatePrices((prev) => ({
+                    ...prev,
+                    [editingPrice.templateId]: {
+                      ...prev[editingPrice.templateId],
+                      [editingPrice.itemId]: newPrice,
+                    },
+                  }));
+                  setEditingPrice(null);
+                  setPriceInputValue("");
+                }}
+                className="flex-1 rounded-lg bg-primary px-4 py-2 font-medium text-white hover:bg-primary/90"
+              >
+                Kaydet
+              </button>
+              <button
+                onClick={() => {
+                  setEditingPrice(null);
+                  setPriceInputValue("");
+                }}
+                className="flex-1 rounded-lg border border-stroke px-4 py-2 font-medium text-dark hover:bg-gray-2 dark:border-stroke-dark dark:text-white dark:hover:bg-dark-2"
+              >
+                İptal
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

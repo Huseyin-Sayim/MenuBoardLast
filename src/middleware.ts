@@ -92,5 +92,6 @@ export const config = {
     '/dashboard/:path*',
     '/api/users/:path*',
     '/api/:path*',
+    '/design/:path*'
   ]
 }

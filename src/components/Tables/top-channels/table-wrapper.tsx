@@ -14,6 +14,8 @@ import { EditView, ScreenConfig } from "./edit-view";
 import { TableActions } from "./table-actions";
 import Cookies from "js-cookie";
 import { MediaItem } from "@/app/(home)/dashboard/media/_components/media-gallery";
+import { AddScreenModal } from "./add-screen-modal";
+import { useRouter } from "next/navigation";
 
 type Screen = {
   id: string,
@@ -38,6 +40,8 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
   const [selectedScreenData, setSelectedScreenData] = useState<Screen | null>(null);
   const [screens, setScreens] = useState<Screen[]>(data);
   const [initialPlaylist, setInitialPlaylist] = useState<Array<{ id: string; item: MediaItem | any; isDesign: boolean ; duration:number}>>([]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const router = useRouter();
 
   const handleEdit = async (screenId: string) => {
     const screen = screens.find((s) => s.id === screenId);
@@ -139,6 +143,11 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
     setInitialPlaylist([]);
   };
 
+  const handleAddScreenSuccess = () => {
+    // Sayfayı yenileyerek yeni ekranı göster
+    router.refresh();
+  };
+
   if (isEditing) {
     return (
       <div className={className}>
@@ -167,6 +176,27 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
         <h2 className="text-body-2xlg font-bold text-dark dark:text-white">
           Ekranlar
         </h2>
+        {showActions && (
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-white transition-all hover:bg-primary/90"
+          >
+            <svg
+              className="size-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Ekran Ekle
+          </button>
+        )}
       </div>
 
       <Table>
@@ -216,6 +246,14 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
           ))}
         </TableBody>
       </Table>
+
+      {/* Add Screen Modal */}
+      {isAddModalOpen && (
+        <AddScreenModal
+          onClose={() => setIsAddModalOpen(false)}
+          onSuccess={handleAddScreenSuccess}
+        />
+      )}
     </div>
   );
 }

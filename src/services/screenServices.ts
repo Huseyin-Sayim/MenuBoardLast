@@ -77,6 +77,7 @@ export const createScreenCode = async (data: {userId: string, width: number, hei
     if (!deviceId || deviceId === "" ) {
       throw new Error('Cihaz id eksik');
     }
+
     const isExistsScreen = await prisma.screen.findFirst({
       where: {
         deviceId: deviceId
@@ -120,7 +121,7 @@ export const createScreenCode = async (data: {userId: string, width: number, hei
       }
     }
   } catch (error: any) {
-    throw new Error('Doğrulama kodu oluşturulamadı');
+    throw new Error('Doğrulama kodu oluşturulamadı',error.message);
   }
 }
 
