@@ -68,7 +68,7 @@ export const createScreen = async (code: string) => {
   }
 }
 
-export const createScreenCode = async (data: {userId: string, width: number, height: number, deviceId?: string}) => {
+export const createScreenCode = async (data: {userId: string, width: number, height: number, deviceId: string}) => {
   try {
     const {userId, width, height, deviceId} = data;
     let attempts = 0;
