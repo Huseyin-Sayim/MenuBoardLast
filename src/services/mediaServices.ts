@@ -65,6 +65,7 @@ export const createMedia = async (formData: FormData, userId: string) =>   {
   }
 }
 
+
 export const updateMediaName = async (id: string, newName: string) => {
   try {
     return await prisma.media.update({

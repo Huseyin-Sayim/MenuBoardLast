@@ -33,8 +33,6 @@ model Screen {
   deviceId     String
   userId       String
   user         User           @relation(fields: [userId], references: [id])
-  width        Int
-  height       Int
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   ScreenConfig ScreenConfig[]
