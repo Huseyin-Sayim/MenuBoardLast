@@ -1,5 +1,6 @@
 "use server"
 import prisma from "@/generated/prisma";
+import * as crypto from "crypto";
 
 export const getScreen = async (user_id: string) => {
   try {
@@ -16,32 +17,110 @@ export const getScreen = async (user_id: string) => {
   }
 }
 
-export const createScreen = async (data: {name: string, userId: string, width: number, height: number, deviceId?: string, device?: string}) => {
+export const createScreen = async (code: string) => {
   try {
-    const {name, userId, width, height, deviceId, device} = data;
-    const finalDeviceId = deviceId || device;
-
-    if (!finalDeviceId) {
-      throw new Error('deviceId veya device parametresi gerekli');
+    if (!code) {
+      throw new Error('Doğrulama kodu gerekli');
     }
 
-    return await prisma.screen.create({
-      data: {
-        name: name,
-        deviceId: finalDeviceId,
-        user: {
-          connect: {id: userId}
-        },
-        width: width,
-        height: height
+    const deviceCode = await prisma.deviceScreenCode.findFirst({
+      where: {
+        code: code
       }
     })
+
+    if (!deviceCode) {
+      throw new Error('Device Kod yok. Lütfen tekrar deneyin');
+    }
+
+    if (deviceCode.code !== code) {
+      throw new Error('Kod eşleşmiyor');
+    }
+
+    const newScreen = await prisma.screen.create({
+      data: {
+        name: deviceCode.deviceId,
+        deviceId: deviceCode.deviceId,
+        user: {
+          connect: {id: deviceCode.userId}
+        },
+        width: deviceCode.width,
+        height: deviceCode.height
+      }
+    })
+
+    await prisma.deviceScreenCode.deleteMany({
+      where: {
+        code: code,
+        OR: [
+          {deviceId: deviceCode.deviceId}
+        ]
+      },
+    });
+
+    return newScreen;
+
   } catch (error: any) {
-    // Unique constraint hatasını daha anlaşılır hale getir
-    if (error.code === 'P2002' && error.meta?.target?.includes('deviceId')) {
-      throw new Error('Bu deviceId zaten kullanılıyor. Farklı bir deviceId kullanın.');
+    if (error.code === 'P2002') {
+      throw new Error('Bu Cihaz zaten kullanılıyor. Farklı bir Cihaz kullanın.');
     }
     throw new Error('Ekran eklenmedi: ' + error.message);
+  }
+}
+
+export const createScreenCode = async (data: {userId: string, width: number, height: number, deviceId?: string}) => {
+  try {
+    const {userId, width, height, deviceId} = data;
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    if (!deviceId || deviceId === "" ) {
+      throw new Error('Cihaz id eksik');
+    }
+    const isExistsScreen = await prisma.screen.findFirst({
+      where: {
+        deviceId: deviceId
+      }
+    });
+
+
+
+    if (isExistsScreen) {
+      throw new Error('Bu cihaza tanımlanmış bir ekran zaten var');
+    }
+
+    await prisma.deviceScreenCode.deleteMany({
+      where: {
+        deviceId: deviceId
+      }
+    })
+
+    while (attempts < maxAttempts) {
+      const code = crypto.randomInt(100000, 1000000).toString();
+      try {
+        await prisma.deviceScreenCode.create({
+          data: {
+            deviceId: deviceId,
+            user: {
+              connect: {id: userId}
+            },
+            width: width,
+            height: height,
+            code: code
+          }
+        })
+
+        return code;
+      } catch (error: any) {
+        if (error.code === "P2002") {
+          attempts++;
+          continue;
+        }
+        throw new Error('kod üretilirken bir hata oluştu');
+      }
+    }
+  } catch (error: any) {
+    throw new Error('Doğrulama kodu oluşturulamadı');
   }
 }
 
@@ -57,10 +136,7 @@ export const getScreenByDeviceId = async (deviceId: string) => {
   }
 }
 
-export const updateScreenConfig = async (
-  screenId: string,
-  configs: {mediaId: string, mediaIndex: number, duration:number}[]
-) => {
+export const updateScreenConfig = async (screenId: string, configs: {mediaId: string, mediaIndex: number, duration:number}[]) => {
   try {
     // Önce mevcut config'leri sil (veri yoksa hiçbir şey yapmaz, hata vermez)
     await prisma.screenConfig.deleteMany({
@@ -131,17 +207,4 @@ export const getScreenName = async (id:string) => {
     throw new Error(`Screen name getirilemedi: ${err.message}`)
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
