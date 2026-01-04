@@ -1,5 +1,5 @@
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import { DesignStore } from "./_components/design-store";
+import React from 'react';
+import { DesignStore } from "@/app/(home)/dashboard/designs/_components/design-store";
 
 type Design = {
   id: string;
@@ -11,8 +11,7 @@ type Design = {
   isPurchased?: boolean;
 };
 
-export default function DesignsPage() {
-
+const page = () => {
   const mockDesigns: Design[] = [
     {
       id: "1",
@@ -64,13 +63,12 @@ export default function DesignsPage() {
     },
   ];
 
+
   return (
     <>
-      <Breadcrumb pageName="" />
-      
-      <div className="mt-4 md:mt-6 2xl:mt-9">
-        <DesignStore initialDesigns={mockDesigns} />
-      </div>
+      <DesignStore initialDesigns={mockDesigns} />
     </>
   );
-}
+};
+
+export default page;
