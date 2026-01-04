@@ -44,6 +44,8 @@ model Screen {
 model Template {
   id          String        @id @default(uuid())
   name        String
+  path        String
+  component   String
   BuyTemplate BuyTemplate[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt

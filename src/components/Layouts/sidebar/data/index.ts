@@ -24,7 +24,13 @@ export const NAV_DATA = [
         items: [],
       },
       {
-        title: "Tasarımlar",
+        title: "Tasarımlarım",
+        url: "/dashboard/myDesigns",
+        icon: Icons.PieChart,
+        items: [],
+      },
+      {
+        title: "Şablonlar",
         url: "/dashboard/designs",
         icon: Icons.PaintIcon,
         items: [],
