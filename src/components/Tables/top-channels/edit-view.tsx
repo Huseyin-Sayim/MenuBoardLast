@@ -435,16 +435,6 @@ export function EditView({
     }
   }, [activeTemplate, screenWidth, screenHeight]);
 
-  // const handleDesignSelect = (designId: string) => {
-  //   setSelectedDesign(designId);
-  //   setSelectedMediaId(null);
-  //   setDesigns((prev) =>
-  //     prev.map((d) => ({ ...d, isActive: d.id === designId }))
-  //   );
-  //   // Tasarımlar sekmesinden playlist'e ekleme yapılmaz
-  //   // Sadece önizleme için seçilir
-  // };
-
   const handleDurationChange = (id: string, newDuration: number) => {
     setPlaylist((prev) => {
       return prev.map((item) =>

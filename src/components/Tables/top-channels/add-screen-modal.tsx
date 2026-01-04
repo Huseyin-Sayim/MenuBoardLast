@@ -14,12 +14,11 @@ export function AddScreenModal({ onClose, onSuccess }: AddScreenModalProps) {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
     setError(null);
 
     // 6 haneli kod kontrolü
     if (code.length !== 6 || !/^\d+$/.test(code)) {
-      setError("Lütfen 6 haneli bir kod girin");
+      setError("Lütfen 6 haneli kodu girin");
       return;
     }
 
