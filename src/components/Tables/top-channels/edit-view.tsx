@@ -22,9 +22,28 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { getScreenName } from "@/services/screenServices";
-import Template1Content from "@/app/design/_components/template-1-content";
-import Template2Content from "@/app/design/_components/template-2-content";
-import Template3Content from "@/app/design/_components/template-3-content";
+import Template1Content from "@/app/design/template-1/component/template-1";
+import Template2Content from "@/app/design/template-2/component/template-2";
+import Template3Content from "@/app/design/template-3/component/template-3";
+import { defaultBurgers, menuItems } from "@/app/design/template-data";
+
+// Template1 için tip
+type BurgerItem = {
+  id?: number;
+  name: string;
+  price: string;
+  img: string;
+  heroIMG?: string;
+  heroTitle?: string;
+};
+
+// Template2 için tip
+type MenuItem = {
+  name: string;
+  price: string;
+  desc: string;
+  category: string;
+};
 
 type MenuBoardDesign = {
   id: string;
@@ -317,6 +336,8 @@ export function EditView({
   const [readyScreenConfig, setReadyScreenConfig] = useState<ScreenConfig[]>(
     [],
   );
+  const [template1Data, setTemplate1Data] = useState<BurgerItem[]>(defaultBurgers);
+  const [template2Data, setTemplate2Data] = useState<MenuItem[]>(menuItems);
   // Playlist: Seçilen medyaların sıralı listesi
   const [playlist, setPlaylist] = useState<PlaylistItemType[]>(() => {
     if (!initialPlaylist) return [];
@@ -604,9 +625,10 @@ export function EditView({
                       >
                         {activeTemplate.id === "template-1" && (
                           <Template1Content
-                            prices={templatePrices[activeTemplate.id] as Record<number, string>}
-                            onPriceClick={(itemId, currentPrice) => {
-                              setEditingPrice({ templateId: activeTemplate.id, itemId, currentPrice });
+                            burgerItems={template1Data}
+                            prices={templatePrices[activeTemplate.id] as Record<string, string>}
+                            onPriceClick={(itemName: string, currentPrice: string) => {
+                              setEditingPrice({ templateId: activeTemplate.id, itemId: itemName, currentPrice });
                               setPriceInputValue(currentPrice.replace("₺", ""));
                             }}
                             isEditable={true}
@@ -614,8 +636,9 @@ export function EditView({
                         )}
                         {activeTemplate.id === "template-2" && (
                           <Template2Content
+                            menuItems={template2Data}
                             prices={templatePrices[activeTemplate.id] as Record<string, string>}
-                            onPriceClick={(itemName, currentPrice) => {
+                            onPriceClick={(itemName:string, currentPrice:string) => {
                               setEditingPrice({ templateId: activeTemplate.id, itemId: itemName, currentPrice });
                               setPriceInputValue(currentPrice.replace("₺", ""));
                             }}

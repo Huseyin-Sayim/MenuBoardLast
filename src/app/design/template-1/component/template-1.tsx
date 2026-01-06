@@ -1,80 +1,87 @@
 "use client";
 
-type Template1ContentProps = {
-  prices?: Record<number, string>;
-  onPriceClick?: (itemId: number, currentPrice: string) => void;
+interface BurgerItem {
+  name: string;
+  price: string;
+  img: string;
+  heroIMG?: string;
+  heroTitle?: string;
+}
+
+interface Template1Props {
+  burgerItems?: BurgerItem[];
+  prices?: Record<string, string>;
+  onPriceClick?: (itemName: string, currentPrice: string) => void;
   isEditable?: boolean;
-};
+}
 
-export default function Template1Content({ prices, onPriceClick, isEditable = false }: Template1ContentProps = {}) {
-  const defaultBurgers = [
-    { id: 1, name: "VEGGIE BURGER", price: "₺180", img: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop" },
-    { id: 2, name: "ANGUS BEEF BURGER", price: "₺260", img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=400&auto=format&fit=crop" },
-    { id: 3, name: "SURF AND TURF BURGER", price: "₺310", img: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?q=80&w=400&auto=format&fit=crop" },
-    { id: 4, name: "THREEFLE SPECIALTY", price: "₺340", img: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?q=80&w=400&auto=format&fit=crop" },
-    { id: 5, name: "CHICKEN AIOLI BURGER", price: "₺210", img: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?q=80&w=400&auto=format&fit=crop" },
-    { id: 6, name: "GROUND TURKEY BURGER", price: "₺195", img: "https://images.unsplash.com/photo-1521305916504-4a1121188589?q=80&w=400&auto=format&fit=crop" },
-  ];
+export default function Template1Content({burgerItems, prices, onPriceClick, isEditable = false}:Template1Props) {
 
-  const burgers = defaultBurgers.map(burger => ({
-    ...burger,
-    price: prices?.[burger.id] || burger.price,
-  }));
+  if (!burgerItems || burgerItems.length === 0) {
+    return <div style={{ color: "white", padding: "50px", textAlign: "center" }}>Menü Yükleniyor...</div>;
+  }
+
+  const heroItem = burgerItems[0];
+
+  if (!heroItem) {
+    return <div style={{ color: "white", padding: "50px", textAlign: "center" }}>Menü Yükleniyor...</div>;
+  }
+
+  const heroIMG = heroItem.heroIMG || heroItem.img;
+  const heroTitle = heroItem.heroTitle || heroItem.name || "Menü";
 
   return (
+
     <>
       <div className="fire-menu-container">
-        {/* ARKA PLAN: AGRESİF ALEV */}
         <div className="bg-fire">
-          <img 
-            src="https://images.unsplash.com/photo-1599591037488-3a5d33698d45?q=80&w=1600&auto=format&fit=crop" 
-            alt="Intense Fire" 
-          />
+          <img src="https://static.vecteezy.com/system/resources/previews/027/179/070/non_2x/realistic-colored-flame-fire-concept-vector.jpg" alt="Fire" />
           <div className="dark-mask"></div>
         </div>
 
-        {/* SOL: HERO BÖLÜMÜ */}
         <div className="pane-hero">
-          <div className="badge-new">YENİ</div>
-          <h1 className="title-large">CHEESE<br/><span>BURGER</span></h1>
-          
-          <div className="main-burger-wrapper">
-            <img 
-              src="https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=1000&auto=format&fit=crop" 
-              className="hero-burger"
-              alt="King Burger"
-            />
-          </div>
+          <div className="badge-new">ÖZEL SEÇİM</div>
+          <h1 className="title-large">
+            {heroTitle && heroTitle.split(' ').map((word, index) => (
+              <span key={`${word}-${index}`}>{word}<br/></span>
+            ))}
+          </h1>
 
-      
+          <div className="main-burger-wrapper">
+              <img
+                src={heroIMG}
+                className="hero-burger"
+                alt="Hero Burger"
+              />
+          </div>
         </div>
 
-        {/* SAĞ: MENÜ LİSTESİ */}
         <div className="pane-menu">
           <div className="grid-layout">
-            {burgers.map((b) => (
-              <div key={b.id} className="menu-item-card">
+            {burgerItems.map((burger) => (
+              <div key={burger.name} className="menu-item-card">
                 <div className="thumb-box">
-                  <img src={b.img} alt={b.name} />
+                  <img src={burger.img} alt={burger.name} />
                 </div>
                 <div className="item-txt">
-                  <h3>{b.name}</h3>
+                  <h3>{burger.name}</h3>
                   {isEditable && onPriceClick ? (
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        onPriceClick(b.id, b.price);
+                        const currentPrice = prices?.[burger.name] || `₺${burger.price}`;
+                        onPriceClick(burger.name, currentPrice);
                       }}
                       className="price-pill"
-                      style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit' }}
+                      style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: '2px 14px' }}
                     >
-                      {b.price}
+                      {prices?.[burger.name] || `₺${burger.price}`}
                     </button>
                   ) : (
-                    <span className="price-pill">{b.price}</span>
-                  )}
-                </div>
+                    <span className="price-pill">{prices?.[burger.name] || `₺${burger.price}`}</span>
+                  )}                
+                  </div>
               </div>
             ))}
           </div>
@@ -85,12 +92,13 @@ export default function Template1Content({ prices, onPriceClick, isEditable = fa
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         :global(html, body) {
           margin: 0 !important;
           padding: 0 !important;
           width: 100vw !important;
           height: 100vh !important;
+          overflow: hidden !important;
           background: #000;
         }
 
@@ -108,7 +116,7 @@ export default function Template1Content({ prices, onPriceClick, isEditable = fa
         .bg-fire {
           position: absolute;
           inset: 0;
-          z-index: -1;
+          z-index: 0;
         }
 
         .bg-fire img {
@@ -129,6 +137,8 @@ export default function Template1Content({ prices, onPriceClick, isEditable = fa
           display: flex;
           flex-direction: column;
           justify-content: space-between;
+          position:relative;
+          z-index:1;
         }
 
         .badge-new {
@@ -177,6 +187,8 @@ export default function Template1Content({ prices, onPriceClick, isEditable = fa
           display: flex;
           flex-direction: column;
           justify-content: space-between;
+          height:100vh;
+          overflow-y: auto;
         }
 
         .grid-layout {
@@ -234,6 +246,7 @@ export default function Template1Content({ prices, onPriceClick, isEditable = fa
           font-size: 1.6vw;
           font-weight: 900;
           text-transform: uppercase;
+          z-index: 1;
         }
       `}</style>
     </>
