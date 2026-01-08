@@ -628,7 +628,13 @@ export function EditView({
                             burgerItems={template1Data}
                             prices={templatePrices[activeTemplate.id] as Record<string, string>}
                             onPriceClick={(itemName: string, currentPrice: string) => {
-                              setEditingPrice({ templateId: activeTemplate.id, itemId: itemName, currentPrice });
+                             setTemplatePrices((prev) =>({
+                               ...prev,
+                               [activeTemplate.id]: {
+                                 ...prev[activeTemplate.id],
+                                 [itemName]: currentPrice
+                               }
+                             }))
                               setPriceInputValue(currentPrice.replace("₺", ""));
                             }}
                             isEditable={true}

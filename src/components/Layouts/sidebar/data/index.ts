@@ -35,6 +35,12 @@ export const NAV_DATA = [
         icon: Icons.PaintIcon,
         items: [],
       },
+      {
+        title: "Şablon Düzenle",
+        url: "/dashboard/designTemplate",
+        icon: Icons.PaintBorderIcon,
+        items: [],
+      },
     ],
     label: undefined
   }

@@ -1,26 +1,39 @@
 "use client";
 
+
 interface MenuItem {
-  name:string,
-  price:string,
-  desc:string,
-  category:string
+  name: string;
+  price: string;
+  desc: string;
+  category: string;
 }
 
 interface Template2Props {
-  menuItems:MenuItem[]
+  menuItems?: MenuItem[];
   prices?: Record<string, string>;
   onPriceClick?: (itemName: string, currentPrice: string) => void;
   isEditable?: boolean;
+  selectedCategory?: string;
+  onCategoryChange?: (value: ((prevState: string) => string) | string) => void;
 }
 
-export default function Template2Content({menuItems}:Template2Props) {
-
+export default function Template2Content({
+  menuItems,
+  prices,
+  onPriceClick,
+  isEditable = false,
+}: Template2Props) {
   if (!menuItems || menuItems.length === 0) {
-    return <div className='p-10 text-center'>Menü yükleniyor veya veri bulunamadı!</div>
+    return (
+      <div className="p-10 text-center">
+        Menü yükleniyor veya veri bulunamadı!
+      </div>
+    );
   }
 
-  const categories = Array.from(new Set(menuItems.map(item => item.category)))
+  const categories = Array.from(
+    new Set(menuItems.map((item) => item.category)),
+  );
 
   return (
     <>
@@ -45,14 +58,38 @@ export default function Template2Content({menuItems}:Template2Props) {
 
               <div className="category-items">
                 {menuItems
-                  .filter(item => item.category === category)
+                  .filter((item) => item.category === category)
                   .map((item, index) => (
                     <div className="category-item" key={index}>
                       <div className="item-content">
                         <h3 className="item-title">{item.name}</h3>
                         <p className="item-desc">{item.desc}</p>
                       </div>
-                      <div className="item-price">{item.price}</div>
+                      {isEditable && onPriceClick ? (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const currentPrice =
+                              prices?.[item.name] || item.price;
+                            onPriceClick(item.name, currentPrice);
+                          }}
+                          className="item-price"
+                          style={{
+                            cursor: "pointer",
+                            border: "none",
+                            background: "inherit",
+                            font: "inherit",
+                            padding: 0,
+                          }}
+                        >
+                          {prices?.[item.name] || item.price}
+                        </button>
+                      ) : (
+                        <div className="item-price">
+                          {prices?.[item.name] || item.price}
+                        </div>
+                      )}
                     </div>
                   ))}
               </div>
@@ -224,5 +261,3 @@ export default function Template2Content({menuItems}:Template2Props) {
     </>
   );
 }
-
-

@@ -1,18 +1,72 @@
 import Template1Content from "./component/template-1";
+import { defaultBurgers } from "../template-data";
+import { cookies } from "next/headers";
+import { getTemplateConfig } from "@/services/templateServices";
 
-export default function Template1Page() {
-
-  const defaultBurgers = [
-    {id:1, name: "VEGGIE BURGER", price: "312", img: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop",heroIMG:"https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=1000&auto=format&fit=crop",heroTitle:'Manyak Burger' },
-    {id:2, name: "ANGUS BEEF BURGER", price: "260", img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=400&auto=format&fit=crop",heroIMG:"https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=1000&auto=format&fit=crop",heroTitle:'Manyak Burger' },
-    {id:3, name: "SURF AND TURF BURGER", price: "312312", img: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?q=80&w=400&auto=format&fit=crop",heroIMG:"https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=1000&auto=format&fit=crop",heroTitle:'Manyak Burger' },
-    {id:4, name: "THREEFLE SPECIALTY", price: "340", img: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?q=80&w=400&auto=format&fit=crop",heroIMG:"https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=1000&auto=format&fit=crop",heroTitle:'Manyak Burger' },
-    {id:5, name: "CHICKEN AIOLI BURGER", price: "210", img: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?q=80&w=400&auto=format&fit=crop",heroIMG:"https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=1000&auto=format&fit=crop" ,heroTitle:'Manyak Burger'},
-    {id:6, name: "GROUND TURKEY BURGER", price: "195", img: "https://images.unsplash.com/photo-1521305916504-4a1121188589?q=80&w=400&auto=format&fit=crop",heroIMG:"https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=1000&auto=format&fit=crop",heroTitle:'Manyak Burger' }
-  ];
+export default async function Template1Page() {
+  // Kullanıcı oturumu kontrolü
+  const cookieStore = await cookies();
+  const userCookie = cookieStore.get('user')?.value;
+  
+  let burgerItems = defaultBurgers;
+  
+  if (userCookie) {
+    try {
+      const user = JSON.parse(userCookie) as { id: string };
+      
+      // Template ID'yi path'e göre bul
+      // Önce path'e göre template'i bul
+      const { prisma } = await import('@/generated/prisma');
+      const template = await prisma.template.findFirst({
+        where: { path: '/design/template-1' },
+      });
+      
+      if (template) {
+        const config = await getTemplateConfig(user.id, template.id);
+        
+        if (config && config.configData) {
+          const configData = config.configData as {
+            category?: string;
+            data?: Array<{ name: string; price: string }>;
+          };
+          
+          if (configData.data && configData.data.length > 0) {
+            // Veritabanından gelen veriyi formatla
+            burgerItems = configData.data.map((item, index) => ({
+              id: index + 1,
+              name: item.name || '',
+              price: item.price ? item.price.replace(/[^\d]/g, '') : '0',
+              img: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop",
+              heroIMG: "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=1000&auto=format&fit=crop",
+              heroTitle: item.name || 'Menü',
+              category: configData.category || '',
+            }));
+            
+            // Eğer 6'dan az ürün varsa, default burger'ları ekle
+            while (burgerItems.length < 6) {
+              const defaultItem = defaultBurgers[burgerItems.length];
+              burgerItems.push(defaultItem || {
+                id: burgerItems.length + 1,
+                name: '',
+                price: '0',
+                img: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop",
+                heroIMG: "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=1000&auto=format&fit=crop",
+                heroTitle: 'Menü',
+                category: '',
+              });
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Template config çekilirken hata:', error);
+      // Hata durumunda default burger'ları kullan
+    }
+  }
+  
   return (
     <>
-        <Template1Content burgerItems={defaultBurgers}/>
+      <Template1Content burgerItems={burgerItems}/>
     </>
   );
 }
