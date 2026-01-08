@@ -24,7 +24,7 @@ export default function Template3Content({ prices, onPriceClick, isEditable = fa
   return (
     <>
       <div className="template-3-container">
-      {/* HTML/CSS şablon içeriği buraya */}
+        {/* HTML/CSS şablon içeriği buraya */}
         <header className="minimal-header">
           <h1 className="minimal-title">Menü</h1>
         </header>
@@ -222,7 +222,7 @@ export default function Template3Content({ prices, onPriceClick, isEditable = fa
       </div>
 
       <script>
-      
+
       </script>
 
       <style jsx>{`

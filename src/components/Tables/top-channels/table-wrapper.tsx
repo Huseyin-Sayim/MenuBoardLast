@@ -144,8 +144,7 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
   };
 
   const handleAddScreenSuccess = () => {
-    // Sayfayı yenileyerek yeni ekranı göster
-    router.refresh();
+    window.location.reload();
   };
 
   if (isEditing) {

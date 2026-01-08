@@ -1,5 +1,4 @@
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import Template3Content from "../_components/template-3-content";
+import Template3Content from "./component/template-3";
 
 export default function Template3Page() {
   return (
