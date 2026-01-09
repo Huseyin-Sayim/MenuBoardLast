@@ -65,19 +65,44 @@ export async function PUT(
       
       const body = await req.json();
       console.log('Gelen body:', JSON.stringify(body, null, 2));
-      const { category, data } = body;
-
-      if (!data || !Array.isArray(data)) {
-        console.error('Geçersiz veri formatı - data:', data);
-        return NextResponse.json(
-          { message: 'Geçersiz veri formatı' },
-          { status:400 }
-        )
-      }
-
-      const configData = {
-        category: category || "",
-        data: data
+      
+      // Template-2 için özel format kontrolü
+      const isTemplate2 = templateId === 'template-2' || templateId?.includes('template-2');
+      
+      let configData: any;
+      
+      if (isTemplate2) {
+        // Template-2 formatı: { categories: {...}, data: {...} }
+        const { categories, data } = body;
+        
+        if (!data || typeof data !== 'object' || Array.isArray(data)) {
+          console.error('Template-2 için geçersiz veri formatı - data:', data);
+          return NextResponse.json(
+            { message: 'Geçersiz veri formatı: Template-2 için data bir object olmalı' },
+            { status:400 }
+          );
+        }
+        
+        configData = {
+          categories: categories || {},
+          data: data || {}
+        };
+      } else {
+        // Template-1 formatı: { category: string, data: Array }
+        const { category, data } = body;
+        
+        if (!data || !Array.isArray(data)) {
+          console.error('Geçersiz veri formatı - data:', data);
+          return NextResponse.json(
+            { message: 'Geçersiz veri formatı: data bir array olmalı' },
+            { status:400 }
+          );
+        }
+        
+        configData = {
+          category: category || "",
+          data: data
+        };
       }
       
       console.log('Kaydedilecek configData:', JSON.stringify(configData, null, 2));

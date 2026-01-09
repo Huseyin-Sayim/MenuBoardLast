@@ -28,8 +28,13 @@ export function useUpdateTemplateConfig () {
     }: {
       templateId: string;
       configData: {
+        // Template-1 formatı
         category?: string,
-        data: Array<{name: string, price: string}>
+        data?: Array<{name: string, price: string}>,
+        // Template-2 formatı
+        categories?: Record<string, string>,
+        // Template-2 için data bir object (Record<string, Array>)
+        [key: string]: any
       }
     }) => {
       console.log('Mutation çağrıldı:', { templateId, configData });

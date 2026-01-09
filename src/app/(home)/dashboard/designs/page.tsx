@@ -1,81 +1,82 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { DesignStore } from "./_components/design-store";
-import EditDesign from "@/app/(home)/dashboard/designs/_components/editDesign";
+import { getAllTemplates } from "@/services/templateServices";
 
-type Design = {
+type Template = {
   id: string;
   name: string;
-  description: string;
-  price: number;
-  image: string;
-  category: string;
-  isPurchased?: boolean;
+  path: string;
+  component: string;
+  defaultConfig: any;
 };
 
-export default function DesignsPage() {
-
-  const mockDesigns: Design[] = [
-    {
-      id: "1",
-      name: "Modern Menü Tasarımı",
-      description: "Şık ve modern menü kartı tasarımı",
-      price: 99,
-      image: "/images/cards/cards-01.png",
-      category: "Menü",
-    },
-    {
-      id: "2",
-      name: "Klasik Restoran Tasarımı",
-      description: "Geleneksel ve zarif restoran menü tasarımı",
-      price: 149,
-      image: "/images/cards/cards-02.png",
-      category: "Menü",
-    },
-    {
-      id: "3",
-      name: "Minimalist Tasarım",
-      description: "Sade ve minimal menü tasarımı",
-      price: 79,
-      image: "/images/cards/cards-03.png",
-      category: "Menü",
-    },
-    {
-      id: "4",
-      name: "Renkli Promosyon Tasarımı",
-      description: "Dikkat çekici promosyon menü tasarımı",
-      price: 129,
-      image: "/images/cards/cards-04.png",
-      category: "Promosyon",
-    },
-    {
-      id: "5",
-      name: "Lüks Restoran Tasarımı",
-      description: "Premium restoran menü tasarımı",
-      price: 199,
-      image: "/images/cards/cards-05.png",
-      category: "Menü",
-    },
-    {
-      id: "6",
-      name: "Hızlı Servis Tasarımı",
-      description: "Fast food restoranlar için tasarım",
-      price: 89,
-      image: "/images/cards/cards-06.png",
-      category: "Fast Food",
-    },
-  ];
-
-  const handleEdit = () => {
-    return <EditDesign></EditDesign>
+// Default config'leri tanımla
+const getDefaultConfig = (component: string) => {
+  if (component === 'template-1') {
+    return {
+      category: "Ana Menü",
+      data: [
+        { name: "Örnek Ürün 1", price: "100,00" },
+        { name: "Örnek Ürün 2", price: "150,00" }
+      ]
+    };
   }
+
+  if (component === 'template-2') {
+    return {
+      categories: {
+        "Ana Yemekler": "#FF5733",
+        "İçecekler": "#33FF57",
+        "Tatlılar": "#3357FF"
+      },
+      data: {
+        "Ana Yemekler": [
+          { name: "Örnek Yemek 1", price: "200,00" }
+        ],
+        "İçecekler": [
+          { name: "Örnek İçecek 1", price: "50,00" }
+        ],
+        "Tatlılar": []
+      }
+    };
+  }
+
+  return { category: "", data: [] };
+};
+
+async function getTemplates(): Promise<Template[]> {
+  try {
+    const templates = await getAllTemplates();
+
+    if (!templates || !Array.isArray(templates)) {
+      return [];
+    }
+
+    return templates.map((template) => ({
+      id: template.id,
+      name: template.name,
+      path: template.path,
+      component: template.component,
+      defaultConfig: getDefaultConfig(template.component)
+    }));
+  } catch (error) {
+    console.error('Template\'ler getirilemedi:', error);
+    return [];
+  }
+}
+
+export default async function DesignsPage() {
+  const templates = await getTemplates();
 
   return (
     <>
       <Breadcrumb pageName="" />
-      
+
       <div className="mt-4 md:mt-6 2xl:mt-9">
-        <button className="bg-blue-500 p-3 border rounded-xl float-end m-5 text-amber-50" >Şablon Ekle</button>
-        <DesignStore initialDesigns={mockDesigns} />
+        <button className="bg-blue-500 p-3 border rounded-xl float-end m-5 text-amber-50">
+          Şablon Ekle
+        </button>
+        <DesignStore templates={templates} />
       </div>
     </>
   );

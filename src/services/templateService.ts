@@ -1,12 +1,22 @@
-interface TemplateProps {
-  name: string;
-  component: string;
-}
+"use server"
 
-export const createTemplate = async (formData: FormData) => {
+import prisma from "@/generated/prisma";
+
+export async function getAllTemplates() {
   try {
-    const template = formData.get('template');
-  } catch (error: any) {
+    const templates = await prisma.template.findMany({
+      orderBy: {
+        createdAt: 'asc'
+      }
+    });
 
+    if (!templates || !Array.isArray(templates)) {
+      return [];
+    }
+
+    return templates;
+  } catch (err: any) {
+    console.error('Template listesi getirilirken hata oluştu:', err.message);
+    return [];
   }
 }
