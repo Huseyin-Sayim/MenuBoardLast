@@ -28,6 +28,15 @@ export default function TemplatePage () {
   }>>([])
   const [availableCategories, setAvailableCategories] = useState<Array<{_id: string; name: string}>>([]);
   const [availableProducts, setAvailableProducts] = useState<Array<{_id: string; name: string; pricing: any; category: string}>>([]);
+  
+  // Template-2 için kategori bazlı state'ler
+  const [selectedCategories, setSelectedCategories] = useState<Record<string, string>>({});
+  const [selectedProductsByCategory, setSelectedProductsByCategory] = useState<Record<string, Array<{
+    name: string;
+    price: string;
+    productId?: string;
+    priceType?: string;
+  }>>>({});
 
   // Fiyat formatlama helper function
   const formatPrice = (currency?: string, price?: number): string => {
@@ -80,7 +89,7 @@ export default function TemplatePage () {
     fetchCategories();
   }, []);
 
-  // Kategori seçildiğinde ürünleri çek
+  // Kategori seçildiğinde ürünleri çek (Template-1 için)
   useEffect(() => {
     const fetchProducts = async () => {
       if (!selectedCategory) {
@@ -89,13 +98,11 @@ export default function TemplatePage () {
       }
       try {
         console.log('Ürünler çekiliyor, kategori:', selectedCategory);
-        // API tüm ürünleri döndürüyor, client-side'da filtreleyeceğiz
         const response = await fetch('http://localhost:5000/api/products');
         if (response.ok) {
           const data = await response.json();
           const products = data.data || [];
           console.log('Tüm ürünler geldi:', products.length, 'adet');
-          // Seçilen kategori ID'sine göre filtrele
           const filteredProducts = products.filter((p: any) => p.category === selectedCategory);
           console.log('Filtrelenmiş ürünler:', filteredProducts.length, 'adet');
           setAvailableProducts(filteredProducts);
@@ -106,18 +113,62 @@ export default function TemplatePage () {
         console.error('Ürünler çekilirken hata:', error);
       }
     };
-    fetchProducts();
-  }, [selectedCategory]);
+    if (templateId === "template-1") {
+      fetchProducts();
+    }
+  }, [selectedCategory, templateId]);
+
+  useEffect(() => {
+    const fetchProductsForCategories = async () => {
+      if (templateId !== "template-2") return;
+      
+      const categoryIds = Object.values(selectedCategories).filter(Boolean);
+      if (categoryIds.length === 0) {
+        setAvailableProducts([]);
+        return;
+      }
+      
+      try {
+        console.log('Template-2 için ürünler çekiliyor, kategoriler:', categoryIds);
+        const response = await fetch('http://localhost:5000/api/products');
+        if (response.ok) {
+          const data = await response.json();
+          const products = data.data || [];
+          console.log('Tüm ürünler geldi:', products.length, 'adet');
+          // Tüm seçili kategorilere ait ürünleri filtrele
+          const filteredProducts = products.filter((p: any) => 
+            categoryIds.includes(p.category)
+          );
+          console.log('Filtrelenmiş ürünler:', filteredProducts.length, 'adet');
+          setAvailableProducts(filteredProducts);
+        } else {
+          console.error('Ürünler çekilemedi:', response.status, response.statusText);
+        }
+      } catch (error) {
+        console.error('Ürünler çekilirken hata:', error);
+      }
+    };
+    
+    fetchProductsForCategories();
+  }, [selectedCategories, templateId]);
 
   useEffect(() => {
     if (configData) {
-      setSelectedCategory(configData.category || "");
-      setSelectedProducts(configData.data || []);
+      if (templateId === "template-2") {
+        const config = configData.configData as any;
+        if (config?.categories) {
+          setSelectedCategories(config.categories || {});
+        }
+        if (config?.data) {
+          setSelectedProductsByCategory(config.data || {});
+        }
+      } else {
+        // Template-1 için eski yapı
+        setSelectedCategory(configData.category || "");
+        setSelectedProducts(configData.data || []);
+      }
     }
-  }, [configData]);
-
-  // Otomatik kaydetme kaldırıldı - sadece butona tıklayınca kaydedilecek
-
+  }, [configData, templateId]);
 
   // const handleSave = () => {
   //   updateConfig.mutate({
@@ -186,25 +237,82 @@ export default function TemplatePage () {
       id: "template-2",
       name: "Şablon 2",
       component: <Template2Content
-        menuItems={selectedProducts.length > 0 ? selectedProducts.map((p, i) => ({
-          name: p.name,
-          price: p.price,
-          desc: "",
-          category: selectedCategory
-        })) : menuItems}
+        menuItems={menuItems}
         isEditable={true}
-        prices={selectedProducts.reduce((acc, p) => {
-          acc[p.name] = p.price;
-          return acc;
-        }, {} as Record<string, string>)}
-        onPriceClick={(itemName: string, currentPrice: string) => {
-          const index = selectedProducts.findIndex(p => p.name === itemName);
-          if (index !== -1) {
-            handleProductChange(index, itemName, currentPrice);
+        availableProducts={availableProducts}
+        availableCategories={availableCategories}
+        selectedCategories={selectedCategories}
+        onCategorySlotChange={(categorySlot: string, categoryId: string) => {
+          setSelectedCategories(prev => ({
+            ...prev,
+            [categorySlot]: categoryId
+          }));
+          // Kategori değiştiğinde o kategoriye ait ürünleri temizle
+          setSelectedProductsByCategory(prev => {
+            const newProducts = { ...prev };
+            newProducts[categorySlot] = [];
+            return newProducts;
+          });
+        }}
+        selectedProductsByCategory={selectedProductsByCategory}
+        onProductSelectByCategory={(categorySlot: string, itemIndex: number, productId: string) => {
+          const product = availableProducts.find(p => p._id === productId);
+          if (product && product.pricing.basePrice) {
+            const formattedPrice = formatPrice(
+              product.pricing.basePrice.currency,
+              product.pricing.basePrice.price
+            );
+            
+            setSelectedProductsByCategory(prev => {
+              const categoryProducts = prev[categorySlot] || [];
+              const newProducts = [...categoryProducts];
+              while (newProducts.length <= itemIndex && newProducts.length < 4) {
+                newProducts.push({ name: '', price: '' });
+              }
+              if (newProducts[itemIndex]) {
+                newProducts[itemIndex] = {
+                  name: product.name,
+                  price: formattedPrice,
+                  productId: productId,
+                  priceType: 'basePrice'
+                };
+              }
+              return {
+                ...prev,
+                [categorySlot]: newProducts.slice(0, 4)
+              };
+            });
           }
         }}
-        selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
+        onPriceTypeSelectByCategory={(categorySlot: string, itemIndex: number, priceType: string) => {
+          const categoryProducts = selectedProductsByCategory[categorySlot] || [];
+          const currentProduct = categoryProducts[itemIndex];
+          
+          if (currentProduct && currentProduct.productId) {
+            const product = availableProducts.find(p => p._id === currentProduct.productId);
+            if (product && product.pricing[priceType]) {
+              const formattedPrice = formatPrice(
+                product.pricing[priceType].currency,
+                product.pricing[priceType].price
+              );
+              
+              setSelectedProductsByCategory(prev => {
+                const categoryProducts = [...(prev[categorySlot] || [])];
+                if (categoryProducts[itemIndex]) {
+                  categoryProducts[itemIndex] = {
+                    ...categoryProducts[itemIndex],
+                    price: formattedPrice,
+                    priceType: priceType
+                  };
+                }
+                return {
+                  ...prev,
+                  [categorySlot]: categoryProducts
+                };
+              });
+            }
+          }
+        }}
       />
     }
   }
@@ -264,13 +372,21 @@ export default function TemplatePage () {
               console.log('selectedCategory:', selectedCategory);
               console.log('selectedProducts:', selectedProducts);
               
+              // Template-2 için farklı veri yapısı
+              const configData = templateId === "template-2" 
+                ? {
+                    categories: selectedCategories,
+                    data: selectedProductsByCategory
+                  }
+                : {
+                    category: selectedCategory || "",
+                    data: selectedProducts.length > 0 ? selectedProducts : []
+                  };
+              
               updateConfig.mutate(
                 {
                   templateId,
-                  configData: {
-                    category: selectedCategory || "",
-                    data: selectedProducts.length > 0 ? selectedProducts : []
-                  }
+                  configData: configData as any
                 },
                 {
                   onSuccess: (data) => {

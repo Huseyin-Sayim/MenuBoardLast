@@ -1,139 +1,172 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 
-type Design = {
+type Template = {
   id: string;
   name: string;
-  description: string;
-  price: number;
-  image: string;
-  category: string;
-  isPurchased?: boolean;
+  path: string;
+  component: string;
+  defaultConfig: any;
 };
 
 interface DesignStoreProps {
-  initialDesigns: Design[];
+  templates: Template[];
 }
 
+export function DesignStore({ templates }: DesignStoreProps) {
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
 
-export function DesignStore({ initialDesigns }: DesignStoreProps) {
-  const [selectedCategory, setSelectedCategory] = useState<string>("Tümü");
-  const [designs, setDesigns] = useState<Design[]>(initialDesigns);
+  // Config özetini göster
+  const getConfigSummary = (template: Template) => {
+    const config = template.defaultConfig;
 
-  const categories = ["Tümü", "Menü", "Promosyon", "Fast Food"];
+    if (template.component === 'template-1') {
+      return `Kategori: ${config.category || 'Yok'}, Ürün Sayısı: ${config.data?.length || 0}`;
+    }
 
-  const filteredDesigns =
-    selectedCategory === "Tümü"
-      ? designs
-      : designs.filter((design) => design.category === selectedCategory);
+    if (template.component === 'template-2') {
+      const categoryCount = Object.keys(config.categories || {}).length;
+      const totalItems = Object.values(config.data || {}).reduce(
+        (sum: number, items: any) => sum + (Array.isArray(items) ? items.length : 0),
+        0
+      );
+      return `Kategori Sayısı: ${categoryCount}, Toplam Ürün: ${totalItems}`;
+    }
 
-  const handlePurchase = (id: string) => {
-    setDesigns((prev) =>
-      prev.map((design) =>
-        design.id === id ? { ...design, isPurchased: true } : design
-      )
-    );
-    console.log(`Tasarım ${id} satın alındı`);
+    return 'Varsayılan ayarlar';
   };
 
+  // Preview URL oluştur - preview=true parametresi ekle
+  const getPreviewUrl = (path: string) => {
+    return `${path}?preview=true`;
+  };
+
+  // Template önizlemesini aç
+  const openPreview = (template: Template) => {
+    setSelectedTemplate(template);
+  };
+
+  // Geri dön
+  const closePreview = () => {
+    setSelectedTemplate(null);
+  };
+
+  // Template tipine göre yükseklik belirle
+  const getTemplateHeight = (component: string) => {
+    // Template-2 için özel yükseklik (içerik yüksekliğine göre)
+    if (component === 'template-2') {
+      return { height: '100vh', overflow: 'hidden' };
+    }
+    // Diğer template'ler için
+    return { minHeight: '80vh' };
+  };
+
+  // Eğer template seçildiyse, tam görünümü göster
+  if (selectedTemplate) {
+    const templateStyle = getTemplateHeight(selectedTemplate.component);
+    
+    return (
+      <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h2 className="text-body-2xlg font-bold text-dark dark:text-white mb-2">
+              {selectedTemplate.name}
+            </h2>
+            <p className="text-sm text-dark-4 dark:text-dark-6">
+              Şablon Önizlemesi
+            </p>
+          </div>
+          <button
+            onClick={closePreview}
+            className="flex items-center gap-2 rounded-lg bg-gray-2 px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Geri Dön
+          </button>
+        </div>
+
+        {/* Template Tam Görünümü */}
+        <div 
+          className="relative w-full rounded-lg border border-stroke bg-gray-2 dark:border-stroke-dark dark:bg-dark-2"
+          style={templateStyle}
+        >
+          <iframe
+            src={getPreviewUrl(selectedTemplate.path)}
+            className="w-full border-0"
+            style={templateStyle}
+            allowFullScreen
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Liste görünümü
   return (
     <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
       <div className="mb-6">
         <h2 className="text-body-2xlg font-bold text-dark dark:text-white mb-4">
-          Tasarım Mağazası
+          Şablonlar
         </h2>
-        <p className="text-sm text-dark-4 dark:text-dark-6 mb-6">
-          Yeni tasarımlar satın alın ve menü tahtanızı güzelleştirin
-        </p>
-
-        {/* Kategori Filtreleri */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              className={cn(
-                "rounded-lg px-4 py-2 text-sm font-medium transition-all",
-                selectedCategory === category
-                  ? "bg-primary text-white"
-                  : "bg-gray-2 text-dark-4 hover:bg-gray-3 dark:bg-dark-2 dark:text-dark-6 dark:hover:bg-dark-3"
-              )}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
       </div>
 
-      {/* Tasarım Grid */}
+      {/* Template Grid */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredDesigns.map((design) => (
+        {templates.map((template) => (
           <div
-            key={design.id}
-            className="group relative rounded-lg border border-stroke bg-white overflow-hidden shadow-card hover:shadow-card-2 transition-all dark:border-stroke-dark dark:bg-dark-2"
+            key={template.id}
+            className="group relative rounded-lg border border-stroke bg-white overflow-hidden shadow-card hover:shadow-card-2 transition-all dark:border-stroke-dark dark:bg-dark-2 cursor-pointer"
+            onClick={() => openPreview(template)}
           >
+            {/* Iframe Önizleme - preview=true ile */}
             <div className="relative aspect-video w-full overflow-hidden bg-gray-2 dark:bg-dark-3">
-              <Image
-                src={design.image}
-                alt={design.name}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
+              <iframe
+                src={getPreviewUrl(template.path)}
+                className="absolute inset-0 border-0 pointer-events-none"
+                style={{
+                  transform: 'scale(0.25)',
+                  transformOrigin: 'top left',
+                  width: '400%',
+                  height: '400%'
+                }}
+                loading="lazy"
               />
-              {design.isPurchased && (
-                <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                  <span className="bg-primary text-white px-3 py-1 rounded-full text-xs font-medium">
-                    Satın Alındı
-                  </span>
+
+              {/* Hover Overlay */}
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center">
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-primary/90 text-white px-4 py-2 rounded-lg font-medium">
+                  Önizlemeyi Aç
                 </div>
-              )}
+              </div>
             </div>
-            <div className="p-4">
-              <div className="mb-2">
-                <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded">
-                  {design.category}
-                </span>
-              </div>
+
+            <div className="p-7">
               <h3 className="text-lg font-semibold text-dark dark:text-white mb-1">
-                {design.name}
+                {template.name}
               </h3>
-              <p className="text-sm text-dark-4 dark:text-dark-6 mb-4">
-                {design.description}
-              </p>
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-2xl font-bold text-dark dark:text-white">
-                    ${design.price}
-                  </span>
-                </div>
-                <button
-                  onClick={() => handlePurchase(design.id)}
-                  disabled={design.isPurchased}
-                  className={cn(
-                    "rounded-lg px-4 py-2 text-sm font-medium transition-all",
-                    design.isPurchased
-                      ? "bg-gray-3 text-dark-4 cursor-not-allowed dark:bg-dark-3 dark:text-dark-6"
-                      : "bg-primary text-white hover:bg-primary/90 active:scale-95"
-                  )}
-                >
-                  {design.isPurchased ? "Satın Alındı" : "Satın Al"}
-                </button>
-              </div>
             </div>
           </div>
         ))}
       </div>
 
-      {filteredDesigns.length === 0 && (
+      {templates.length === 0 && (
         <div className="text-center py-12">
           <p className="text-dark-4 dark:text-dark-6">
-            Bu kategoride tasarım bulunamadı.
+            Henüz şablon bulunmamaktadır.
           </p>
         </div>
       )}
     </div>
   );
 }
-

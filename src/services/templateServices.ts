@@ -153,3 +153,23 @@ export async function getTemplateConfig(userId: string, templateId: string) {
   }
 
 }
+
+// Tüm template'leri getir (sadece template bilgileri, config yok)
+export async function getAllTemplates() {
+  try {
+    const templates = await prisma.template.findMany({
+      orderBy: {
+        createdAt: 'asc'
+      }
+    });
+
+    if (!templates || !Array.isArray(templates)) {
+      return [];
+    }
+
+    return templates;
+  } catch (err: any) {
+    console.error('Template listesi getirilirken hata oluştu:', err.message);
+    return [];
+  }
+}
