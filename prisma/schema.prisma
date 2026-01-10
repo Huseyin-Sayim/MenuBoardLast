@@ -89,7 +89,7 @@ model Media {
 model ScreenConfig {
   id              String @id @default(uuid())
   screenId        String
-  screen          Screen @relation(fields: [screenId], references: [id])
+  screen          Screen @relation(fields: [screenId], references: [id], onDelete: Cascade)
   mediaId         String
   mediaIndex      Int
   displayDuration Int?

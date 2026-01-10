@@ -204,3 +204,15 @@ export const getScreenName = async (id:string) => {
   }
 }
 
+export const deleteScreen = async (id: string) => {
+  try {
+    return await prisma.screen.delete({
+      where: {
+        id: id
+      }
+    })
+  } catch (error: any) {
+    throw new Error('Ekran silme başarısız: ', error.message);
+  }
+}
+
