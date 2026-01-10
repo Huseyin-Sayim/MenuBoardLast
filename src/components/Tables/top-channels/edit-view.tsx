@@ -292,7 +292,8 @@ const calculateAspectRatio = (width: number, height: number): string => {
 
 export interface ScreenConfig {
   screenId: string;
-  mediaId: string;
+  mediaId?: string;
+  templateId?: string;
   mediaIndex: number
   duration:number
 }
@@ -358,15 +359,31 @@ export function EditView({
   }, [initialPlaylist, playlist.length]);
 
   useEffect(() => {
-    const formattedConfig: ScreenConfig[] = playlist.map((item, index) => ({
-      screenId: screenName,
-      mediaId: item.item.id,
-      mediaIndex: index + 1,
-      duration: item.duration,
-    }));
+    const formattedConfig: ScreenConfig[] = playlist.map((item, index) => {
+      if (item.isDesign && item.id.startsWith('template-')) {
+        // Template için - ID zaten "template-1" formatında, direkt kullan
+        // Backend'de component field'ına göre gerçek UUID'yi bulacağız
+        return {
+          screenId: screenName,
+          templateId: item.id, // Zaten "template-1" formatında
+          mediaIndex: index + 1,
+          duration: item.duration,
+        };
+      } else {
+        // Media için
+        const mediaId = item.id.startsWith('media-') 
+          ? item.id.replace('media-', '') 
+          : item.item.id;
+        return {
+          screenId: screenName,
+          mediaId: mediaId,
+          mediaIndex: index + 1,
+          duration: item.duration,
+        };
+      }
+    });
 
-    console.log(playlist);
-
+    console.log('Playlist:', playlist);
     console.log("Tertemiz Config:", formattedConfig);
     setReadyScreenConfig(formattedConfig);
   }, [playlist, screenName]);
@@ -486,7 +503,10 @@ export function EditView({
     setSelectedTemplate(templateId);
     
     const template = templates.find((t) => t.id === templateId);
-    if (template && !playlist.find((p) => p.id === `template-${templateId}`)) {
+    // Template ID'si zaten "template-1" formatında, tekrar "template-" eklemeye gerek yok
+    const playlistId = templateId.startsWith('template-') ? templateId : `template-${templateId}`;
+    
+    if (template && !playlist.find((p) => p.id === playlistId)) {
       // Şablonu MenuBoardDesign formatına çevir
       const templateAsDesign: MenuBoardDesign = {
         id: template.id,
@@ -499,7 +519,7 @@ export function EditView({
       setPlaylist((prev) => [
         ...prev,
         {
-          id: `template-${templateId}`,
+          id: playlistId, // template-1 formatında olacak
           item: templateAsDesign,
           isDesign: true,
           duration: 10, // Şablonlar için varsayılan süre

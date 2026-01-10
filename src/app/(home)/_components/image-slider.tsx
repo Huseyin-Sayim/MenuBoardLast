@@ -5,12 +5,20 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
+type Template = {
+  id: string;
+  name: string;
+  path: string;
+  component: string;
+};
+
 type ImageSliderProps = {
-  images: string[];
+  images?: string[];
+  templates?: Template[];
   className?: string;
 };
 
-export function ImageSlider({ images, className }: ImageSliderProps) {
+export function ImageSlider({ images, templates, className }: ImageSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -19,10 +27,21 @@ export function ImageSlider({ images, className }: ImageSliderProps) {
   const thumbnailContainerRef = useRef<HTMLDivElement>(null);
   const thumbnailRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
+  // Template'ler varsa onları kullan, yoksa images kullan
+  const items = templates || images || [];
+  const isTemplateMode = !!templates;
+
+  // Preview URL oluştur
+  const getPreviewUrl = (path: string) => {
+    return `${path}?preview=true`;
+  };
+
   useEffect(() => {
+    if (items.length === 0) return;
+    
     // Otomatik geçiş için interval
     intervalRef.current = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % images.length);
+      setCurrentIndex((prev) => (prev + 1) % items.length);
     }, 4000); // 4 saniye
 
     return () => {
@@ -30,7 +49,7 @@ export function ImageSlider({ images, className }: ImageSliderProps) {
         clearInterval(intervalRef.current);
       }
     };
-  }, [images.length]);
+  }, [items.length]);
 
   // Aktif thumbnail'ı görünür alana getir
   useEffect(() => {
@@ -67,12 +86,12 @@ export function ImageSlider({ images, className }: ImageSliderProps) {
     
     // Yeni interval başlat
     intervalRef.current = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % images.length);
+      setCurrentIndex((prev) => (prev + 1) % items.length);
     }, 4000);
   };
 
   const getImageIndex = (offset: number) => {
-    const index = (currentIndex + offset + images.length) % images.length;
+    const index = (currentIndex + offset + items.length) % items.length;
     return index;
   };
 
@@ -146,64 +165,133 @@ export function ImageSlider({ images, className }: ImageSliderProps) {
 
       {/* Slider Container */}
       <div className="flex items-center justify-center gap-2 md:gap-4">
-        {/* Sol taraftaki küçük görünen fotoğraf */}
-        <button
-          onClick={() => handleImageClick(getImageIndex(-1))}
-          className="relative h-32 w-24 shrink-0 overflow-hidden rounded-lg opacity-60 transition-all duration-300 ease-in-out hover:opacity-80 hover:scale-105 active:scale-95 md:h-40 md:w-32"
-        >
-          <Image
-            src={images[getImageIndex(-1)]}
-            alt={`Previous ${getImageIndex(-1) + 1}`}
-            fill
-            className="object-cover"
-          />
-        </button>
+        {/* Sol taraftaki küçük görünen preview */}
+        {isTemplateMode && templates ? (
+          <button
+            onClick={() => handleImageClick(getImageIndex(-1))}
+            className="relative h-32 w-24 shrink-0 overflow-hidden rounded-lg opacity-60 transition-all duration-300 ease-in-out hover:opacity-80 hover:scale-105 active:scale-95 md:h-40 md:w-32 bg-gray-2 dark:bg-dark-2"
+          >
+            <iframe
+              src={getPreviewUrl(templates[getImageIndex(-1)].path)}
+              className="absolute inset-0 border-0 pointer-events-none"
+              style={{
+                transform: 'scale(0.15)',
+                transformOrigin: 'top left',
+                width: '667%',
+                height: '667%'
+              }}
+            />
+          </button>
+        ) : images ? (
+          <button
+            onClick={() => handleImageClick(getImageIndex(-1))}
+            className="relative h-32 w-24 shrink-0 overflow-hidden rounded-lg opacity-60 transition-all duration-300 ease-in-out hover:opacity-80 hover:scale-105 active:scale-95 md:h-40 md:w-32"
+          >
+            <Image
+              src={images[getImageIndex(-1)]}
+              alt={`Previous ${getImageIndex(-1) + 1}`}
+              fill
+              className="object-cover"
+            />
+          </button>
+        ) : null}
 
-        {/* Ortadaki ana fotoğraf */}
-        <div className="relative h-64 w-full max-w-2xl overflow-hidden rounded-lg shadow-lg md:h-80">
+        {/* Ortadaki ana preview */}
+        <div className="relative h-64 w-full max-w-2xl overflow-hidden rounded-lg shadow-lg md:h-80 bg-gray-2 dark:bg-dark-2">
           <div className="relative h-full w-full">
-            {images.map((image, index) => {
-              const isActive = index === currentIndex;
-              const offset = ((index - currentIndex + images.length) % images.length);
-              const isNext = offset === 1;
-              
-              return (
-                <div
-                  key={index}
-                  className={cn(
-                    "absolute inset-0 transition-all duration-700 ease-in-out",
-                    isActive 
-                      ? "z-10 opacity-100 translate-x-0 scale-100" 
-                      : isNext
-                      ? "z-0 opacity-0 translate-x-12 scale-105"
-                      : "z-0 opacity-0 -translate-x-12 scale-95"
-                  )}
-                >
-                  <Image
-                    src={image}
-                    alt={`Slide ${index + 1}`}
-                    fill
-                    className="object-cover"
-                    priority={isActive}
-                  />
-                </div>
-              );
-            })}
+            {isTemplateMode && templates ? (
+              templates.map((template, index) => {
+                const isActive = index === currentIndex;
+                const offset = ((index - currentIndex + templates.length) % templates.length);
+                const isNext = offset === 1;
+                
+                return (
+                  <div
+                    key={template.id}
+                    className={cn(
+                      "absolute inset-0 transition-all duration-700 ease-in-out",
+                      isActive 
+                        ? "z-10 opacity-100 translate-x-0 scale-100" 
+                        : isNext
+                        ? "z-0 opacity-0 translate-x-12 scale-105"
+                        : "z-0 opacity-0 -translate-x-12 scale-95"
+                    )}
+                  >
+                    <iframe
+                      src={getPreviewUrl(template.path)}
+                      className="absolute inset-0 border-0 pointer-events-none"
+                      style={{
+                        transform: 'scale(0.33)',
+                        transformOrigin: 'top left',
+                        width: '303%',
+                        height: '303%'
+                      }}
+                    />
+                  </div>
+                );
+              })
+            ) : images ? (
+              images.map((image, index) => {
+                const isActive = index === currentIndex;
+                const offset = ((index - currentIndex + images.length) % images.length);
+                const isNext = offset === 1;
+                
+                return (
+                  <div
+                    key={index}
+                    className={cn(
+                      "absolute inset-0 transition-all duration-700 ease-in-out",
+                      isActive 
+                        ? "z-10 opacity-100 translate-x-0 scale-100" 
+                        : isNext
+                        ? "z-0 opacity-0 translate-x-12 scale-105"
+                        : "z-0 opacity-0 -translate-x-12 scale-95"
+                    )}
+                  >
+                    <Image
+                      src={image}
+                      alt={`Slide ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      priority={isActive}
+                    />
+                  </div>
+                );
+              })
+            ) : null}
           </div>
         </div>
 
-        {/* Sağ taraftaki küçük görünen fotoğraf */}
-        <button
-          onClick={() => handleImageClick(getImageIndex(1))}
-          className="relative h-32 w-24 shrink-0 overflow-hidden rounded-lg opacity-60 transition-all duration-300 ease-in-out hover:opacity-80 hover:scale-105 active:scale-95 md:h-40 md:w-32"
-        >
-          <Image
-            src={images[getImageIndex(1)]}
-            alt={`Next ${getImageIndex(1) + 1}`}
-            fill
-            className="object-cover"
-          />
-        </button>
+        {/* Sağ taraftaki küçük görünen preview */}
+        {isTemplateMode && templates ? (
+          <button
+            onClick={() => handleImageClick(getImageIndex(1))}
+            className="relative h-32 w-24 shrink-0 overflow-hidden rounded-lg opacity-60 transition-all duration-300 ease-in-out hover:opacity-80 hover:scale-105 active:scale-95 md:h-40 md:w-32 bg-gray-2 dark:bg-dark-2"
+          >
+            <iframe
+              src={getPreviewUrl(templates[getImageIndex(1)].path)}
+              className="absolute inset-0 border-0 pointer-events-none"
+              style={{
+                transform: 'scale(0.15)',
+                transformOrigin: 'top left',
+                width: '667%',
+                height: '667%'
+              }}
+            />
+          </button>
+        ) : images ? (
+          <button
+            onClick={() => handleImageClick(getImageIndex(1))}
+            className="relative h-32 w-24 shrink-0 overflow-hidden rounded-lg opacity-60 transition-all duration-300 ease-in-out hover:opacity-80 hover:scale-105 active:scale-95 md:h-40 md:w-32"
+          >
+            <Image
+              src={images[getImageIndex(1)]}
+              alt={`Next ${getImageIndex(1) + 1}`}
+              fill
+              className="object-cover"
+            />
+          </button>
+        ) : null}
       </div>
 
       {/* Thumbnail Gallery */}
@@ -235,34 +323,72 @@ export function ImageSlider({ images, className }: ImageSliderProps) {
             WebkitOverflowScrolling: "touch",
           }}
         >
-          {images.map((image, index) => {
-            const isActive = index === currentIndex;
-            return (
-              <button
-                key={index}
-                ref={(el) => {
-                  thumbnailRefs.current[index] = el;
-                }}
-                onClick={() => handleImageClick(index)}
-                className={cn(
-                  "relative h-12 w-18 shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 md:h-15 md:w-",
-                  isActive
-                    ? "border-primary shadow-lg scale-105"
-                    : "border-stroke opacity-70 hover:opacity-100 dark:border-stroke-dark"
-                )}
-              >
-                <Image
-                  src={image}
-                  alt={`Thumbnail ${index + 1}`}
-                  fill
-                  className="object-cover"
-                />
-                {isActive && (
-                  <div className="absolute inset-0 bg-primary/20" />
-                )}
-              </button>
-            );
-          })}
+          {isTemplateMode && templates ? (
+            templates.map((template, index) => {
+              const isActive = index === currentIndex;
+              return (
+                <button
+                  key={template.id}
+                  ref={(el) => {
+                    thumbnailRefs.current[index] = el;
+                  }}
+                  onClick={() => handleImageClick(index)}
+                  className={cn(
+                    "relative h-12 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 md:h-15 md:w-20 bg-gray-2 dark:bg-dark-2",
+                    isActive
+                      ? "border-primary shadow-lg scale-105"
+                      : "border-stroke opacity-70 hover:opacity-100 dark:border-stroke-dark"
+                  )}
+                >
+                  <iframe
+                    src={getPreviewUrl(template.path)}
+                    className="absolute inset-0 border-0 pointer-events-none"
+                    style={{
+                      transform: 'scale(0.1)',
+                      transformOrigin: 'top left',
+                      width: '1000%',
+                      height: '1000%'
+                    }}
+                  />
+                  {isActive && (
+                    <div className="absolute inset-0 bg-primary/20" />
+                  )}
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-[10px] px-1 py-0.5 truncate">
+                    {template.name}
+                  </div>
+                </button>
+              );
+            })
+          ) : images ? (
+            images.map((image, index) => {
+              const isActive = index === currentIndex;
+              return (
+                <button
+                  key={index}
+                  ref={(el) => {
+                    thumbnailRefs.current[index] = el;
+                  }}
+                  onClick={() => handleImageClick(index)}
+                  className={cn(
+                    "relative h-12 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 md:h-15 md:w-20",
+                    isActive
+                      ? "border-primary shadow-lg scale-105"
+                      : "border-stroke opacity-70 hover:opacity-100 dark:border-stroke-dark"
+                  )}
+                >
+                  <Image
+                    src={image}
+                    alt={`Thumbnail ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                  {isActive && (
+                    <div className="absolute inset-0 bg-primary/20" />
+                  )}
+                </button>
+              );
+            })
+          ) : null}
         </div>
 
         {/* Sağ Ok */}
