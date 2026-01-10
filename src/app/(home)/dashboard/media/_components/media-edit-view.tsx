@@ -4,6 +4,7 @@ import { TrashIcon } from "@/assets/icons";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
+import { deleteMedia } from "@/services/mediaServices";
 
 type MediaItem = {
   id: string;
@@ -122,9 +123,10 @@ export function MediaEditView({
     };
   }, [isEditingName, isEditingTrim, selectedItem.name, selectedItem.startTime, selectedItem.endTime, selectedItem.duration, onClose]);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (deleteConfirmId === id) {
       onDelete(id);
+      await deleteMedia(id);
       setDeleteConfirmId(null);
       // Eğer silinen tasarım seçili tasarımsa, ilk tasarıma geç
       if (id === selectedItem.id && allItems.length > 1) {

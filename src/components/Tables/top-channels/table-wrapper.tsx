@@ -16,6 +16,7 @@ import Cookies from "js-cookie";
 import { MediaItem } from "@/app/(home)/dashboard/media/_components/media-gallery";
 import { AddScreenModal } from "./add-screen-modal";
 import { useRouter } from "next/navigation";
+import { deleteScreen } from "@/services/screenServices";
 
 type Screen = {
   id: string,
@@ -112,7 +113,8 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
     setIsEditing(true);
   };
 
-  const handleDelete = (screenName: string) => {
+  const handleDelete = async (screenName: string, id: string) => {
+    await deleteScreen(id);
     setScreens((prev) => prev.filter((screen) => screen.name !== screenName));
   };
 
@@ -269,7 +271,7 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
                 <TableActions
                   screenName={screen.id}
                   onEdit={handleEdit}
-                  onDelete={handleDelete}
+                  onDelete={() => handleDelete(screen.name, screen.id)}
                 />
               )}
             </TableRow>
