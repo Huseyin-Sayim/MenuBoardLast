@@ -144,7 +144,7 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
   };
 
   const handleAddScreenSuccess = () => {
-    window.location.reload();
+    // window.location.reload();
   };
 
   if (isEditing) {
@@ -246,7 +246,6 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
         </TableBody>
       </Table>
 
-      {/* Add Screen Modal */}
       {isAddModalOpen && (
         <AddScreenModal
           onClose={() => setIsAddModalOpen(false)}
