@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import InputGroup from "@/components/FormElements/InputGroup";
+import Cookies from "js-cookie";
 
 type AddScreenModalProps = {
   onClose: () => void;
@@ -16,7 +17,6 @@ export function AddScreenModal({ onClose, onSuccess }: AddScreenModalProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     setError(null);
 
-    // 6 haneli kod kontrolü
     if (code.length !== 6 || !/^\d+$/.test(code)) {
       setError("Lütfen 6 haneli kodu girin");
       return;
@@ -25,10 +25,11 @@ export function AddScreenModal({ onClose, onSuccess }: AddScreenModalProps) {
     setIsSubmitting(true);
 
     try {
+      const token = Cookies.get('accessToken');
       const response = await fetch("/api/screens/device", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Authorization" : `Bearer ${token}`
         },
         body: JSON.stringify({ code }),
       });
