@@ -84,8 +84,6 @@ export const createScreenCode = async (data: {userId: string, width: number, hei
       }
     });
 
-
-
     if (isExistsScreen) {
       throw new Error('Bu cihaza tanımlanmış bir ekran zaten var');
     }
@@ -139,19 +137,16 @@ export const getScreenByDeviceId = async (deviceId: string) => {
 
 export const updateScreenConfig = async (screenId: string, configs: {mediaId: string, mediaIndex: number, duration:number}[]) => {
   try {
-    // Önce mevcut config'leri sil (veri yoksa hiçbir şey yapmaz, hata vermez)
     await prisma.screenConfig.deleteMany({
       where: {
         screenId: screenId
       }
     });
 
-    // Configs array'i boşsa, sadece silme işlemini yaptık, bitir
     if (!configs || configs.length === 0) {
       return [];
     }
 
-    // Yeni config'leri ekle
     const createPromises = configs.map((config) =>
       prisma.screenConfig.create({
         data: {
