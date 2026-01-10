@@ -49,6 +49,7 @@ model Template {
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   TemplateConfig TemplateConfig[]
+  ScreenConfig   ScreenConfig[]
 }
 
 model TemplateConfig {
@@ -87,13 +88,15 @@ model Media {
 }
 
 model ScreenConfig {
-  id              String @id @default(uuid())
+  id              String   @id @default(uuid())
   screenId        String
-  screen          Screen @relation(fields: [screenId], references: [id])
-  mediaId         String
+  screen          Screen   @relation(fields: [screenId], references: [id])
+  mediaId         String?
+  templateId      String?
   mediaIndex      Int
   displayDuration Int?
-  Media           Media  @relation(fields: [mediaId], references: [id])
+  Media           Media?   @relation(fields: [mediaId], references: [id])
+  Template        Template? @relation(fields: [templateId], references: [id])
 }
 
 model DeviceScreenCode {
@@ -104,4 +107,13 @@ model DeviceScreenCode {
   height   Int
   userId   String
   user     User   @relation(fields: [userId], references: [id])
+}
+
+model Gallery {
+  id        String   @id @default(uuid())
+  name      String
+  url       String
+  extension String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

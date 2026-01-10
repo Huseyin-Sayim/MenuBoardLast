@@ -70,14 +70,13 @@ export default async function middleware (req: NextRequest) {
     const secret = new TextEncoder().encode(process.env.ACCES_TOKEN_SECRET);
     const { payload } = await jose.jwtVerify(token, secret);
 
-    // Admin kontrolünden muaf tutulan user endpoint'leri
     const userAllowedPaths = ['/api/users/', '/media', '/screen'];
     const isUserAllowedPath = pathname.startsWith('/api/users/') && 
       (pathname.includes('/media') || pathname.includes('/screen'));
 
     const adminOnlyPaths = ['/api/users']
+    // /api/gallery için admin kontrolü endpoint'te yapılıyor, middleware'de kontrol etme
 
-    // Eğer kullanıcının kendi medyasını/screen'ini görmesi için izin verilen path'ler ise admin kontrolü yapma
     if (adminOnlyPaths.some(path => pathname.startsWith(path)) && !isUserAllowedPath) {
       if (payload.role !== "admin") {
         return NextResponse.json({

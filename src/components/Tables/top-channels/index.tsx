@@ -20,7 +20,7 @@ export async function TopChannels({
 
   const data = await getScreen(id);
   const media = await getMedia(id);
-  const formattedData = media.map((item) => {
+  const formattedData = media.map((item : any) => {
     const isVideo = ["mp4", "webm", "ogg", "mov"].includes(
       item.extension.toLowerCase().replace(".", "")
     );

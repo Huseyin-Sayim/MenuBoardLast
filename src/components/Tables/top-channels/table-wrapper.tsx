@@ -56,16 +56,46 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
         const configs = result.data || [];
         
         const playlistItems = configs.map((config: any) => {
-          const mediaId = config.Media?.id || config.mediaId;
-          const media = initialMedia.find(m => m.id === mediaId);
-          if (media) {
+          // Media varsa
+          if (config.Media) {
+            const mediaId = config.Media.id || config.mediaId;
+            const media = initialMedia.find(m => m.id === mediaId);
+            if (media) {
+              return {
+                id: `media-${mediaId}`,
+                item: media,
+                isDesign: false,
+                duration: config.displayDuration ?? (media.type === 'video' ? 0 : 10)
+              };
+            }
+          }
+          
+          // Template varsa
+          if (config.Template) {
+            const template = config.Template;
+            // Template'i MenuBoardDesign formatına çevir
+            const templateAsDesign = {
+              id: template.component || template.id, // component: template-1, template-2 vs.
+              name: template.name,
+              preview: "/images/cover/cover-01.png", // Varsayılan preview
+              isActive: true,
+              type: "image" as const
+            };
+            
+            // Template ID'sini component değerine göre oluştur
+            const templateComponent = template.component || template.id;
+            const templateId = templateComponent.startsWith('template-') 
+              ? templateComponent 
+              : `template-${templateComponent}`;
+            
             return {
-              id: `media-${mediaId}`,
-              item: media,
-              isDesign: false,
-              duration: config.displayDuration ?? (media.type === 'video' ? 0 : 10)
+              id: `template-${templateComponent}`,
+              item: templateAsDesign,
+              isDesign: true,
+              duration: config.displayDuration ?? 10
             };
           }
+          
           return null;
         }).filter((item: any) => item !== null);
         
@@ -100,12 +130,13 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
     try {
       // API route üzerinden toplu güncelleme yap
       const configsToSave = screenConfig.map(config => ({
-        mediaId: config.mediaId,
+        ...(config.mediaId && { mediaId: config.mediaId }),
+        ...(config.templateId && { templateId: config.templateId }),
         mediaIndex: config.mediaIndex,
-        duration:config.duration
+        duration: config.duration
       }));
 
-      console.log("API'ye giden paket: ",configsToSave);
+      console.log("API'ye giden paket: ",JSON.stringify(configsToSave, null, 2));
 
       const response = await fetch(`/api/screens/${selectedScreenId}/config`, {
         method: 'PUT',
