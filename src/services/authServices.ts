@@ -74,63 +74,99 @@ export const logout = async (data: {token : string}) =>{
 }
 
 export const login = async (data : { userData: {email:string; password: string}; devices: string }) => {
+  try {
+    const {userData, devices} = data;
+    const {email, password} = userData;
 
-  const {userData, devices} = data;
-  const {email, password} = userData;
-
-  if (!password || !email) {
-    throw new Error('Şifre ve email boş olamaz');
-  }
-
-  const user = await prisma.user.findUnique({
-    where: {
-      email : email
+    if (!password || !email) {
+      throw new Error('Şifre ve email boş olamaz');
     }
-  })
 
-  if (!user) {
-    throw new Error('Kullanıcı bulunamadı');
-  }
-
-  let userPassword : string = user.password;
-  let isMatch: boolean = await bcrypt.compare(password, userPassword);
-
-  if (!isMatch) {
-    throw new Error('Şifre yanlış');
-  }
-
-  if (!ACCES_TOKEN_SECRET) {
-    throw new Error("ACCES_TOKEN_SECRET ortam değişkeni tanımlanmamış! .env dosyasını kontrol et.");
-  }
-
-  const accessToken = jwt.sign(
-    {userId: user.id, email: user.email, role: user.role},
-    ACCES_TOKEN_SECRET,
-    {expiresIn: '15m'}
-  );
-
-  if (!REFRESH_TOKEN_SECRET) {
-    throw new Error("REFRESH_TOKEN_SECRET ortam değişkeni tanımlanmamış! .env dosyasını kontrol et.");
-  }
-
-  const refreshToken = jwt.sign(
-    {userId: user.id, email: user.email, role: user.role},
-    REFRESH_TOKEN_SECRET,
-    {expiresIn: '7d'}
-  );
-
-  await prisma.refreshToken.create({
-    data: {
-      token: refreshToken,
-      userId: user.id,
-      devices: devices,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    if (!email.includes('@')) {
+      throw new Error('Geçerli bir email adresi giriniz');
     }
-  })
 
-  return {
-    user: {id: user.id, name: user.name, email: user.email, role: user.role},
-    accessToken: accessToken,
-    refreshToken: refreshToken
+    // Kullanıcıyı veritabanında ara
+    const user = await prisma.user.findUnique({
+      where: {
+        email : email
+      }
+    })
+
+    if (!user) {
+      throw new Error(`"${email}" adresine kayıtlı kullanıcı bulunamadı`);
+    }
+
+    if (!user.password) {
+      throw new Error('Kullanıcı şifresi tanımlı değil. Lütfen şifrenizi sıfırlayın.');
+    }
+
+    // Şifre kontrolü
+    let userPassword : string = user.password;
+    let isMatch: boolean = await bcrypt.compare(password, userPassword);
+
+    if (!isMatch) {
+      throw new Error('Girdiğiniz şifre yanlış. Lütfen tekrar deneyin.');
+    }
+
+    // Environment variable kontrolleri
+    if (!ACCES_TOKEN_SECRET) {
+      console.error('❌ ACCES_TOKEN_SECRET tanımlı değil!');
+      throw new Error("Sunucu yapılandırma hatası: ACCES_TOKEN_SECRET tanımlanmamış. Lütfen sistem yöneticisine başvurun.");
+    }
+
+    if (!REFRESH_TOKEN_SECRET) {
+      console.error('❌ REFRESH_TOKEN_SECRET tanımlı değil!');
+      throw new Error("Sunucu yapılandırma hatası: REFRESH_TOKEN_SECRET tanımlanmamış. Lütfen sistem yöneticisine başvurun.");
+    }
+
+    // Token oluşturma
+    const accessToken = jwt.sign(
+      {userId: user.id, email: user.email, role: user.role},
+      ACCES_TOKEN_SECRET,
+      {expiresIn: '15m'}
+    );
+
+    const refreshToken = jwt.sign(
+      {userId: user.id, email: user.email, role: user.role},
+      REFRESH_TOKEN_SECRET,
+      {expiresIn: '7d'}
+    );
+
+    // Refresh token'ı veritabanına kaydet
+    try {
+      await prisma.refreshToken.create({
+        data: {
+          token: refreshToken,
+          userId: user.id,
+          devices: devices,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        }
+      })
+    } catch (dbError: any) {
+      console.error('❌ Refresh token kaydetme hatası:', dbError);
+      // Token kaydetme hatası kritik değil, devam edebiliriz
+      if (dbError.code === 'P2002') {
+        // Unique constraint hatası - token zaten var, sorun değil
+        console.log('⚠️ Refresh token zaten mevcut, devam ediliyor...');
+      } else {
+        throw new Error('Oturum oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.');
+      }
+    }
+
+    return {
+      user: {id: user.id, name: user.name, email: user.email, role: user.role},
+      accessToken: accessToken,
+      refreshToken: refreshToken
+    }
+  } catch (error: any) {
+    console.error('❌ Login servis hatası:', {
+      message: error.message,
+      code: error.code,
+      name: error.name
+    });
+    
+    // Hata mesajını yeniden fırlat (zaten açıklayıcı mesajlar ekledik)
+    throw error;
   }
 }

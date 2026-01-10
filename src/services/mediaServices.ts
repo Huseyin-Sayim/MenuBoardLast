@@ -14,7 +14,7 @@ export const getMedia = async (id: string) => {
       }
     })
   } catch (error: any) {
-    throw new Error('Media verisine erişilemedi: ', error.message)
+    throw new Error('Media verisine erişilemedi: ' + error.message)
   }
 }
 
@@ -61,7 +61,7 @@ export const createMedia = async (formData: FormData, userId: string) =>   {
       }
     })
   } catch (error: any) {
-    throw new Error('Media eklenmedi: ', error.message);
+    throw new Error('Media eklenmedi: ' + error.message);
   }
 }
 
@@ -80,7 +80,7 @@ export const updateMediaName = async (id: string, newName: string) => {
 export const getFormattedMedia = async (userId: string) => {
   const rawData = await getMedia(userId); // Mevcut getMedia fonksiyonunu kullanır
 
-  return rawData.map((item) => {
+  return rawData.map((item: { extension: string; id: any; name: any; url: any; createdAt: { toLocaleDateString: (arg0: string) => any; }; }) => {
     const isVideo = ["mp4", "webm", "ogg", "mov"].includes(
       item.extension.toLowerCase().replace(".", "")
     );

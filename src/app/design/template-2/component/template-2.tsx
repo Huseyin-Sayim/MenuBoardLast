@@ -24,7 +24,7 @@ interface Template2Props {
   // Yeni props: Her kategori için ayrı yönetim
   selectedCategories?: Record<string, string>, // { "Ana Yemekler": "categoryId1", "İçecekler": "categoryId2" }
   onCategorySlotChange?: (categorySlot: string, categoryId: string) => void,
-  selectedProductsByCategory?: Record<string, Array<{name: string; price: string; productId?: string; priceType?: string}>>,
+  selectedProductsByCategory?: Record<string, Array<{name: string; price: string; productId?: string; priceType?: string, image?: string}>>,
   onProductSelectByCategory?: (categorySlot: string, itemIndex: number, productId: string) => void,
   onPriceTypeSelectByCategory?: (categorySlot: string, itemIndex: number, priceType: string) => void
 }

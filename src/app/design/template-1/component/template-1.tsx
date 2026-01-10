@@ -23,6 +23,7 @@ interface Template1Props {
   onProductSelect?: (gridIndex: number, productId: string) => void;
   onPriceTypeSelect?: (gridIndex: number, priceType: string) => void;
   selectedProducts?: Array<{name: string; price: string; productId?: string; priceType?: string}>;
+  onImageClick?: (gridIndex: number) => void;
 }
 
 export default function Template1Content({
@@ -37,6 +38,7 @@ export default function Template1Content({
   selectedProducts,
   selectedCategory,
   onCategoryChange,
+  onImageClick,
 }: Template1Props) {
   const [editingItemId, setEditingItemId] = useState<string | number | null>(
     null,
@@ -168,8 +170,43 @@ export default function Template1Content({
           <div className="grid-layout">
             {filteredBurgers.map((burger,index) => (
               <div key={`burger-${index}-${burger.name || index}`} className="menu-item-card">
-                <div className="thumb-box">
+                <div 
+                  className="thumb-box"
+                  onClick={() => {
+                    if (isEditable && onImageClick) {
+                      onImageClick(index);
+                    }
+                  }}
+                  style={{
+                    cursor: isEditable && onImageClick ? 'pointer' : 'default',
+                    position: 'relative'
+                  }}
+                >
                   <img src={burger.img} alt={burger.name} />
+                  {isEditable && onImageClick && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '8px',
+                        right: '8px',
+                        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                        borderRadius: '4px',
+                        padding: '4px 8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '12px',
+                        color: 'white',
+                        pointerEvents: 'none'
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                        <circle cx="12" cy="13" r="4" />
+                      </svg>
+                      Değiştir
+                    </div>
+                  )}
                 </div>
                 <div className="item-txt">
                   {isEditable && availableProducts && availableProducts.length > 0 ? (

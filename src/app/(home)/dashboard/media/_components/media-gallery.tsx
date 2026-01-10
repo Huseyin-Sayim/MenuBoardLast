@@ -72,14 +72,31 @@ interface MediaGalleryProps {
   gridCols?: string;
   maxHeight?: string;
   disableClick?: boolean;
+  selectionMode?: boolean;
+  onImageSelect?: (imageUrl: string) => void;
 }
 
 
-export function MediaGallery({showActions=true,className,initialData,gridCols = "grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10", maxHeight, disableClick = false} : MediaGalleryProps) {
+export function MediaGallery({showActions=true,className,initialData,gridCols = "grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10", maxHeight, disableClick = false, selectionMode = false, onImageSelect} : MediaGalleryProps) {
   const [mediaItems, setMediaItems] = useState<MediaItem[]>(initialData);
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<"all" | "image" | "video">("all");
+  const [selectedCategory, setSelectedCategory] = useState<"all" | "image" | "video">(selectionMode ? "image" : "all");
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
+  // initialData değiştiğinde mediaItems'ı güncelle
+  useEffect(() => {
+    if (initialData && Array.isArray(initialData)) {
+      setMediaItems(initialData);
+      console.log('MediaGallery - initialData güncellendi:', initialData.length, 'item');
+    }
+  }, [initialData]);
+
+  // Seçim modunda kategoriyi otomatik olarak "image" yap
+  useEffect(() => {
+    if (selectionMode) {
+      setSelectedCategory("image");
+    }
+  }, [selectionMode]);
 
   const handleDelete = (id: string) => {
     setMediaItems((prev) => prev.filter((item) => item.id !== id));
@@ -89,6 +106,11 @@ export function MediaGallery({showActions=true,className,initialData,gridCols = 
   };
 
   const handleItemClick = (item: MediaItem) => {
+    if (selectionMode && onImageSelect && item.type === "image") {
+      // Seçim modunda: sadece image'ları seçilebilir yap ve callback çağır
+      onImageSelect(item.url);
+      return;
+    }
     if (!disableClick) {
       setSelectedItem(item);
     }
@@ -127,8 +149,8 @@ export function MediaGallery({showActions=true,className,initialData,gridCols = 
 
 
 
-  // Upload modal açıksa upload view'ı göster
-  if (isUploadModalOpen) {
+  // Upload modal açıksa upload view'ı göster (seçim modunda değilse)
+  if (isUploadModalOpen && !selectionMode) {
     return (
       <MediaUploadView
         onClose={() => setIsUploadModalOpen(false)}
@@ -137,8 +159,8 @@ export function MediaGallery({showActions=true,className,initialData,gridCols = 
     );
   }
 
-  // Düzenleme modunda düzenleme ekranını göster (sadece click devre dışı değilse)
-  if (selectedItem && !disableClick) {
+  // Düzenleme modunda düzenleme ekranını göster (sadece click devre dışı değilse ve seçim modunda değilse)
+  if (selectedItem && !disableClick && !selectionMode) {
     return (
       <MediaEditView
         selectedItem={selectedItem}
@@ -152,10 +174,13 @@ export function MediaGallery({showActions=true,className,initialData,gridCols = 
   }
 
   // Kategoriye göre filtreleme
-  const filteredItems =
-    selectedCategory === "all"
-      ? mediaItems
-      : mediaItems.filter((item) => item.type === selectedCategory);
+  const filteredItems = selectionMode
+    ? mediaItems.filter((item) => item.type === "image") // Seçim modunda sadece image'ları göster
+    : selectedCategory === "all"
+    ? mediaItems
+    : mediaItems.filter((item) => item.type === selectedCategory);
+
+  console.log('MediaGallery - filteredItems:', filteredItems.length, 'item (selectionMode:', selectionMode, ', category:', selectedCategory, ')');
 
   // Normal modda galeri görünümünü göster
   return  (
@@ -189,44 +214,46 @@ export function MediaGallery({showActions=true,className,initialData,gridCols = 
         </div>
       </div>
 
-      {/* Kategori Filtreleri */}
-      <div className="border-b border-stroke px-7.5 py-4 dark:border-stroke-dark">
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => setSelectedCategory("all")}
-            className={cn(
-              "rounded-lg px-4 py-2 text-sm font-medium transition-all",
-              selectedCategory === "all"
-                ? "bg-primary text-white"
-                : "bg-gray-2 text-dark-4 hover:bg-gray-3 dark:bg-dark-2 dark:text-dark-6 dark:hover:bg-dark-3"
-            )}
-          >
-            Tümü
-          </button>
-          <button
-            onClick={() => setSelectedCategory("image")}
-            className={cn(
-              "rounded-lg px-4 py-2 text-sm font-medium transition-all",
-              selectedCategory === "image"
-                ? "bg-primary text-white"
-                : "bg-gray-2 text-dark-4 hover:bg-gray-3 dark:bg-dark-2 dark:text-dark-6 dark:hover:bg-dark-3"
-            )}
-          >
-            Fotoğraf
-          </button>
-          <button
-            onClick={() => setSelectedCategory("video")}
-            className={cn(
-              "rounded-lg px-4 py-2 text-sm font-medium transition-all",
-              selectedCategory === "video"
-                ? "bg-primary text-white"
-                : "bg-gray-2 text-dark-4 hover:bg-gray-3 dark:bg-dark-2 dark:text-dark-6 dark:hover:bg-dark-3"
-            )}
-          >
-            Video
-          </button>
+      {/* Kategori Filtreleri - Seçim modunda gizle */}
+      {!selectionMode && (
+        <div className="border-b border-stroke px-7.5 py-4 dark:border-stroke-dark">
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedCategory("all")}
+              className={cn(
+                "rounded-lg px-4 py-2 text-sm font-medium transition-all",
+                selectedCategory === "all"
+                  ? "bg-primary text-white"
+                  : "bg-gray-2 text-dark-4 hover:bg-gray-3 dark:bg-dark-2 dark:text-dark-6 dark:hover:bg-dark-3"
+              )}
+            >
+              Tümü
+            </button>
+            <button
+              onClick={() => setSelectedCategory("image")}
+              className={cn(
+                "rounded-lg px-4 py-2 text-sm font-medium transition-all",
+                selectedCategory === "image"
+                  ? "bg-primary text-white"
+                  : "bg-gray-2 text-dark-4 hover:bg-gray-3 dark:bg-dark-2 dark:text-dark-6 dark:hover:bg-dark-3"
+              )}
+            >
+              Fotoğraf
+            </button>
+            <button
+              onClick={() => setSelectedCategory("video")}
+              className={cn(
+                "rounded-lg px-4 py-2 text-sm font-medium transition-all",
+                selectedCategory === "video"
+                  ? "bg-primary text-white"
+                  : "bg-gray-2 text-dark-4 hover:bg-gray-3 dark:bg-dark-2 dark:text-dark-6 dark:hover:bg-dark-3"
+              )}
+            >
+              Video
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className={cn("p-7.5", maxHeight && "overflow-y-auto media-gallery-scrollbar")} style={maxHeight ? { maxHeight } : undefined}>
         {filteredItems.length === 0 ? (

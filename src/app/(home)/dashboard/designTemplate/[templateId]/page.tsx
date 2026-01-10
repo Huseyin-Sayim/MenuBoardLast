@@ -6,6 +6,8 @@ import Template2Content from "@/app/design/template-2/component/template-2";
 import {defaultBurgers,menuItems} from "@/app/design/template-data";
 import { useEffect, useState } from "react";
 import { useTemplateConfig, useUpdateTemplateConfig } from "@/hooks/use-template-config";
+import { MediaGallery, MediaItem } from "@/app/(home)/dashboard/media/_components/media-gallery";
+import Cookies from "js-cookie";
 
 
 type TemplateConfig = {
@@ -25,9 +27,10 @@ export default function TemplatePage () {
     price:string;
     productId?: string;
     priceType?: string;
+    image?: string;
   }>>([])
   const [availableCategories, setAvailableCategories] = useState<Array<{_id: string; name: string}>>([]);
-  const [availableProducts, setAvailableProducts] = useState<Array<{_id: string; name: string; pricing: any; category: string}>>([]);
+  const [availableProducts, setAvailableProducts] = useState<Array<{_id: string; name: string; pricing: any; category: string; image?: string; img?: string; imageUrl?: string}>>([]);
   
   // Template-2 için kategori bazlı state'ler
   const [selectedCategories, setSelectedCategories] = useState<Record<string, string>>({});
@@ -36,7 +39,14 @@ export default function TemplatePage () {
     price: string;
     productId?: string;
     priceType?: string;
+    image?: string;
   }>>>({});
+  
+  // Image seçimi için modal state'leri
+  const [isImageSelectorOpen, setIsImageSelectorOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const [selectedImageCategorySlot, setSelectedImageCategorySlot] = useState<string | null>(null);
+  const [availableMedia, setAvailableMedia] = useState<MediaItem[]>([]);
 
   // Fiyat formatlama helper function
   const formatPrice = (currency?: string, price?: number): string => {
@@ -49,18 +59,18 @@ export default function TemplatePage () {
     return `${currencySymbol} ${formattedPrice}`;
   };
 
-  const handleProductChange = (index: number, name: string, price: string, productId?: string, priceType?: string) => {
+  const handleProductChange = (index: number, name: string, price: string, productId?: string, priceType?: string, image?: string) => {
     setSelectedProducts(prev => {
       const newProducts = [...prev];
       // Array'i 6 elemana kadar genişlet (undefined yerine boş obje)
       while (newProducts.length <= index) {
-        newProducts.push({ name: '', price: '' });
+        newProducts.push({ name: '', price: '', image: undefined });
       }
       // Mevcut elemanı güncelle veya yeni ekle
       if (newProducts[index]) {
-        newProducts[index] = { name, price, productId, priceType };
+        newProducts[index] = { name, price, productId, priceType, image };
       } else {
-        newProducts[index] = { name, price, productId, priceType };
+        newProducts[index] = { name, price, productId, priceType, image };
       }
       return newProducts;
     })
@@ -170,6 +180,50 @@ export default function TemplatePage () {
     }
   }, [configData, templateId]);
 
+  // Media gallery'yi yükle
+  useEffect(() => {
+    const loadMedia = async () => {
+      try {
+        const userCookie = Cookies.get("user");
+        if (userCookie) {
+          const user = JSON.parse(userCookie) as { id: string };
+          console.log('Media yükleniyor, userId:', user.id);
+          const response = await fetch(`/api/users/${user.id}/media`);
+          console.log('Media response status:', response.status);
+          if (response.ok) {
+            const result = await response.json();
+            console.log('Media response data:', result);
+            const rawData = result.data || [];
+            console.log('Raw media data:', rawData);
+            // Format media data
+            const formattedData = rawData.map((item: any) => {
+              const isVideo = ["mp4", "webm", "ogg", "mov"].includes(
+                item.extension?.toLowerCase().replace(".", "") || ""
+              );
+              return {
+                id: item.id,
+                name: item.name,
+                type: (isVideo ? "video" : "image") as "image" | "video",
+                url: item.url,
+                uploadedAt: new Date(item.createdAt).toLocaleDateString("tr-TR"),
+                duration: 0,
+              };
+            });
+            console.log('Formatted media data:', formattedData);
+            setAvailableMedia(formattedData);
+          } else {
+            console.error('Media yüklenemedi:', response.status, response.statusText);
+          }
+        } else {
+          console.error('User cookie bulunamadı');
+        }
+      } catch (error) {
+        console.error('Media yüklenirken hata:', error);
+      }
+    };
+    loadMedia();
+  }, []);
+
   // const handleSave = () => {
   //   updateConfig.mutate({
   //     templateId,
@@ -189,7 +243,7 @@ export default function TemplatePage () {
               id: i + 1,
               name: p?.name || '',
               price: p?.price ? p.price.replace(/[^\d]/g, '') : '0',
-              img: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop",
+              img: p?.image || "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop",
               category: selectedCategory
             }))
           : defaultBurgers}
@@ -203,7 +257,9 @@ export default function TemplatePage () {
               product.pricing.basePrice.currency,
               product.pricing.basePrice.price
             );
-            handleProductChange(gridIndex, product.name, formattedPrice, productId, 'basePrice');
+            // Harici API'den image'ı al (product.image veya product.img veya product.imageUrl)
+            const productImage = product.image || product.img || product.imageUrl || undefined;
+            handleProductChange(gridIndex, product.name, formattedPrice, productId, 'basePrice', productImage);
           }
         }}
         onPriceTypeSelect={(gridIndex: number, priceType: string) => {
@@ -215,7 +271,9 @@ export default function TemplatePage () {
                 product.pricing[priceType].currency,
                 product.pricing[priceType].price
               );
-              handleProductChange(gridIndex, selectedProduct.name, formattedPrice, selectedProduct.productId, priceType);
+              // Mevcut image'ı koru (eğer varsa)
+              const currentImage = selectedProduct.image || product.image || product.img || product.imageUrl || undefined;
+              handleProductChange(gridIndex, selectedProduct.name, formattedPrice, selectedProduct.productId, priceType, currentImage);
             }
           }
         }}
@@ -226,11 +284,50 @@ export default function TemplatePage () {
         onPriceClick={(index: string, name: string, price: string) => {
           const idx = parseInt(index);
           const currentProduct = selectedProducts[idx];
-          handleProductChange(idx, name, price, currentProduct?.productId, currentProduct?.priceType)
+          // Mevcut image'ı koru
+          handleProductChange(idx, name, price, currentProduct?.productId, currentProduct?.priceType, currentProduct?.image)
         }}
         selectedProducts={selectedProducts}
         selectedCategory={selectedCategory}
         onCategoryChange={setSelectedCategory}
+        onImageClick={(gridIndex: number) => {
+          setSelectedImageIndex(gridIndex);
+          setSelectedImageCategorySlot(null);
+          // Modal açılmadan önce media'yı kontrol et ve yükle
+          if (availableMedia.length === 0) {
+            const loadMedia = async () => {
+              try {
+                const userCookie = Cookies.get("user");
+                if (userCookie) {
+                  const user = JSON.parse(userCookie) as { id: string };
+                  const response = await fetch(`/api/users/${user.id}/media`);
+                  if (response.ok) {
+                    const result = await response.json();
+                    const rawData = result.data || [];
+                    const formattedData = rawData.map((item: any) => {
+                      const isVideo = ["mp4", "webm", "ogg", "mov"].includes(
+                        item.extension?.toLowerCase().replace(".", "") || ""
+                      );
+                      return {
+                        id: item.id,
+                        name: item.name,
+                        type: (isVideo ? "video" : "image") as "image" | "video",
+                        url: item.url,
+                        uploadedAt: new Date(item.createdAt).toLocaleDateString("tr-TR"),
+                        duration: 0,
+                      };
+                    });
+                    setAvailableMedia(formattedData);
+                  }
+                }
+              } catch (error) {
+                console.error('Media yüklenirken hata:', error);
+              }
+            };
+            loadMedia();
+          }
+          setIsImageSelectorOpen(true);
+        }}
       />
     },
     "template-2": {
@@ -262,19 +359,22 @@ export default function TemplatePage () {
               product.pricing.basePrice.currency,
               product.pricing.basePrice.price
             );
+            // Harici API'den image'ı al (product.image veya product.img veya product.imageUrl)
+            const productImage = product.image || product.img || product.imageUrl || undefined;
             
             setSelectedProductsByCategory(prev => {
               const categoryProducts = prev[categorySlot] || [];
               const newProducts = [...categoryProducts];
               while (newProducts.length <= itemIndex && newProducts.length < 4) {
-                newProducts.push({ name: '', price: '' });
+                newProducts.push({ name: '', price: '', image: undefined });
               }
               if (newProducts[itemIndex]) {
                 newProducts[itemIndex] = {
                   name: product.name,
                   price: formattedPrice,
                   productId: productId,
-                  priceType: 'basePrice'
+                  priceType: 'basePrice',
+                  image: productImage
                 };
               }
               return {
@@ -295,6 +395,8 @@ export default function TemplatePage () {
                 product.pricing[priceType].currency,
                 product.pricing[priceType].price
               );
+              // Mevcut image'ı koru (eğer varsa)
+              const currentImage = currentProduct.image || product.image || product.img || product.imageUrl || undefined;
               
               setSelectedProductsByCategory(prev => {
                 const categoryProducts = [...(prev[categorySlot] || [])];
@@ -302,7 +404,8 @@ export default function TemplatePage () {
                   categoryProducts[itemIndex] = {
                     ...categoryProducts[itemIndex],
                     price: formattedPrice,
-                    priceType: priceType
+                    priceType: priceType,
+                    image: currentImage
                   };
                 }
                 return {
@@ -327,7 +430,7 @@ export default function TemplatePage () {
             Şablon bulunamadı
           </h2>
           <button
-            onClick={() => router.push("/designTemplate")}
+            onClick={() => router.push("/dashboard/designTemplate")}
             className="mt-4 rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary/90"
           >
             Şablonlara Dön
@@ -456,6 +559,108 @@ export default function TemplatePage () {
         </button>
       </div>
       {selectedTemplate.component}
+      
+      {/* Image Selector Modal */}
+      {isImageSelectorOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="relative w-full max-w-6xl max-h-[90vh] rounded-lg bg-white shadow-xl dark:bg-gray-dark overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between border-b border-stroke px-6 py-4 dark:border-stroke-dark">
+              <h2 className="text-xl font-bold text-dark dark:text-white">
+                Fotoğraf Seç
+              </h2>
+              <button
+                onClick={() => {
+                  setIsImageSelectorOpen(false);
+                  setSelectedImageIndex(null);
+                  setSelectedImageCategorySlot(null);
+                }}
+                className="rounded-lg p-2 text-dark-4 transition-all hover:bg-gray-2 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-2 dark:hover:text-white"
+              >
+                <svg
+                  className="size-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="flex-1 overflow-auto p-6">
+              {availableMedia.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <svg
+                    className="mb-4 size-12 text-dark-4 dark:text-dark-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  <p className="text-dark-4 dark:text-dark-6">
+                    Fotoğraf yükleniyor...
+                  </p>
+                  <p className="mt-2 text-sm text-dark-4 dark:text-dark-6">
+                    Henüz yüklenmiş fotoğraf yoksa, önce medya galerisinden fotoğraf yükleyin.
+                  </p>
+                </div>
+              ) : (
+                <MediaGallery
+                  initialData={availableMedia}
+                  showActions={false}
+                  selectionMode={true}
+                  onImageSelect={(imageUrl: string) => {
+                    if (selectedImageIndex !== null && selectedImageCategorySlot === null) {
+                      // Template-1 için
+                      setSelectedProducts(prev => {
+                        const newProducts = [...prev];
+                        if (newProducts[selectedImageIndex]) {
+                          newProducts[selectedImageIndex] = {
+                            ...newProducts[selectedImageIndex],
+                            image: imageUrl
+                          };
+                        }
+                        return newProducts;
+                      });
+                    } else if (selectedImageCategorySlot !== null && selectedImageIndex !== null) {
+                      // Template-2 için
+                      setSelectedProductsByCategory(prev => {
+                        const categoryProducts = [...(prev[selectedImageCategorySlot] || [])];
+                        if (categoryProducts[selectedImageIndex]) {
+                          categoryProducts[selectedImageIndex] = {
+                            ...categoryProducts[selectedImageIndex],
+                            image: imageUrl
+                          };
+                        }
+                        return {
+                          ...prev,
+                          [selectedImageCategorySlot]: categoryProducts
+                        };
+                      });
+                    }
+                    setIsImageSelectorOpen(false);
+                    setSelectedImageIndex(null);
+                    setSelectedImageCategorySlot(null);
+                  }}
+                  gridCols="grid-cols-4 sm:grid-cols-5 md:grid-cols-6"
+                  maxHeight="600px"
+                  disableClick={true}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

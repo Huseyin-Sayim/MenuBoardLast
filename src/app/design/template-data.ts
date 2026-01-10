@@ -15,6 +15,8 @@ export const defaultBurgers = [
     { name: "Döner Tabağı", price: "₺75", desc: "Taze döner, pilav ve salata",category:'Ana Yemekler' },
     { name: "Döner Tabağı", price: "₺75", desc: "Taze döner, pilav ve salata",category:'Ana Yemekler' },
     { name: "Döner Tabağı", price: "₺75", desc: "Taze döner, pilav ve salata",category:'Ana Yemekler' },
+    { name: "Döner Tabağı", price: "₺75", desc: "Taze döner, pilav ve salata",category:'Ana Yemekler' },
+    { name: "Döner Tabağı", price: "₺75", desc: "Taze döner, pilav ve salata",category:'İçecekler' },
     { name: "Döner Tabağı", price: "₺75", desc: "Taze döner, pilav ve salata",category:'İçecekler' },
     { name: "Döner Tabağı", price: "₺75", desc: "Taze döner, pilav ve salata",category:'İçecekler' },
     { name: "Döner Tabağı", price: "₺75", desc: "Taze döner, pilav ve salata",category:'İçecekler' },
