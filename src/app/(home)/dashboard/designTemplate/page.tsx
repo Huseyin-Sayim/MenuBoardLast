@@ -4,10 +4,14 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 type Template = {
-  id: string;
+  id: string; // Config ID
+  templateId: string; // Template ID
   name: string;
   path: string;
   component: string;
+  configId: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export default function DesignTemplatePage() {
@@ -35,8 +39,8 @@ export default function DesignTemplatePage() {
     fetchUserTemplates();
   }, []);
 
-  const handleTemplateClick = (templateComponent: string) => {
-    router.push(`/dashboard/designTemplate/${templateComponent}`);
+  const handleTemplateClick = (templateComponent: string, configId: string) => {
+    router.push(`/dashboard/designTemplate/${templateComponent}?configId=${configId}`);
   };
 
   if (loading) {
@@ -70,12 +74,12 @@ export default function DesignTemplatePage() {
             <div
               key={template.id}
               className="group cursor-pointer overflow-hidden rounded-lg border border-stroke bg-white shadow-sm transition-all hover:shadow-lg dark:border-stroke-dark dark:bg-gray-dark"
-              onClick={() => handleTemplateClick(template.component)}
+              onClick={() => handleTemplateClick(template.component, template.configId)}
             >
               {/* Önizleme */}
               <div className="relative aspect-video w-full overflow-hidden bg-gray-2 dark:bg-dark-2">
                 <iframe
-                  src={template.path}
+                  src={`${template.path}${template.path.includes('?') ? '&' : '?'}configId=${template.configId}`}
                   className="absolute inset-0 border-0"
                   style={{
                     transform: `scale(${Math.min(400 / 1920, 225 / 1080)})`,

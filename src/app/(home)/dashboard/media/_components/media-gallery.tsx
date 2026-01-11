@@ -185,34 +185,35 @@ export function MediaGallery({showActions=true,className,initialData,gridCols = 
   // Normal modda galeri görünümünü göster
   return  (
     <div className="rounded-[10px] bg-white shadow-1 dark:bg-gray-dark dark:shadow-card">
-      <div className="border-b border-stroke px-7.5 py-4 dark:border-stroke-dark">
-        <div className="flex items-center justify-between">
-          <h2 className="text-body-2xlg font-bold text-dark dark:text-white">
+      {/* Başlık bölümü - seçim modunda gizle */}
+      {!selectionMode && (
+        <div className="flex justify-between border-b border-stroke px-7.5 py-4 dark:border-stroke-dark">
+          <span className="font-bold text-black text-2xl">
             Medya
-          </h2>
-          {showActions && (
-            <button
-              onClick={handleUploadClick}
-              className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-all hover:bg-primary/90 active:scale-95"
-            >
-              <svg
-                className="size-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+          </span>
+            {showActions && (
+              <button
+                onClick={handleUploadClick}
+                className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-all hover:bg-primary/90 active:scale-95"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              Yeni Medya Ekle
-            </button>
-          )}
+                <svg
+                  className="size-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                Yeni Medya Ekle
+              </button>
+            )}
         </div>
-      </div>
+      )}
 
       {/* Kategori Filtreleri - Seçim modunda gizle */}
       {!selectionMode && (

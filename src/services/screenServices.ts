@@ -135,7 +135,7 @@ export const getScreenByDeviceId = async (deviceId: string) => {
   }
 }
 
-export const updateScreenConfig = async (screenId: string, configs: {mediaId?: string, templateId?: string, mediaIndex: number, duration:number}[]) => {
+export const updateScreenConfig = async (screenId: string, configs: {mediaId?: string, templateId?: string, templateConfigId?: string, mediaIndex: number, duration:number}[]) => {
   try {
     await prisma.screenConfig.deleteMany({
       where: {
@@ -205,7 +205,13 @@ export const updateScreenConfig = async (screenId: string, configs: {mediaId?: s
         };
       }
 
-      if (config.templateId) {
+      if (config.templateConfigId) {
+        // TemplateConfig ID'si kullanılıyor (her config ayrı)
+        console.log(`Adding TemplateConfig connection for templateConfigId: ${config.templateConfigId}`);
+        data.TemplateConfig = {
+          connect: { id: config.templateConfigId }
+        };
+      } else if (config.templateId) {
         let templateDbId = config.templateId;
         
         if (config.templateId.startsWith('template-')) {
@@ -226,9 +232,9 @@ export const updateScreenConfig = async (screenId: string, configs: {mediaId?: s
         };
       }
 
-      if (!config.mediaId && !config.templateId) {
-        console.error(`Config ${index + 1} has neither mediaId nor templateId`);
-        throw new Error('Config için mediaId veya templateId gereklidir');
+      if (!config.mediaId && !config.templateId && !config.templateConfigId) {
+        console.error(`Config ${index + 1} has neither mediaId, templateId nor templateConfigId`);
+        throw new Error('Config için mediaId, templateId veya templateConfigId gereklidir');
       }
 
       console.log(`Creating ScreenConfig with data:`, JSON.stringify(data, null, 2));
@@ -272,6 +278,28 @@ export const getScreenConfig = async (screenId:string) => {
         where: { id: config.templateId }
       }) : null;
       
+      // TemplateConfig varsa, Template bilgisini de al
+      let templateConfig = null;
+      if (config.templateConfigId) {
+        templateConfig = await prisma.templateConfig.findUnique({
+          where: { id: config.templateConfigId },
+          include: { Template: true }
+        });
+        // TemplateConfig varsa, Template bilgisini TemplateConfig'den al
+        if (templateConfig && templateConfig.Template) {
+          const templateFromConfig = templateConfig.Template;
+          return {
+            ...config,
+            Media: media,
+            Template: templateFromConfig, // TemplateConfig'deki Template'i kullan
+            TemplateConfig: templateConfig,
+            screen: await prisma.screen.findUnique({
+              where: { id: config.screenId }
+            })
+          };
+        }
+      }
+      
       const screen = await prisma.screen.findUnique({
         where: { id: config.screenId }
       });
@@ -280,6 +308,7 @@ export const getScreenConfig = async (screenId:string) => {
         ...config,
         Media: media,
         Template: template,
+        TemplateConfig: templateConfig,
         screen: screen
       };
     }));

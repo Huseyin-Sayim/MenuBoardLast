@@ -4,12 +4,13 @@ import { getTemplateConfig } from "@/services/templateServices";
 import { cookies } from "next/headers";
 
 type Props = {
-  searchParams: Promise<{ preview?: string }>;
+  searchParams: Promise<{ preview?: string; configId?: string }>;
 };
 
 export default async function Template2Page({ searchParams }: Props) {
   const params = await searchParams;
   const isPreview = params.preview === 'true';
+  const configId = params.configId;
   
   // Preview modunda sadece default ayarları göster
   let menuItemsData = menuItems;
@@ -28,7 +29,7 @@ export default async function Template2Page({ searchParams }: Props) {
         });
 
         if (template) {
-          const config = await getTemplateConfig(user.id, template.id);
+          const config = await getTemplateConfig(user.id, template.id, configId);
 
           if (config && config.configData) {
             const configData = config.configData as {

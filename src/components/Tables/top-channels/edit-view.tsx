@@ -51,6 +51,8 @@ type MenuBoardDesign = {
   preview: string;
   isActive: boolean;
   type: "image" | "video";
+  path?: string; // Şablonlar için path bilgisi
+  configId?: string; // TemplateConfig ID'si (config'li şablonlar için)
 };
 
 type Template = {
@@ -58,6 +60,8 @@ type Template = {
   name: string;
   preview: string;
   path: string;
+  configId?: string; // TemplateConfig ID'si
+  component?: string; // Template component (template-1, template-2, vs.)
 };
 
 type PlaylistItemType = {
@@ -144,8 +148,8 @@ function SortableItem({ id, item, isDesign,duration,onDurationChange, onRemove }
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const isTemplate = id.startsWith('template-');
-  const template = isTemplate ? templates.find(t => t.id === id.replace('template-', '')) : null;
+  const isTemplate = id.startsWith('template-') || id.startsWith('config-');
+  const templateItem = isTemplate ? (item as MenuBoardDesign) : null;
   
   const thumbnail = isDesign
     ? (item as MenuBoardDesign).preview
@@ -188,9 +192,11 @@ function SortableItem({ id, item, isDesign,duration,onDurationChange, onRemove }
         </svg>
       </div>
       <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded bg-gray-2 dark:bg-dark-2">
-        {isTemplate && template ? (
+        {isTemplate && templateItem?.path ? (
           <iframe
-            src={template.path}
+            src={templateItem.configId 
+              ? `${templateItem.path}?configId=${templateItem.configId}` 
+              : templateItem.path}
             className="absolute inset-0 border-0"
             style={{
               transform: `scale(${Math.min(80 / 1920, 56 / 1080)})`,
@@ -198,7 +204,7 @@ function SortableItem({ id, item, isDesign,duration,onDurationChange, onRemove }
               width: "1920px",
               height: "1080px",
             }}
-            title={`${template.name} Önizleme`}
+            title={`${templateItem.name} Önizleme`}
             scrolling="no"
           />
         ) : (
@@ -274,6 +280,7 @@ export interface ScreenConfig {
   screenId: string;
   mediaId?: string;
   templateId?: string;
+  templateConfigId?: string; // TemplateConfig ID'si (her config ayrı)
   mediaIndex: number
   duration:number
 }
@@ -341,9 +348,17 @@ export function EditView({
 
   useEffect(() => {
     const formattedConfig: ScreenConfig[] = playlist.map((item, index) => {
-      if (item.isDesign && item.id.startsWith('template-')) {
-        // Template için - ID zaten "template-1" formatında, direkt kullan
-        // Backend'de component field'ına göre gerçek UUID'yi bulacağız
+      if (item.isDesign && item.id.startsWith('config-')) {
+        // Config için - config-{configId} formatında
+        const configId = item.id.replace('config-', '');
+        return {
+          screenId: screenName,
+          templateConfigId: configId, // Config ID'si
+          mediaIndex: index + 1,
+          duration: item.duration,
+        };
+      } else if (item.isDesign && item.id.startsWith('template-')) {
+        // Eski format template için (geriye uyumluluk)
         return {
           screenId: screenName,
           templateId: item.id, // Zaten "template-1" formatında
@@ -377,11 +392,14 @@ export function EditView({
         if (response.ok) {
           const result = await response.json();
           // Template tipine uygun formata çevir (preview ekle)
+          // Her config ayrı bir template olarak gösterilecek
           const formattedTemplates: Template[] = (result.data || []).map((t: any) => ({
-            id: t.id,
+            id: t.configId || t.id, // Config ID'sini kullan (her config ayrı)
             name: t.name,
             path: t.path,
             preview: t.path, // Path'i preview olarak kullan
+            configId: t.configId || t.id, // Config ID'si
+            component: t.component, // Component bilgisi
           }));
           setTemplates(formattedTemplates);
         } else {
@@ -510,23 +528,26 @@ export function EditView({
     setSelectedTemplate(templateId);
     
     const template = templates.find((t) => t.id === templateId);
-    // Template ID'si zaten "template-1" formatında, tekrar "template-" eklemeye gerek yok
-    const playlistId = templateId.startsWith('template-') ? templateId : `template-${templateId}`;
     
-    if (template && !playlist.find((p) => p.id === playlistId)) {
+    if (template && !playlist.find((p) => p.id === `config-${template.configId}`)) {
+      // Her config ayrı bir şablon olarak gösterilecek - config-{configId} formatında ID
+      const playlistId = `config-${template.configId}`;
+      
       // Şablonu MenuBoardDesign formatına çevir
       const templateAsDesign: MenuBoardDesign = {
-        id: template.id,
+        id: template.configId || template.id, // Config ID'sini kullan
         name: template.name,
         preview: template.preview,
         isActive: true,
         type: "image", // Şablonlar görsel olarak kabul ediliyor
+        path: template.path, // Path bilgisini de ekle
+        configId: template.configId, // Config ID'sini ekle (iframe için)
       };
       
       setPlaylist((prev) => [
         ...prev,
         {
-          id: playlistId, // template-1 formatında olacak
+          id: playlistId, // config-{configId} formatında
           item: templateAsDesign,
           isDesign: true,
           duration: 10, // Şablonlar için varsayılan süre
@@ -875,7 +896,9 @@ export function EditView({
                     >
                       <div className="relative aspect-video w-full overflow-hidden bg-gray-2 dark:bg-dark-2">
                         <iframe
-                          src={template.path}
+                          src={template.configId 
+                            ? `${template.path}?configId=${template.configId}` 
+                            : template.path}
                           className="absolute inset-0 border-0"
                           style={{
                             transform: `scale(${Math.min(280 / screenWidth, 160 / screenHeight, 1)})`,

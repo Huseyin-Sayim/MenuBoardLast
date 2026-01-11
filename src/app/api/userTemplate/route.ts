@@ -16,11 +16,14 @@ export async function GET(req: Request) {
 
     const user = JSON.parse(userCookies) as { id: string };
 
-    const userTemplates = await prisma.templateConfig.findMany({
+    const userConfigs = await prisma.templateConfig.findMany({
       where: {
         userId: user.id,
       },
       select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
         Template: {
           select: {
             id: true,
@@ -29,10 +32,37 @@ export async function GET(req: Request) {
             component: true,
           }
         }
+      },
+      orderBy: {
+        createdAt: 'desc'
       }
     });
 
-    const templates = userTemplates.map((ut: any) => ut.Template).filter(Boolean);
+    // Her config için template bilgisini içeren objeler oluştur
+    // Aynı template'in farklı config'lerini ayırt etmek için isimlendirme
+    const templateConfigCounts = new Map<string, number>();
+    const templates = userConfigs.map((config: any) => {
+      const templateKey = config.Template.component || config.Template.id;
+      const currentCount = (templateConfigCounts.get(templateKey) || 0) + 1;
+      templateConfigCounts.set(templateKey, currentCount);
+      
+      // Her config için benzersiz isim oluştur
+      const baseName = config.Template.name;
+      const configName = currentCount > 1 
+        ? `${baseName} - Config ${currentCount}` 
+        : baseName;
+      
+      return {
+        id: config.id, // Config ID'si - unique key için
+        templateId: config.Template.id, // Template ID'si
+        name: configName, // Her config için benzersiz isim
+        path: config.Template.path,
+        component: config.Template.component,
+        configId: config.id, // Config ID'si (referans için)
+        createdAt: config.createdAt,
+        updatedAt: config.updatedAt,
+      };
+    });
 
     return NextResponse.json({
       data: templates,

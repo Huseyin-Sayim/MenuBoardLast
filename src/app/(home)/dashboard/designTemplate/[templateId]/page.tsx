@@ -1,6 +1,6 @@
 "use client"
 
-import {useParams, useRouter} from "next/navigation";
+import {useParams, useRouter, useSearchParams} from "next/navigation";
 import Template1Content from "@/app/design/template-1/component/template-1";
 import Template2Content from "@/app/design/template-2/component/template-2";
 import {defaultBurgers,menuItems} from "@/app/design/template-data";
@@ -18,7 +18,9 @@ type TemplateConfig = {
 export default function TemplatePage () {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const templateId = params?.templateId as string;
+  const configId = searchParams.get('configId') || undefined;
 
   const [selectedCategory,setSelectedCategory] = useState<string>("");
   const [ selectedProducts, setSelectedProducts ] = useState<Array<{
@@ -70,8 +72,12 @@ export default function TemplatePage () {
     })
   }
 
-  const { data: configData, isLoading } = useTemplateConfig(templateId)
+  const { data: configResponse, isLoading } = useTemplateConfig(templateId, configId)
   const updateConfig = useUpdateTemplateConfig();
+  
+  // configResponse artık { configData, configId } formatında
+  const configData = configResponse?.configData;
+  const currentConfigId = configResponse?.configId || configId;
   
   useEffect(() => {
     const fetchCategories = async () => {
@@ -157,7 +163,7 @@ export default function TemplatePage () {
   useEffect(() => {
     if (configData) {
       if (templateId === "template-2") {
-        const config = configData.configData as any;
+        const config = configData as any;
         if (config?.categories) {
           setSelectedCategories(config.categories || {});
         }
@@ -165,8 +171,8 @@ export default function TemplatePage () {
           setSelectedProductsByCategory(config.data || {});
         }
       } else {
-        setSelectedCategory(configData.category || "");
-        setSelectedProducts(configData.data || []);
+        setSelectedCategory((configData as any)?.category || "");
+        setSelectedProducts((configData as any)?.data || []);
       }
     }
   }, [configData, templateId]);
@@ -451,11 +457,19 @@ export default function TemplatePage () {
               updateConfig.mutate(
                 {
                   templateId,
-                  configData: configData as any
+                  configData: configData as any,
+                  configId: currentConfigId
                 },
                 {
                   onSuccess: (data) => {
-                    alert('Başarıyla kaydedildi!');
+                    const savedConfigId = data?.data?.id || currentConfigId;
+                    
+                    // Eğer yeni config oluşturulduysa (currentConfigId yoktu), configId ile sayfayı yenile
+                    if (!currentConfigId && savedConfigId) {
+                      router.push(`/dashboard/designTemplate/${templateId}?configId=${savedConfigId}`);
+                    } else {
+                      alert('Başarıyla kaydedildi!');
+                    }
                   },
                   onError: (error) => {
                     alert('Kaydetme sırasında bir hata oluştu: ' + error.message);

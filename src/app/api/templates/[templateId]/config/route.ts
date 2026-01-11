@@ -19,7 +19,12 @@ export async function GET (
     }
 
     const user = JSON.parse(userCookies) as {id: string};
-    const config = await getTemplateConfig(user.id, templateId)
+    
+    // Query parametresinden configId al
+    const { searchParams } = new URL(req.url);
+    const configId = searchParams.get('configId') || undefined;
+    
+    const config = await getTemplateConfig(user.id, templateId, configId)
 
     if (!config) {
       return NextResponse.json({
@@ -30,7 +35,8 @@ export async function GET (
 
     return NextResponse.json({
       message:'Konfigrasyon başarıyla getirildi.',
-      configData:config.configData
+      configData:config.configData,
+      configId: config.id
     });
 
   } catch (err : any) {
@@ -66,6 +72,9 @@ export async function PUT(
       const body = await req.json();
       console.log('Gelen body:', JSON.stringify(body, null, 2));
       
+      // configId parametresini al
+      const { configId, ...configBody } = body;
+      
       // Template-2 için özel format kontrolü
       const isTemplate2 = templateId === 'template-2' || templateId?.includes('template-2');
       
@@ -73,7 +82,7 @@ export async function PUT(
       
       if (isTemplate2) {
         // Template-2 formatı: { categories: {...}, data: {...} }
-        const { categories, data } = body;
+        const { categories, data } = configBody;
         
         if (!data || typeof data !== 'object' || Array.isArray(data)) {
           console.error('Template-2 için geçersiz veri formatı - data:', data);
@@ -89,7 +98,7 @@ export async function PUT(
         };
       } else {
         // Template-1 formatı: { category: string, data: Array }
-        const { category, data } = body;
+        const { category, data } = configBody;
         
         if (!data || !Array.isArray(data)) {
           console.error('Geçersiz veri formatı - data:', data);
@@ -106,8 +115,9 @@ export async function PUT(
       }
       
       console.log('Kaydedilecek configData:', JSON.stringify(configData, null, 2));
+      console.log('ConfigId:', configId);
 
-      const result = await saveTemplateConfig(user.id,templateId,configData)
+      const result = await saveTemplateConfig(user.id, templateId, configData, configId)
       console.log('Kaydetme başarılı, result:', result);
 
       return NextResponse.json({

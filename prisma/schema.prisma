@@ -87,17 +87,17 @@ model Media {
 }
 
 model ScreenConfig {
-  id               String          @id @default(uuid())
-  screenId         String
-  screen           Screen          @relation(fields: [screenId], references: [id])
-  mediaId          String?
-  templateId       String?
-  mediaIndex       Int
+  id              String         @id @default(uuid())
+  screenId        String
+  screen          Screen         @relation(fields: [screenId], references: [id])
+  mediaId         String?
+  templateId      String?
   templateConfigId String?
-  displayDuration  Int?
-  Media            Media?          @relation(fields: [mediaId], references: [id])
-  Template         Template?       @relation(fields: [templateId], references: [id])
-  TemplateConfig   TemplateConfig? @relation(fields: [templateConfigId], references: [id])
+  mediaIndex      Int
+  displayDuration Int?
+  Media           Media?         @relation(fields: [mediaId], references: [id])
+  Template        Template?      @relation(fields: [templateId], references: [id])
+  TemplateConfig  TemplateConfig? @relation(fields: [templateConfigId], references: [id])
 }
 
 model DeviceScreenCode {

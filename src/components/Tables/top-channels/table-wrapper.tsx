@@ -71,16 +71,46 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
             }
           }
           
-          // Template varsa
+          // TemplateConfig varsa (her config ayrı)
+          if (config.TemplateConfig) {
+            const templateConfig = config.TemplateConfig;
+            const template = templateConfig.Template || config.Template;
+            
+            if (template) {
+              // Config için benzersiz isim oluştur (template ismi + config ID'sinin son 4 karakteri)
+              const configSuffix = templateConfig.id.slice(-4);
+              const configName = `${template.name} - ${configSuffix}`;
+              
+              const templateAsDesign = {
+                id: templateConfig.id, // Config ID'sini kullan
+                name: configName, // Benzersiz isim
+                preview: template.path || "/images/cover/cover-01.png",
+                isActive: true,
+                type: "image" as const,
+                path: template.path,
+                configId: templateConfig.id // Config ID'sini ekle (iframe için)
+              };
+              
+              return {
+                id: `config-${templateConfig.id}`, // config-{configId} formatında
+                item: templateAsDesign,
+                isDesign: true,
+                duration: config.displayDuration ?? 10
+              };
+            }
+          }
+          
+          // Eski format: Template varsa (geriye uyumluluk)
           if (config.Template) {
             const template = config.Template;
             // Template'i MenuBoardDesign formatına çevir
             const templateAsDesign = {
               id: template.component || template.id, // component: template-1, template-2 vs.
               name: template.name,
-              preview: "/images/cover/cover-01.png", // Varsayılan preview
+              preview: template.path || "/images/cover/cover-01.png", // Path'i preview olarak kullan
               isActive: true,
-              type: "image" as const
+              type: "image" as const,
+              path: template.path // Path bilgisini ekle
             };
             
             // Template ID'sini component değerine göre oluştur
@@ -134,6 +164,7 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
       const configsToSave = screenConfig.map(config => ({
         ...(config.mediaId && { mediaId: config.mediaId }),
         ...(config.templateId && { templateId: config.templateId }),
+        ...(config.templateConfigId && { templateConfigId: config.templateConfigId }),
         mediaIndex: config.mediaIndex,
         duration: config.duration
       }));
