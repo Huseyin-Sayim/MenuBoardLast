@@ -118,26 +118,6 @@ const mockMenuBoardDesigns: MenuBoardDesign[] = [
   },
 ];
 
-const templates: Template[] = [
-  {
-    id: "template-1",
-    name: "Şablon 1",
-    preview: "/images/cover/cover-01.png",
-    path: "/design/template-1",
-  },
-  {
-    id: "template-2",
-    name: "Şablon 2",
-    preview: "/images/cover/cover-02.jpg",
-    path: "/design/template-2",
-  },
-  {
-    id: "template-3",
-    name: "Şablon 3",
-    preview: "/images/cover/cover-03.jpg",
-    path: "/design/template-3",
-  },
-];
 
 type SortableItemProps = {
   id: string;
@@ -321,6 +301,7 @@ export function EditView({
   const [designs, setDesigns] = useState(mockMenuBoardDesigns);
   const [activeTab, setActiveTab] = useState<"tasarim" | "medya" | "şablon">("medya");
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [templates, setTemplates] = useState<Template[]>([]);
   const [templatePrices, setTemplatePrices] = useState<Record<string, Record<string | number, string>>>({});
   const [editingPrice, setEditingPrice] = useState<{ templateId: string; itemId: string | number; currentPrice: string } | null>(null);
   const [priceInputValue, setPriceInputValue] = useState<string>("");
@@ -387,6 +368,32 @@ export function EditView({
     console.log("Tertemiz Config:", formattedConfig);
     setReadyScreenConfig(formattedConfig);
   }, [playlist, screenName]);
+
+  // Kullanıcının sahip olduğu template'leri çek
+  useEffect(() => {
+    const fetchUserTemplates = async () => {
+      try {
+        const response = await fetch("/api/userTemplate");
+        if (response.ok) {
+          const result = await response.json();
+          // Template tipine uygun formata çevir (preview ekle)
+          const formattedTemplates: Template[] = (result.data || []).map((t: any) => ({
+            id: t.id,
+            name: t.name,
+            path: t.path,
+            preview: t.path, // Path'i preview olarak kullan
+          }));
+          setTemplates(formattedTemplates);
+        } else {
+          console.error("Kullanıcı template'leri getirilemedi");
+        }
+      } catch (error) {
+        console.error("Kullanıcı template'leri getirilirken hata:", error);
+      }
+    };
+
+    fetchUserTemplates();
+  }, []);
 
   useEffect(() => {
     const fetchName = async () => {

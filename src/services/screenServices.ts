@@ -137,8 +137,6 @@ export const getScreenByDeviceId = async (deviceId: string) => {
 
 export const updateScreenConfig = async (screenId: string, configs: {mediaId?: string, templateId?: string, mediaIndex: number, duration:number}[]) => {
   try {
-    console.log('updateScreenConfig called with:', { screenId, configs: JSON.stringify(configs, null, 2) });
-    
     await prisma.screenConfig.deleteMany({
       where: {
         screenId: screenId
@@ -150,11 +148,10 @@ export const updateScreenConfig = async (screenId: string, configs: {mediaId?: s
       return [];
     }
 
-    // Önce tüm template ID'lerini topla ve veritabanından gerçek ID'lerini bul veya oluştur
     const templateComponentMap = new Map<string, string>();
     for (const config of configs) {
       if (config.templateId && config.templateId.startsWith('template-')) {
-        const component = config.templateId; // template-1
+        const component = config.templateId;
         if (!templateComponentMap.has(component)) {
           const path = `/design/${component}`;
           console.log(`Looking for template with path: ${path}`);
@@ -163,7 +160,6 @@ export const updateScreenConfig = async (screenId: string, configs: {mediaId?: s
             where: { path: path }
           });
           
-          // Template yoksa oluştur
           if (!template) {
             const name = component === 'template-1' ? 'Şablon 1' : 
                          component === 'template-2' ? 'Şablon 2' : 
@@ -202,7 +198,6 @@ export const updateScreenConfig = async (screenId: string, configs: {mediaId?: s
         displayDuration: config.duration || 10
       };
 
-      // Media varsa bağla
       if (config.mediaId) {
         console.log(`Adding Media connection for mediaId: ${config.mediaId}`);
         data.Media = {
@@ -210,11 +205,9 @@ export const updateScreenConfig = async (screenId: string, configs: {mediaId?: s
         };
       }
 
-      // Template varsa bağla - templateId component değeri ise (template-1, template-2) gerçek ID'yi bul
       if (config.templateId) {
         let templateDbId = config.templateId;
         
-        // Eğer template-1, template-2 gibi bir component değeri ise, map'ten gerçek ID'yi al
         if (config.templateId.startsWith('template-')) {
           const component = config.templateId; // template-1
           const foundId = templateComponentMap.get(component);
@@ -233,7 +226,6 @@ export const updateScreenConfig = async (screenId: string, configs: {mediaId?: s
         };
       }
 
-      // En az birisi olmalı
       if (!config.mediaId && !config.templateId) {
         console.error(`Config ${index + 1} has neither mediaId nor templateId`);
         throw new Error('Config için mediaId veya templateId gereklidir');
@@ -262,7 +254,6 @@ export const getScreenConfig = async (screenId:string) => {
   try {
     console.log('getScreenConfig called with screenId:', screenId);
     
-    // Önce ScreenConfig'leri çek
     const configs = await prisma.screenConfig.findMany({
       where: {
         screenId: screenId
@@ -272,8 +263,7 @@ export const getScreenConfig = async (screenId:string) => {
       }
     });
     
-    // Sonra her bir config için Media ve Template'leri ayrı ayrı çek
-    const result = await Promise.all(configs.map(async (config) => {
+    const result = await Promise.all(configs.map(async (config: any) => {
       const media = config.mediaId ? await prisma.media.findUnique({
         where: { id: config.mediaId }
       }) : null;

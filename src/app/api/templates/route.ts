@@ -1,6 +1,5 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { getAllTemplatesWithConfigs } from "@/services/templateService";
+import { getAllTemplates, createTemplate } from "@/services/templateServices";
 
 const getDefaultConfig = (component: string) => {
   if (component === 'template-1') {
@@ -43,20 +42,9 @@ const getDefaultConfig = (component: string) => {
 
 export async function GET(req:Request) {
   try {
-    const cookieStore = await cookies();
-    const userCokkies = cookieStore.get('user')?.value;
+    const templates = await getAllTemplates();
 
-    if (!userCokkies) {
-      return NextResponse.json(
-        { message: 'Kullanıcı oturumu bulunamadı.' },
-        { status: 401 }
-      )
-    }
-
-    const user = JSON.parse(userCokkies) as { id: string };
-    const templates = await getAllTemplatesWithConfigs(user.id);
-
-    const templatesWithDefaults = templates.map((template) => {
+    const templatesWithDefaults = templates.map((template : any) => {
       const defaultConfig = getDefaultConfig(template.component);
 
       return {
@@ -64,10 +52,8 @@ export async function GET(req:Request) {
         name: template.name,
         path: template.path,
         component: template.component,
-        hasUserConfig: template.hasUserConfig,
         defaultConfig: defaultConfig,
-        userConfig: template.userConfig,
-        displayConfig: template.userConfig || defaultConfig
+        displayConfig: defaultConfig
       }
     })
 
@@ -79,9 +65,37 @@ export async function GET(req:Request) {
 
   } catch (err : any) {
     return NextResponse.json(
-      { message: 'Template\'ler getirildi.' + err.message },
+      { message: 'Template\'ler getirilemedi: ' + err.message },
       { status: 500 }
     )
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    const { name, path, component } = body;
+
+    if (!name || !path || !component) {
+      return NextResponse.json(
+        { message: 'Name, path ve component alanları zorunludur' },
+        { status: 400 }
+      );
+    }
+
+    const template = await createTemplate({ name, path, component });
+
+    return NextResponse.json({
+      message: 'Şablon başarıyla oluşturuldu',
+      data: template
+    }, { status: 201 });
+
+  } catch (err: any) {
+    console.error('Template oluşturma hatası:', err);
+    return NextResponse.json(
+      { message: 'Şablon oluşturulamadı: ' + err.message },
+      { status: 500 }
+    );
   }
 }
 
