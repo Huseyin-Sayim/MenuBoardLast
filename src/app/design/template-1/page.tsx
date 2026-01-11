@@ -4,12 +4,13 @@ import { cookies } from "next/headers";
 import { getTemplateConfig } from "@/services/templateServices";
 
 type Props = {
-  searchParams: Promise<{ preview?: string }>;
+  searchParams: Promise<{ preview?: string; configId?: string }>;
 };
 
 export default async function Template1Page({ searchParams }: Props) {
   const params = await searchParams;
   const isPreview = params.preview === 'true';
+  const configId = params.configId;
   
   // Preview modunda sadece default ayarları göster
   let burgerItems = defaultBurgers;
@@ -29,12 +30,12 @@ export default async function Template1Page({ searchParams }: Props) {
         });
         
         if (template) {
-          const config = await getTemplateConfig(user.id, template.id);
+          const config = await getTemplateConfig(user.id, template.id, configId);
           
           if (config && config.configData) {
             const configData = config.configData as {
               category?: string;
-              data?: Array<{ name: string; price: string }>;
+              data?: Array<{ name: string; price: string; image?: string }>;
             };
             
             if (configData.data && configData.data.length > 0) {
@@ -42,8 +43,8 @@ export default async function Template1Page({ searchParams }: Props) {
                 id: index + 1,
                 name: item.name || '',
                 price: item.price ? item.price.replace(/[^\d]/g, '') : '0',
-                img: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop",
-                heroIMG: "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=1000&auto=format&fit=crop",
+                img: item.image || "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop",
+                heroIMG: item.image || "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=1000&auto=format&fit=crop",
                 heroTitle: item.name || 'Menü',
                 category: configData.category || '',
               }));

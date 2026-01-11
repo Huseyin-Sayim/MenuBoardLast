@@ -372,11 +372,7 @@ export default function Template1Content({
                 </div>
               </div>
             ))}
-          </div>
-
-          <div className="slogan-footer">
-            EN İYİ BURGERLAR BASİT, SULU VE DAĞINIKTIR
-          </div>
+          </div>  
         </div>
       </div>
 
@@ -436,12 +432,14 @@ export default function Template1Content({
           font-weight: 900;
           transform: rotate(-3deg);
           box-shadow: 4px 4px 0 #e31818;
+          margin-left: 3vh;
         }
 
         .title-large {
           font-size: 7vw;
           line-height: 0.8;
           margin: 0;
+          margin-left: 5vh;
           text-shadow: 6px 6px 0px #000;
         }
 
@@ -455,10 +453,16 @@ export default function Template1Content({
         }
 
         .hero-burger {
-        border-radius: 5% !important;
+          border-radius: 10% !important;
+          width: 100%;
+          height: 48vh;
+          min-height: 48vh;
           max-height: 48vh;
+          object-fit: contain;
+          object-position: center;
           filter: drop-shadow(0 25px 40px rgba(0,0,0,0.9));
           margin-bottom: 2vh;
+          margin-left: -10vh;
         }
 
         .hours-label {
@@ -505,15 +509,25 @@ export default function Template1Content({
         }
 
         .thumb-box {
-          width: 11vh;
-          height: 11vh;
+          width: 16vh;
+          height: 16vh;
+          min-width: 16vh;
+          min-height: 16vh;
           border-radius: 50%;
           overflow: hidden;
           border: 3px solid #fff;
           flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
-        .thumb-box img { width: 100%; height: 100%; object-fit: cover; }
+        .thumb-box img { 
+          width: 100%; 
+          height: 100%; 
+          object-fit: cover; 
+          display: block;
+        }
 
         .item-txt {
           flex: 1;

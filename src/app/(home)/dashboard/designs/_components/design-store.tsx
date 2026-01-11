@@ -65,21 +65,16 @@ export function DesignStore({ templates }: DesignStoreProps) {
       const result = await response.json();
 
       if (response.ok) {
-        // API'den tekrar kullanıcının template'lerini çek (güncel liste için)
-        try {
-          const userTemplatesResponse = await fetch("/api/userTemplate");
-          if (userTemplatesResponse.ok) {
-            const userTemplatesResult = await userTemplatesResponse.json();
-            const templateIds = (userTemplatesResult.data || []).map((t: any) => t.id);
-            setUserTemplateIds(templateIds);
-          }
-        } catch (err) {
-          console.error("Template listesi güncellenirken hata:", err);
-          // Fallback: Manuel olarak ID'yi ekle
-          setUserTemplateIds((prev) => [...prev, template.id]);
+        // Oluşturulan configId ve component ile yönlendir
+        const configId = result.data?.id;
+        const component = result.data?.component || template.component;
+        
+        if (configId) {
+          router.push(`/dashboard/designTemplate/${component}?configId=${configId}`);
+        } else {
+          // Fallback: component ile yönlendir (configId yoksa)
+          router.push(`/dashboard/designTemplate/${component}`);
         }
-        // Düzenleme sayfasına yönlendir
-        router.push(`/dashboard/designTemplate/${template.component}`);
       } else {
         alert(result.message || "Şablon alınırken bir hata oluştu");
       }
@@ -235,8 +230,8 @@ export function DesignStore({ templates }: DesignStoreProps) {
                   {template.name}
                 </h3>
                 
-                {/* Butonlar - Sadece sahip değilse göster */}
-                {!loadingUserTemplates && !hasTemplate && (
+                {/* Butonlar - Her zaman göster */}
+                {!loadingUserTemplates && (
                   <div className="flex gap-2">
                     <button
                       onClick={(e) => handleAcquireTemplate(template, e)}
