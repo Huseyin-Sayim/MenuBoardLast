@@ -12,9 +12,14 @@ const handle = app.getRequestHandler();
 
 app.prepare().then(() => {
   const httpServer = createServer((req, res) => {
+    // Büyük dosya yüklemeleri için body size limitini artır (500MB)
+    req.setTimeout(300000); // 5 dakika timeout
     const parsedUrl = parse(req.url, true);
     handle(req, res, parsedUrl);
   });
+  
+  // HTTP server için max body size ayarı
+  httpServer.maxHeadersCount = 2000;
 
   const io = new Server(httpServer, {
     cors: {

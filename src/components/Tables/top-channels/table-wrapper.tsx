@@ -231,12 +231,12 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
   return (
     <div
       className={cn(
-        "grid rounded-[10px] bg-white px-7.5 pb-4 pt-7.5 shadow-1 dark:bg-gray-dark dark:shadow-card",
+         "max-h-[550px] overflow-y-auto grid rounded-[10px] bg-white px-7.5 pb-4 pt-7.5 shadow-1 dark:bg-gray-dark dark:shadow-card",
         className,
       )}
     >
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-body-2xlg font-bold text-dark dark:text-white">
+        <h2 className=" text-body-2xlg font-bold text-dark dark:text-white">
           Ekranlar
         </h2>
         {showActions && (

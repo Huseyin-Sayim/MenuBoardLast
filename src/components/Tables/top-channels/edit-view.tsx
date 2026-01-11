@@ -464,18 +464,24 @@ export function EditView({
         const container = previewContainerRef.current;
         if (!container) return;
         
-        // Container'ın gerçek boyutlarını al (clientWidth/clientHeight padding'i otomatik çıkarır)
+        // Container'ın gerçek iç boyutlarını al (clientWidth/clientHeight padding'i otomatik çıkarır)
         const containerWidth = container.clientWidth;
         const containerHeight = container.clientHeight;
         
-        // Güvenli margin için alan bırak (%3 - minimum margin)
-        const availableWidth = containerWidth * 0.97;
-        const availableHeight = containerHeight * 0.97;
-        
         // Ölçeklendirmeyi hesapla - şablonun önizleme alanına tam sığması için
-        const scaleX = availableWidth / screenWidth;
-        const scaleY = availableHeight / screenHeight;
-        const scale = Math.min(scaleX, scaleY, 1);
+        // Math.min kullanarak en küçük oranı al, böylece hem genişlik hem yükseklik sığar
+        if (containerWidth <= 0 || containerHeight <= 0) {
+          setPreviewScale(1);
+          return;
+        }
+        
+        // Container'a tam sığması için scale hesapla
+        const scaleX = containerWidth / screenWidth;
+        const scaleY = containerHeight / screenHeight;
+        const scale = Math.min(scaleX, scaleY);
+        
+        // Scale'in geçerli olduğundan emin ol ve ayarla
+        setPreviewScale(Math.max(0.01, scale));
         
         setPreviewScale(scale);
       };
@@ -509,6 +515,8 @@ export function EditView({
   const handleMediaSelect = (mediaId: string) => {
     setSelectedMediaId(mediaId);
     setSelectedDesign(`media-${mediaId}`);
+    // Şablon seçimini temizle
+    setSelectedTemplate(null);
 
     const media = mediaItems.find((m) => m.id === mediaId);
     if (media && !playlist.find((p) => p.id === `media-${mediaId}`)) {
@@ -526,6 +534,9 @@ export function EditView({
 
   const handleTemplateSelect = (templateId: string) => {
     setSelectedTemplate(templateId);
+    // Medya seçimini temizle
+    setSelectedMediaId(null);
+    setSelectedDesign(`template-${templateId}`);
     
     const template = templates.find((t) => t.id === templateId);
     
@@ -642,7 +653,7 @@ export function EditView({
             <div className="flex-1 rounded-lg border-[1.5px] border-[#F3F3FE] bg-[#F3F3FE] p-4 dark:border-dark-3 dark:bg-dark-3">
               <div
                 ref={previewContainerRef}
-                className="relative w-full rounded-lg shadow-lg"
+                className="relative w-full h-full rounded-lg shadow-lg"
                 style={{
                   aspectRatio: aspectRatio,
                   maxHeight: maxHeight,
@@ -654,63 +665,22 @@ export function EditView({
               >
                 {activeTemplate ? (
                   <div className="absolute inset-0 flex items-center justify-center" style={{ overflow: 'hidden' }}>
-                    <div 
-                      className="relative"
-                      style={{ 
+                    <iframe
+                      src={activeTemplate.configId 
+                        ? `${activeTemplate.path}?configId=${activeTemplate.configId}` 
+                        : activeTemplate.path}
+                      className="border-0"
+                      style={{
                         width: `${screenWidth}px`,
                         height: `${screenHeight}px`,
                         transform: `scale(${previewScale})`,
                         transformOrigin: "center center",
+                        flexShrink: 0,
                       }}
-                    >
-                      <div 
-                        style={{ 
-                          position: 'relative', 
-                          width: `${screenWidth}px`, 
-                          height: `${screenHeight}px`, 
-                          overflow: 'visible',
-                        }}
-                      >
-                        {activeTemplate.id === "template-1" && (
-                          <Template1Content
-                            burgerItems={template1Data}
-                            prices={templatePrices[activeTemplate.id] as Record<string, string>}
-                            onPriceClick={(itemName: string, currentPrice: string) => {
-                             setTemplatePrices((prev) =>({
-                               ...prev,
-                               [activeTemplate.id]: {
-                                 ...prev[activeTemplate.id],
-                                 [itemName]: currentPrice
-                               }
-                             }))
-                              setPriceInputValue(currentPrice.replace("₺", ""));
-                            }}
-                            isEditable={true}
-                          />
-                        )}
-                        {activeTemplate.id === "template-2" && (
-                          <Template2Content
-                            menuItems={template2Data}
-                            prices={templatePrices[activeTemplate.id] as Record<string, string>}
-                            onPriceClick={(itemName:string, currentPrice:string) => {
-                              setEditingPrice({ templateId: activeTemplate.id, itemId: itemName, currentPrice });
-                              setPriceInputValue(currentPrice.replace("₺", ""));
-                            }}
-                            isEditable={true}
-                          />
-                        )}
-                        {activeTemplate.id === "template-3" && (
-                          <Template3Content
-                            prices={templatePrices[activeTemplate.id] as Record<string, string>}
-                            onPriceClick={(itemName, currentPrice) => {
-                              setEditingPrice({ templateId: activeTemplate.id, itemId: itemName, currentPrice });
-                              setPriceInputValue(currentPrice.replace("₺", ""));
-                            }}
-                            isEditable={true}
-                          />
-                        )}
-                      </div>
-                    </div>
+                      title={`${activeTemplate.name} Önizleme`}
+                      scrolling="no"
+                      allowFullScreen
+                    />
                   </div>
                 ) : activeMedia ? (
                   <div className="absolute inset-0 flex items-center justify-center">

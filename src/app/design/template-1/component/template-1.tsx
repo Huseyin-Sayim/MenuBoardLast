@@ -44,16 +44,12 @@ export default function Template1Content({
     null,
   );
   const [editingValue, setEditingValue] = useState<string>("");
-  // selectedCategory prop'tan geliyor, state'e gerek yok
 
 
-  // Grid için her zaman 6 item göster - Index'leri korumak için
   const fixedBurgerItems: BurgerItem[] = Array.from({ length: 6 }, (_, gridIndex) => {
-    // Eğer bu index'te ürün varsa onu kullan
     if (burgerItems && burgerItems[gridIndex] && burgerItems[gridIndex]?.name) {
       return burgerItems[gridIndex];
     }
-    // Yoksa boş slot
     return {
       id: gridIndex + 1,
       name: '',
@@ -63,7 +59,6 @@ export default function Template1Content({
     };
   });
 
-  // API'den gelen kategorileri kullan, yoksa burgerItems'ten çıkar
   const uniqueCategories = availableCategories && availableCategories.length > 0
     ? availableCategories.map(cat => ({ id: cat._id, name: cat.name }))
     : Array.from(new Set(fixedBurgerItems.map((item) => item.category).filter((cat): cat is string => cat !== undefined && cat !== null))).map(cat => ({ id: cat, name: cat }));
@@ -74,7 +69,6 @@ export default function Template1Content({
   console.log('Template1 - uniqueCategories:', uniqueCategories);
   console.log('Template1 - fixedBurgerItems:', fixedBurgerItems);
 
-  // Grid'de her zaman 6 item göster
   const filteredBurgers = fixedBurgerItems;
 
   const heroItem = filteredBurgers[0];
@@ -113,9 +107,7 @@ export default function Template1Content({
                 </span>
               ))}
           </h1>
-          <div className="main-burger-wrapper">
             <img src={heroIMG} className="hero-burger" alt="Hero Burger" />
-          </div>
         </div>
 
         <div className="pane-menu">
@@ -451,18 +443,27 @@ export default function Template1Content({
           display: flex;
           justify-content: center;
         }
-
-        .hero-burger {
-          border-radius: 10% !important;
+        
+        .hero-burger-container {
           width: 100%;
           height: 48vh;
-          min-height: 48vh;
-          max-height: 48vh;
-          object-fit: contain;
+          background-color: rgba(255, 255, 255, 0.05); /* Arka planı hafif belirgin yapabilirsin */
+          border-radius: 50px; /* İstediğin yuvarlaklık */
+          overflow: hidden;    /* İçindeki resmin taşan kısımlarını keser */
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-left: -5vh;   /* Senin eski kodundaki kaydırma */
+        }
+
+        .hero-burger {
+          width: 60vh; 
+          height: 45vh;
+          object-fit: cover; 
+          border-radius: 5% !important;
           object-position: center;
-          filter: drop-shadow(0 25px 40px rgba(0,0,0,0.9));
-          margin-bottom: 2vh;
-          margin-left: -10vh;
+          display: block;
+          margin: 0 auto;
         }
 
         .hours-label {
@@ -480,7 +481,7 @@ export default function Template1Content({
           flex-direction: column;
           justify-content: space-between;
           height:100vh;
-          overflow-y: auto;
+          overflow-y: hidden;
         }
 
         .grid-layout {

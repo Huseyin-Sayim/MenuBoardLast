@@ -53,14 +53,14 @@ export async function GET(req: Request) {
         : baseName;
       
       return {
-        id: config.id, // Config ID'si - unique key için
-        templateId: config.Template.id, // Template ID'si
+      id: config.id, // Config ID'si - unique key için
+      templateId: config.Template.id, // Template ID'si
         name: configName, // Her config için benzersiz isim
-        path: config.Template.path,
-        component: config.Template.component,
-        configId: config.id, // Config ID'si (referans için)
-        createdAt: config.createdAt,
-        updatedAt: config.updatedAt,
+      path: config.Template.path,
+      component: config.Template.component,
+      configId: config.id, // Config ID'si (referans için)
+      createdAt: config.createdAt,
+      updatedAt: config.updatedAt,
       };
     });
 

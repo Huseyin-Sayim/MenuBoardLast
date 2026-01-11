@@ -16,9 +16,10 @@ type GalleryImage = {
 interface GalleryProps {
   initialData: GalleryImage[];
   userRole: 'admin' | 'user';
+  showActions?: boolean;
 }
 
-export function Gallery({ initialData, userRole }: GalleryProps) {
+export function Gallery({ initialData, userRole, showActions = true }: GalleryProps) {
   const [images, setImages] = useState<GalleryImage[]>(initialData);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -183,7 +184,7 @@ export function Gallery({ initialData, userRole }: GalleryProps) {
         <h2 className="text-body-2xlg font-bold text-dark dark:text-white">
           Galeri
         </h2>
-        {userRole === 'admin' && (
+        {showActions && userRole === 'admin' && (
           <button
             onClick={() => setIsUploadModalOpen(true)}
             className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary/90"
@@ -362,33 +363,36 @@ export function Gallery({ initialData, userRole }: GalleryProps) {
       )}
 
       {/* Galeri Grid - Admin için silme butonlu, User için sadece görüntüleme */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-        {images.map((image) => (
-          <div
-            key={image.id}
-            className="group relative aspect-square overflow-hidden rounded-lg border border-stroke bg-gray-2 dark:border-stroke-dark dark:bg-dark-2"
-          >
-            <Image
-              src={image.url}
-              alt={image.name}
-              fill
-              className="object-cover transition-transform group-hover:scale-110"
-            />
-            {/* Silme Butonu - Sadece Admin için */}
-            {userRole === 'admin' && (
-              <button
-                onClick={() => handleDelete(image.id)}
-                className="absolute right-2 top-2 rounded-full bg-red-500 p-2 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
-                title="Sil"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polyline points="3 6 5 6 21 6" />
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                </svg>
-              </button>
-            )}
-          </div>
-        ))}
+      {/* Maksimum 3 satır göster (yan yana 6 fotoğraf), fazlası için scroll */}
+      <div className="max-h-[450px] overflow-y-auto">
+        <div className="grid grid-cols-6 gap-4">
+          {images.map((image) => (
+            <div
+              key={image.id}
+              className="group relative aspect-square overflow-hidden rounded-lg border border-stroke bg-gray-2 dark:border-stroke-dark dark:bg-dark-2"
+            >
+              <Image
+                src={image.url}
+                alt={image.name}
+                fill
+                className="object-cover transition-transform group-hover:scale-110"
+              />
+              {/* Silme Butonu - Sadece Admin için */}
+              {showActions && userRole === 'admin' && (
+                <button
+                  onClick={() => handleDelete(image.id)}
+                  className="absolute right-2 top-2 rounded-full bg-red-500 p-2 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
+                  title="Sil"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       {images.length === 0 && (

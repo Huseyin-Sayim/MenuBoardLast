@@ -12,10 +12,8 @@ export default async function Template1Page({ searchParams }: Props) {
   const isPreview = params.preview === 'true';
   const configId = params.configId;
   
-  // Preview modunda sadece default ayarları göster
   let burgerItems = defaultBurgers;
   
-  // Preview değilse kullanıcı config'ini kontrol et
   if (!isPreview) {
     const cookieStore = await cookies();
     const userCookie = cookieStore.get('user')?.value;
