@@ -434,7 +434,6 @@ export default function TemplatePage () {
         <button
           onClick={() => {
             if (templateId) {
-              console.log('Kaydet butonuna tıklandı');
               console.log('templateId:', templateId);
               console.log('selectedCategory:', selectedCategory);
               console.log('selectedProducts:', selectedProducts);
@@ -456,17 +455,14 @@ export default function TemplatePage () {
                 },
                 {
                   onSuccess: (data) => {
-                    console.log('Kaydetme başarılı:', data);
                     alert('Başarıyla kaydedildi!');
                   },
                   onError: (error) => {
-                    console.error('Kaydetme hatası:', error);
                     alert('Kaydetme sırasında bir hata oluştu: ' + error.message);
                   }
                 }
               );
             } else {
-              console.error('templateId bulunamadı');
               alert('Template ID bulunamadı!');
             }
           }}

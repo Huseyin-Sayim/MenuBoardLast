@@ -95,3 +95,13 @@ export const getFormattedMedia = async (userId: string) => {
     };
   });
 };
+
+export const deleteMedia = async (id: string)=> {
+  try {
+    return await prisma.media.delete({
+      where: { id: id }
+    })
+  } catch (error: any) {
+    throw new Error('Media silme başarısız: ', error.message);
+  }
+}
