@@ -4,7 +4,7 @@ import * as jose from "jose"
 export default async function middleware (req: NextRequest) {
   const authHeader = req.headers.get('authorization');
   const headerToken = authHeader?.split(' ')[1];
-  const {pathname} = req.nextUrl;
+  const {pathname, searchParams} = req.nextUrl;
   const cookieToken = req.cookies.get('accessToken')?.value;
   const refreshToken = req.cookies.get('refreshToken')?.value;
 
@@ -12,6 +12,10 @@ export default async function middleware (req: NextRequest) {
   let newTokenCreated = false;
 
   const publicPaths = ['/api/login', '/api/register','/api/check-db', '/api/refresh', '/auth/sign-in', '/auth/sign-up', '/auth/forgot-password']
+  
+  // ConfigId veya preview ile erişilen design/configs route'unu public yap
+  const isPublicConfigsRoute = pathname === '/design/configs' && 
+    (searchParams.get('configId') || searchParams.get('preview') === 'true');
   
   // Büyük dosya yüklemeleri için media API'sini bypass et (body parsing limitini aşmak için)
   if (pathname === '/api/media' && req.method === 'POST') {
@@ -24,7 +28,7 @@ export default async function middleware (req: NextRequest) {
     return NextResponse.next();
   }
 
-  if (publicPaths.some(path => pathname.startsWith(path))) {
+  if (publicPaths.some(path => pathname.startsWith(path)) || isPublicConfigsRoute) {
     return NextResponse.next();
   }
 

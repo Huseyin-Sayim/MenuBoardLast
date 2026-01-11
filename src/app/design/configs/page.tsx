@@ -31,29 +31,10 @@ export default async function ConfigsPage({ searchParams }: Props) {
     );
   }
 
-  // Kullanıcı kontrolü
-  const cookieStore = await cookies();
-  const userCookie = cookieStore.get('user')?.value;
-
-  if (!userCookie) {
-    return (
-      <div className="w-full h-auto rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
-        <div className="text-center text-red-500">
-          Kullanıcı oturumu bulunamadı. Lütfen giriş yapın.
-        </div>
-      </div>
-    );
-  }
-
   try {
-    const user = JSON.parse(userCookie) as { id: string };
-
-    // ConfigId ile TemplateConfig'i getir (kullanıcı kontrolü ile)
-    const config = await prisma.templateConfig.findFirst({
-      where: {
-        id: configId,
-        userId: user.id, // Sadece kullanıcının kendi config'ine erişebilir
-      },
+    // ConfigId varsa public erişim (userId kontrolü olmadan)
+    const config = await prisma.templateConfig.findUnique({
+      where: { id: configId },
       include: {
         Template: true, // Template bilgisini de getir
       },
