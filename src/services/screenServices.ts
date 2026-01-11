@@ -137,8 +137,6 @@ export const getScreenByDeviceId = async (deviceId: string) => {
 
 export const updateScreenConfig = async (screenId: string, configs: {mediaId?: string, templateId?: string, mediaIndex: number, duration:number}[]) => {
   try {
-    console.log('updateScreenConfig called with:', { screenId, configs: JSON.stringify(configs, null, 2) });
-    
     await prisma.screenConfig.deleteMany({
       where: {
         screenId: screenId
@@ -150,11 +148,10 @@ export const updateScreenConfig = async (screenId: string, configs: {mediaId?: s
       return [];
     }
 
-    // Önce tüm template ID'lerini topla ve veritabanından gerçek ID'lerini bul veya oluştur
     const templateComponentMap = new Map<string, string>();
     for (const config of configs) {
       if (config.templateId && config.templateId.startsWith('template-')) {
-        const component = config.templateId; // template-1
+        const component = config.templateId;
         if (!templateComponentMap.has(component)) {
           const path = `/design/${component}`;
           console.log(`Looking for template with path: ${path}`);
@@ -163,7 +160,6 @@ export const updateScreenConfig = async (screenId: string, configs: {mediaId?: s
             where: { path: path }
           });
           
-          // Template yoksa oluştur
           if (!template) {
             const name = component === 'template-1' ? 'Şablon 1' : 
                          component === 'template-2' ? 'Şablon 2' : 
@@ -211,7 +207,7 @@ export const updateScreenConfig = async (screenId: string, configs: {mediaId?: s
 
       if (config.templateId) {
         let templateDbId = config.templateId;
-
+        
         if (config.templateId.startsWith('template-')) {
           const component = config.templateId; // template-1
           const foundId = templateComponentMap.get(component);
@@ -258,7 +254,6 @@ export const getScreenConfig = async (screenId:string) => {
   try {
     console.log('getScreenConfig called with screenId:', screenId);
     
-    // Önce ScreenConfig'leri çek
     const configs = await prisma.screenConfig.findMany({
       where: {
         screenId: screenId
@@ -268,8 +263,7 @@ export const getScreenConfig = async (screenId:string) => {
       }
     });
     
-    // Sonra her bir config için Media ve Template'leri ayrı ayrı çek
-    const result = await Promise.all(configs.map(async (config) => {
+    const result = await Promise.all(configs.map(async (config: any) => {
       const media = config.mediaId ? await prisma.media.findUnique({
         where: { id: config.mediaId }
       }) : null;

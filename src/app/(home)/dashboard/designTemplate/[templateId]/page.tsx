@@ -7,7 +7,6 @@ import {defaultBurgers,menuItems} from "@/app/design/template-data";
 import { useEffect, useState } from "react";
 import { useTemplateConfig, useUpdateTemplateConfig } from "@/hooks/use-template-config";
 import { MediaGallery, MediaItem } from "@/app/(home)/dashboard/media/_components/media-gallery";
-import Cookies from "js-cookie";
 
 
 type TemplateConfig = {
@@ -32,7 +31,6 @@ export default function TemplatePage () {
   const [availableCategories, setAvailableCategories] = useState<Array<{_id: string; name: string}>>([]);
   const [availableProducts, setAvailableProducts] = useState<Array<{_id: string; name: string; pricing: any; category: string; image?: string; img?: string; imageUrl?: string}>>([]);
   
-  // Template-2 için kategori bazlı state'ler
   const [selectedCategories, setSelectedCategories] = useState<Record<string, string>>({});
   const [selectedProductsByCategory, setSelectedProductsByCategory] = useState<Record<string, Array<{
     name: string;
@@ -42,13 +40,11 @@ export default function TemplatePage () {
     image?: string;
   }>>>({});
   
-  // Image seçimi için modal state'leri
   const [isImageSelectorOpen, setIsImageSelectorOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [selectedImageCategorySlot, setSelectedImageCategorySlot] = useState<string | null>(null);
   const [availableMedia, setAvailableMedia] = useState<MediaItem[]>([]);
 
-  // Fiyat formatlama helper function
   const formatPrice = (currency?: string, price?: number): string => {
     if (typeof price !== 'number') return '';
     
@@ -62,11 +58,9 @@ export default function TemplatePage () {
   const handleProductChange = (index: number, name: string, price: string, productId?: string, priceType?: string, image?: string) => {
     setSelectedProducts(prev => {
       const newProducts = [...prev];
-      // Array'i 6 elemana kadar genişlet (undefined yerine boş obje)
       while (newProducts.length <= index) {
         newProducts.push({ name: '', price: '', image: undefined });
       }
-      // Mevcut elemanı güncelle veya yeni ekle
       if (newProducts[index]) {
         newProducts[index] = { name, price, productId, priceType, image };
       } else {
@@ -79,7 +73,6 @@ export default function TemplatePage () {
   const { data: configData, isLoading } = useTemplateConfig(templateId)
   const updateConfig = useUpdateTemplateConfig();
   
-  // API'den kategorileri çek
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -99,7 +92,6 @@ export default function TemplatePage () {
     fetchCategories();
   }, []);
 
-  // Kategori seçildiğinde ürünleri çek (Template-1 için)
   useEffect(() => {
     const fetchProducts = async () => {
       if (!selectedCategory) {
@@ -173,55 +165,41 @@ export default function TemplatePage () {
           setSelectedProductsByCategory(config.data || {});
         }
       } else {
-        // Template-1 için eski yapı
         setSelectedCategory(configData.category || "");
         setSelectedProducts(configData.data || []);
       }
     }
   }, [configData, templateId]);
 
-  // Media gallery'yi yükle
   useEffect(() => {
-    const loadMedia = async () => {
+    const loadGallery = async () => {
       try {
-        const userCookie = Cookies.get("user");
-        if (userCookie) {
-          const user = JSON.parse(userCookie) as { id: string };
-          console.log('Media yükleniyor, userId:', user.id);
-          const response = await fetch(`/api/users/${user.id}/media`);
-          console.log('Media response status:', response.status);
-          if (response.ok) {
-            const result = await response.json();
-            console.log('Media response data:', result);
-            const rawData = result.data || [];
-            console.log('Raw media data:', rawData);
-            // Format media data
-            const formattedData = rawData.map((item: any) => {
-              const isVideo = ["mp4", "webm", "ogg", "mov"].includes(
-                item.extension?.toLowerCase().replace(".", "") || ""
-              );
-              return {
-                id: item.id,
-                name: item.name,
-                type: (isVideo ? "video" : "image") as "image" | "video",
-                url: item.url,
-                uploadedAt: new Date(item.createdAt).toLocaleDateString("tr-TR"),
-                duration: 0,
-              };
-            });
-            console.log('Formatted media data:', formattedData);
-            setAvailableMedia(formattedData);
-          } else {
-            console.error('Media yüklenemedi:', response.status, response.statusText);
-          }
+        console.log('Galeri fotoğrafları yükleniyor...');
+        const response = await fetch(`/api/gallery`);
+        console.log('Galeri response status:', response.status);
+        if (response.ok) {
+          const result = await response.json();
+          console.log('Galeri response data:', result);
+          const rawData = result.data || [];
+          console.log('Raw galeri data:', rawData);
+          const formattedData = rawData.map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            type: "image" as "image" | "video",
+            url: item.url,
+            uploadedAt: new Date(item.createdAt).toLocaleDateString("tr-TR"),
+            duration: 0,
+          }));
+          console.log('Formatted galeri data:', formattedData);
+          setAvailableMedia(formattedData);
         } else {
-          console.error('User cookie bulunamadı');
+          console.error('Galeri yüklenemedi:', response.status, response.statusText);
         }
       } catch (error) {
-        console.error('Media yüklenirken hata:', error);
+        console.error('Galeri yüklenirken hata:', error);
       }
     };
-    loadMedia();
+    loadGallery();
   }, []);
 
   // const handleSave = () => {
@@ -284,7 +262,6 @@ export default function TemplatePage () {
         onPriceClick={(index: string, name: string, price: string) => {
           const idx = parseInt(index);
           const currentProduct = selectedProducts[idx];
-          // Mevcut image'ı koru
           handleProductChange(idx, name, price, currentProduct?.productId, currentProduct?.priceType, currentProduct?.image)
         }}
         selectedProducts={selectedProducts}
@@ -293,38 +270,28 @@ export default function TemplatePage () {
         onImageClick={(gridIndex: number) => {
           setSelectedImageIndex(gridIndex);
           setSelectedImageCategorySlot(null);
-          // Modal açılmadan önce media'yı kontrol et ve yükle
           if (availableMedia.length === 0) {
-            const loadMedia = async () => {
+            const loadGallery = async () => {
               try {
-                const userCookie = Cookies.get("user");
-                if (userCookie) {
-                  const user = JSON.parse(userCookie) as { id: string };
-                  const response = await fetch(`/api/users/${user.id}/media`);
-                  if (response.ok) {
-                    const result = await response.json();
-                    const rawData = result.data || [];
-                    const formattedData = rawData.map((item: any) => {
-                      const isVideo = ["mp4", "webm", "ogg", "mov"].includes(
-                        item.extension?.toLowerCase().replace(".", "") || ""
-                      );
-                      return {
-                        id: item.id,
-                        name: item.name,
-                        type: (isVideo ? "video" : "image") as "image" | "video",
-                        url: item.url,
-                        uploadedAt: new Date(item.createdAt).toLocaleDateString("tr-TR"),
-                        duration: 0,
-                      };
-                    });
-                    setAvailableMedia(formattedData);
-                  }
+                const response = await fetch(`/api/gallery`);
+                if (response.ok) {
+                  const result = await response.json();
+                  const rawData = result.data || [];
+                  const formattedData = rawData.map((item: any) => ({
+                    id: item.id,
+                    name: item.name,
+                    type: "image" as "image" | "video",
+                    url: item.url,
+                    uploadedAt: new Date(item.createdAt).toLocaleDateString("tr-TR"),
+                    duration: 0,
+                  }));
+                  setAvailableMedia(formattedData);
                 }
               } catch (error) {
-                console.error('Media yüklenirken hata:', error);
+                console.error('Galeri yüklenirken hata:', error);
               }
             };
-            loadMedia();
+            loadGallery();
           }
           setIsImageSelectorOpen(true);
         }}
@@ -344,7 +311,6 @@ export default function TemplatePage () {
             ...prev,
             [categorySlot]: categoryId
           }));
-          // Kategori değiştiğinde o kategoriye ait ürünleri temizle
           setSelectedProductsByCategory(prev => {
             const newProducts = { ...prev };
             newProducts[categorySlot] = [];
@@ -359,7 +325,6 @@ export default function TemplatePage () {
               product.pricing.basePrice.currency,
               product.pricing.basePrice.price
             );
-            // Harici API'den image'ı al (product.image veya product.img veya product.imageUrl)
             const productImage = product.image || product.img || product.imageUrl || undefined;
             
             setSelectedProductsByCategory(prev => {
@@ -395,7 +360,6 @@ export default function TemplatePage () {
                 product.pricing[priceType].currency,
                 product.pricing[priceType].price
               );
-              // Mevcut image'ı koru (eğer varsa)
               const currentImage = currentProduct.image || product.image || product.img || product.imageUrl || undefined;
               
               setSelectedProductsByCategory(prev => {
@@ -606,7 +570,7 @@ export default function TemplatePage () {
                     Fotoğraf yükleniyor...
                   </p>
                   <p className="mt-2 text-sm text-dark-4 dark:text-dark-6">
-                    Henüz yüklenmiş fotoğraf yoksa, önce medya galerisinden fotoğraf yükleyin.
+                    Henüz yüklenmiş fotoğraf yoksa, önce galeri sayfasından fotoğraf yükleyin.
                   </p>
                 </div>
               ) : (
