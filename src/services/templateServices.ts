@@ -8,10 +8,8 @@ export async function saveTemplateConfig(
   try {
     console.log('saveTemplateConfig çağrıldı:', { userId, templateId, configData });
     
-    // Template ID'yi path'e göre bul veya oluştur
     let dbTemplateId = templateId;
     
-    // Eğer templateId "template-1" gibi bir string ise, veritabanında path'e göre bul
     if (templateId.startsWith('template-')) {
       const path = `/design/${templateId}`;
       const name = templateId === 'template-1' ? 'Şablon 1' : 
@@ -19,12 +17,10 @@ export async function saveTemplateConfig(
                    templateId === 'template-3' ? 'Şablon 3' : 'Şablon';
       const component = templateId;
       
-      // Template'i path'e göre bul
       let template = await prisma.template.findFirst({
         where: { path: path },
       });
       
-      // Yoksa oluştur
       if (!template) {
         template = await prisma.template.create({
           data: {
@@ -40,7 +36,6 @@ export async function saveTemplateConfig(
       
       dbTemplateId = template.id;
     } else {
-      // UUID formatında ise direkt kullan, ama önce var mı kontrol et
       const existingTemplate = await prisma.template.findUnique({
         where: { id: templateId },
       });
@@ -52,7 +47,6 @@ export async function saveTemplateConfig(
     
     console.log('Kullanılacak dbTemplateId:', dbTemplateId);
     
-    // Önce mevcut config'i kontrol et
     const existingConfig = await prisma.templateConfig.findFirst({
       where: {
         userId,
@@ -62,7 +56,6 @@ export async function saveTemplateConfig(
     
     let saveConfig;
     if (existingConfig) {
-      // Varsa güncelle
       saveConfig = await prisma.templateConfig.update({
         where: {
           id: existingConfig.id,
@@ -74,7 +67,6 @@ export async function saveTemplateConfig(
       });
       console.log('Config güncellendi:', saveConfig);
     } else {
-      // Yoksa oluştur
       saveConfig = await prisma.templateConfig.create({
         data: {
           userId,
@@ -109,19 +101,15 @@ export async function saveTemplateConfig(
 
 export async function getTemplateConfig(userId: string, templateId: string) {
   try {
-    // Template ID'yi path'e göre bul veya oluştur
     let dbTemplateId = templateId;
     
-    // Eğer templateId "template-1" gibi bir string ise, veritabanında path'e göre bul
     if (templateId.startsWith('template-')) {
       const path = `/design/${templateId}`;
       
-      // Template'i path'e göre bul
       let template = await prisma.template.findFirst({
         where: { path: path },
       });
       
-      // Yoksa oluştur
       if (!template) {
         const name = templateId === 'template-1' ? 'Şablon 1' : 
                      templateId === 'template-2' ? 'Şablon 2' : 
@@ -140,7 +128,6 @@ export async function getTemplateConfig(userId: string, templateId: string) {
       dbTemplateId = template.id;
     }
     
-    // findFirst kullanarak composite unique constraint'i kontrol et
     return await prisma.templateConfig.findFirst({
       where: {
         userId,
@@ -154,7 +141,6 @@ export async function getTemplateConfig(userId: string, templateId: string) {
 
 }
 
-// Tüm template'leri getir (sadece template bilgileri, config yok)
 export async function getAllTemplates() {
   try {
     const templates = await prisma.template.findMany({

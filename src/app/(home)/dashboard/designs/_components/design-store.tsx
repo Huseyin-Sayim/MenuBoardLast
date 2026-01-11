@@ -159,7 +159,6 @@ export function DesignStore({ templates }: DesignStoreProps) {
           </div>
         ))}
       </div>
-
       {templates.length === 0 && (
         <div className="text-center py-12">
           <p className="text-dark-4 dark:text-dark-6">
