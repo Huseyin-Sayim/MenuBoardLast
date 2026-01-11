@@ -202,6 +202,28 @@ export async function getAllTemplateConfigs(userId: string, templateId: string) 
   }
 }
 
+// Kullanıcının tüm template config'lerini getir (tüm template'ler için)
+export async function getAllUserTemplateConfigs(userId: string) {
+  try {
+    const configs = await prisma.templateConfig.findMany({
+      where: {
+        userId,
+      },
+      include: {
+        Template: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return configs;
+  } catch (err: any) {
+    console.error('Kullanıcı template config listesi getirilirken hata oluştu:', err.message);
+    throw new Error('Kullanıcı template config listesi getirilemedi: ' + err.message);
+  }
+}
+
 export async function getAllTemplates() {
   try {
     const templates = await prisma.template.findMany({

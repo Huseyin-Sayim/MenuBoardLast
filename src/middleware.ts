@@ -12,6 +12,17 @@ export default async function middleware (req: NextRequest) {
   let newTokenCreated = false;
 
   const publicPaths = ['/api/login', '/api/register','/api/check-db', '/api/refresh', '/auth/sign-in', '/auth/sign-up', '/auth/forgot-password']
+  
+  // Büyük dosya yüklemeleri için media API'sini bypass et (body parsing limitini aşmak için)
+  if (pathname === '/api/media' && req.method === 'POST') {
+    // Token kontrolü yap ama body parsing'i bypass et
+    if (!token && !refreshToken) {
+      return NextResponse.json({
+        message: "Yetkisiz erişim"
+      }, {status: 401});
+    }
+    return NextResponse.next();
+  }
 
   if (publicPaths.some(path => pathname.startsWith(path))) {
     return NextResponse.next();

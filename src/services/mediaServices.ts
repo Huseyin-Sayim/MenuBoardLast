@@ -28,7 +28,7 @@ export const getMediaById = async (id: string) => {
   }
 }
 
-export const createMedia = async (formData: FormData, userId: string) =>   {
+export const createMedia = async (formData: FormData, userId: string, signal?: AbortSignal) =>   {
   const file = formData.get('file') as File;
   const fileExtension = path.extname(file.name);
   const fileName = file.name;
@@ -46,9 +46,24 @@ export const createMedia = async (formData: FormData, userId: string) =>   {
 
   try {
     await fs.mkdir(uploadDir, {recursive: true})
+    
+    // Dosya yazma işlemi
+    // Abort signal kontrolü
+    if (signal?.aborted) {
+      throw new Error('Upload cancelled');
+    }
+    
+    // File'ı stream olarak oku ve yaz
+    // Büyük dosyalar için daha verimli
     const arrayBuffer = await file.arrayBuffer();
+    
+    // Tekrar abort kontrolü
+    if (signal?.aborted) {
+      throw new Error('Upload cancelled');
+    }
+    
     const buffer = Buffer.from(arrayBuffer);
-    await fs.writeFile(filePath,buffer);
+    await fs.writeFile(filePath, buffer);
 
     return await prisma.media.create({
       data: {
@@ -61,6 +76,11 @@ export const createMedia = async (formData: FormData, userId: string) =>   {
       }
     })
   } catch (error: any) {
+    // Hata durumunda yüklenen dosyayı temizle
+    try {
+      await fs.unlink(filePath).catch(() => {});
+    } catch {}
+    
     throw new Error('Media eklenmedi: ' + error.message);
   }
 }

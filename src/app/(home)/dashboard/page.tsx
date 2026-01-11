@@ -2,10 +2,12 @@ import { TopChannels } from "@/components/Tables/top-channels";
 import { TopChannelsSkeleton } from "@/components/Tables/top-channels/skeleton";
 import { Suspense } from "react";
 import { ImageSlider } from "@/app/(home)/_components/image-slider";
-import { MediaGallery } from "@/app/(home)/dashboard/media/_components/media-gallery";
-import { getFormattedMedia} from "@/services/mediaServices";
+import { Gallery } from "@/app/(home)/dashboard/gallery/components/gallery";
+import { getAllGalleryImages } from "@/services/galleryServices";
 import { getAllTemplates } from "@/services/templateServices";
 import { cookies } from "next/headers";
+import * as jose from "jose";
+import prisma from "@/generated/prisma";
 
 type PropsType = {
   searchParams: Promise<{
@@ -47,6 +49,73 @@ const getDefaultConfig = (component: string) => {
   return { category: "", data: [] };
 };
 
+async function getUserRole(): Promise<'admin' | 'user'> {
+  try {
+    const cookieStore = await cookies();
+    
+    // Önce user cookie'den userId'yi al
+    const userCookie = cookieStore.get('user')?.value;
+    let userId: string | null = null;
+
+    if (userCookie) {
+      try {
+        const user = JSON.parse(userCookie) as { id?: string; role?: string };
+        userId = user.id || null;
+        // Eğer user cookie'de role varsa onu kullan
+        if (user.role === 'admin') {
+          return 'admin';
+        }
+      } catch (e) {
+        // User cookie parse edilemediyse token'dan al
+      }
+    }
+
+    // Token'dan userId ve role al
+    const cookieToken = cookieStore.get('accessToken')?.value;
+
+    if (cookieToken && process.env.ACCES_TOKEN_SECRET) {
+      try {
+        const secret = new TextEncoder().encode(process.env.ACCES_TOKEN_SECRET);
+        const { payload } = await jose.jwtVerify(cookieToken, secret);
+        const tokenUserId = (payload as any).userId;
+        const tokenRole = (payload as any).role;
+
+        if (!userId) {
+          userId = tokenUserId;
+        }
+
+        // Token'dan role alındıysa onu kullan
+        if (tokenRole === 'admin') {
+          return 'admin';
+        }
+      } catch (tokenError) {
+        console.error('Token verify hatası:', tokenError);
+      }
+    }
+
+    // Veritabanından user'ı bul ve role'ünü al
+    if (userId) {
+      try {
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { role: true }
+        });
+
+        if (user && user.role === 'admin') {
+          return 'admin';
+        }
+      } catch (dbError) {
+        console.error('Veritabanı hatası:', dbError);
+      }
+    }
+
+    return 'user';
+  } catch (error) {
+    console.error('Role kontrolü hatası:', error);
+    return 'user';
+  }
+}
+
 async function getTemplates() {
   try {
     const templates = await getAllTemplates();
@@ -80,13 +149,29 @@ export default async function Dashboard({ searchParams }: PropsType) {
 
   const user = JSON.parse(userCookies) as {id: string};
 
-  const formattedData = await getFormattedMedia(user.id);
+  const userRole = await getUserRole();
+  let galleryImages = [];
+  try {
+    galleryImages = await getAllGalleryImages();
+  } catch (error) {
+    console.error('Galeri resimleri çekilirken hata:', error);
+    galleryImages = [];
+  }
+
+  const formattedData = galleryImages.map((item: any) => ({
+    id: item.id,
+    name: item.name,
+    type: 'image' as 'image' | 'video',
+    url: item.url,
+    uploadedAt: item.createdAt.toLocaleDateString("tr-TR"),
+    duration: 0,
+  }));
+
   const templates = await getTemplates();
 
   return (
     <>
       <div className="mt-4 space-y-4 md:mt-6 md:space-y-6 2xl:mt-9 2xl:space-y-7.5">
-        {/* Template Slider - Üstte tam genişlikte */}
         <div className="w-full">
           {templates.length > 0 ? (
             <ImageSlider templates={templates} />
@@ -94,34 +179,34 @@ export default async function Dashboard({ searchParams }: PropsType) {
             <ImageSlider
               images={[
                 "/images/carousel/carousel-01.jpg",
+                "/images/carousel/carousel-02.jpg",
+                "/images/carousel/carousel-03.jpg",
+                "/images/cover/cover-03.jpg",
+                "/images/task/task-01.jpg",
                 "/images/carousel/carousel-01.jpg",
+                "/images/carousel/carousel-02.jpg",
+                "/images/carousel/carousel-03.jpg",
+                "/images/cover/cover-03.jpg",
+                "/images/task/task-01.jpg",
                 "/images/carousel/carousel-01.jpg",
-                "/images/carousel/carousel-01.jpg",
-                "/images/carousel/carousel-01.jpg",
-                "/images/carousel/carousel-01.jpg",
-                "/images/carousel/carousel-01.jpg",
-                "/images/carousel/carousel-01.jpg",
-                "/images/carousel/carousel-01.jpg",
-                "/images/carousel/carousel-01.jpg",
-                "/images/carousel/carousel-01.jpg",
-                "/images/carousel/carousel-01.jpg",
+                "/images/carousel/carousel-02.jpg",
+                "/images/carousel/carousel-03.jpg",
+                "/images/cover/cover-03.jpg",
+                "/images/task/task-01.jpg",
               ]}
             />
           )}
         </div>
 
-        {/* Screens ve Media - Altta yan yana */}
         <div className="grid grid-cols-12 gap-4 md:gap-6 2xl:gap-7.5">
-          {/* Ekranlar Tablosu */}
           <div className="col-span-12 lg:col-span-6">
             <Suspense fallback={<TopChannelsSkeleton />}>
               <TopChannels showActions={false} />
             </Suspense>
           </div>
 
-          {/* Medya Tablosu */}
           <div className="col-span-12 lg:col-span-6">
-            <MediaGallery showActions={false} initialData={formattedData} gridCols="grid-cols-4" maxHeight="400px" disableClick={true} />
+            <Gallery initialData={formattedData} userRole={userRole} showActions={false} />
           </div>
         </div>
       </div>
