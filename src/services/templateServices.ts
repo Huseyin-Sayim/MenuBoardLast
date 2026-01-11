@@ -90,7 +90,6 @@ export async function saveTemplateConfig(
     console.error("Hata detayı:", err.message);
     console.error("Hata stack:", err.stack);
     
-    // Prisma hatası ise daha detaylı mesaj
     if (err.code) {
       throw new Error(`Tamplate verisi kaydedilemedi: ${err.code} - ${err.message}`);
     }
@@ -159,3 +158,104 @@ export async function getAllTemplates() {
     return [];
   }
 }
+
+export async function createTemplate(data: { name: string; path: string; component: string }) {
+  try {
+    const template = await prisma.template.create({
+      data: {
+        name: data.name,
+        path: data.path,
+        component: data.component,
+      },
+    });
+
+    return template;
+  } catch (err: any) {
+    console.error('Template oluşturulurken hata oluştu:', err.message);
+    throw new Error('Template oluşturulamadı: ' + err.message);
+  }
+}
+
+export async function acquireTemplate(userId: string, templateId: string) {
+  try {
+    let dbTemplateId = templateId;
+    
+    if (templateId.startsWith('template-')) {
+      const path = `/design/${templateId}`;
+      let template = await prisma.template.findFirst({
+        where: { path: path },
+      });
+      
+      if (!template) {
+        throw new Error(`Template bulunamadı: ${templateId}`);
+      }
+      
+      dbTemplateId = template.id;
+    } else {
+      const existingTemplate = await prisma.template.findUnique({
+        where: { id: templateId },
+      });
+      
+      if (!existingTemplate) {
+        throw new Error(`Template bulunamadı: ${templateId}`);
+      }
+    }
+    
+    const existingConfig = await prisma.templateConfig.findFirst({
+      where: {
+        userId,
+        templateId: dbTemplateId,
+      },
+    });
+    
+    if (existingConfig) {
+      return existingConfig; 
+    }
+    
+    const template = await prisma.template.findUnique({
+      where: { id: dbTemplateId },
+    });
+    
+    let defaultConfig: any = {};
+    if (template?.component === 'template-1') {
+      defaultConfig = { category: "", data: [] };
+    } else if (template?.component === 'template-2') {
+      defaultConfig = { categories: {}, data: {} };
+    } else {
+      defaultConfig = {};
+    }
+    
+    const templateConfig = await prisma.templateConfig.create({
+      data: {
+        userId,
+        templateId: dbTemplateId,
+        configData: defaultConfig,
+      },
+    });
+    
+    return templateConfig;
+  } catch (err: any) {
+    console.error('Template alınırken hata oluştu:', err);
+    throw new Error(`Template alınamadı: ${err.message}`);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

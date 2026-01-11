@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 type Template = {
@@ -17,6 +18,78 @@ interface DesignStoreProps {
 
 export function DesignStore({ templates }: DesignStoreProps) {
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const [userTemplateIds, setUserTemplateIds] = useState<string[]>([]);
+  const [loadingUserTemplates, setLoadingUserTemplates] = useState(true);
+  const [acquiringTemplateId, setAcquiringTemplateId] = useState<string | null>(null);
+  const router = useRouter();
+
+  // Kullanıcının sahip olduğu template'leri çek
+  useEffect(() => {
+    const fetchUserTemplates = async () => {
+      try {
+        const response = await fetch("/api/userTemplate");
+        if (response.ok) {
+          const result = await response.json();
+          // Template objelerinden sadece ID'leri çıkar
+          const templateIds = (result.data || []).map((t: any) => t.id);
+          setUserTemplateIds(templateIds);
+        } else {
+          console.error("Kullanıcı template'leri getirilemedi");
+        }
+      } catch (error) {
+        console.error("Kullanıcı template'leri getirilirken hata:", error);
+      } finally {
+        setLoadingUserTemplates(false);
+      }
+    };
+
+    fetchUserTemplates();
+  }, []);
+
+  // Şablon al
+  const handleAcquireTemplate = async (template: Template, e: React.MouseEvent) => {
+    e.stopPropagation(); // Kart'a tıklama event'ini durdur
+    
+    if (acquiringTemplateId) return; // Zaten bir istek devam ediyorsa
+    
+    setAcquiringTemplateId(template.id);
+    
+    try {
+      const response = await fetch(`/api/templates/${template.id}/acquire`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // API'den tekrar kullanıcının template'lerini çek (güncel liste için)
+        try {
+          const userTemplatesResponse = await fetch("/api/userTemplate");
+          if (userTemplatesResponse.ok) {
+            const userTemplatesResult = await userTemplatesResponse.json();
+            const templateIds = (userTemplatesResult.data || []).map((t: any) => t.id);
+            setUserTemplateIds(templateIds);
+          }
+        } catch (err) {
+          console.error("Template listesi güncellenirken hata:", err);
+          // Fallback: Manuel olarak ID'yi ekle
+          setUserTemplateIds((prev) => [...prev, template.id]);
+        }
+        // Düzenleme sayfasına yönlendir
+        router.push(`/dashboard/designTemplate/${template.component}`);
+      } else {
+        alert(result.message || "Şablon alınırken bir hata oluştu");
+      }
+    } catch (error: any) {
+      console.error("Şablon alınırken hata:", error);
+      alert("Şablon alınırken bir hata oluştu: " + error.message);
+    } finally {
+      setAcquiringTemplateId(null);
+    }
+  };
 
   // Config özetini göster
   const getConfigSummary = (template: Template) => {
@@ -123,41 +196,67 @@ export function DesignStore({ templates }: DesignStoreProps) {
 
       {/* Template Grid */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {templates.map((template) => (
-          <div
-            key={template.id}
-            className="group relative rounded-lg border border-stroke bg-white overflow-hidden shadow-card hover:shadow-card-2 transition-all dark:border-stroke-dark dark:bg-dark-2 cursor-pointer"
-            onClick={() => openPreview(template)}
-          >
-            {/* Iframe Önizleme - preview=true ile */}
-            <div className="relative aspect-video w-full overflow-hidden bg-gray-2 dark:bg-dark-3">
-              <iframe
-                src={getPreviewUrl(template.path)}
-                className="absolute inset-0 border-0 pointer-events-none"
-                style={{
-                  transform: 'scale(0.25)',
-                  transformOrigin: 'top left',
-                  width: '400%',
-                  height: '400%'
-                }}
-                loading="lazy"
-              />
+        {templates.map((template) => {
+          const hasTemplate = userTemplateIds.includes(template.id);
+          const isAcquiring = acquiringTemplateId === template.id;
 
-              {/* Hover Overlay */}
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center">
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-primary/90 text-white px-4 py-2 rounded-lg font-medium">
-                  Önizlemeyi Aç
+          return (
+            <div
+              key={template.id}
+              className="group relative rounded-lg border border-stroke bg-white overflow-hidden shadow-card hover:shadow-card-2 transition-all dark:border-stroke-dark dark:bg-dark-2"
+            >
+              {/* Iframe Önizleme - preview=true ile */}
+              <div 
+                className="relative aspect-video w-full overflow-hidden bg-gray-2 dark:bg-dark-3 cursor-pointer"
+                onClick={() => openPreview(template)}
+              >
+                <iframe
+                  src={getPreviewUrl(template.path)}
+                  className="absolute inset-0 border-0 pointer-events-none"
+                  style={{
+                    transform: 'scale(0.25)',
+                    transformOrigin: 'top left',
+                    width: '400%',
+                    height: '400%'
+                  }}
+                  loading="lazy"
+                />
+
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-primary/90 text-white px-4 py-2 rounded-lg font-medium">
+                    Önizlemeyi Aç
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="p-7">
-              <h3 className="text-lg font-semibold text-dark dark:text-white mb-1">
-                {template.name}
-              </h3>
+              <div className="p-7">
+                <h3 className="text-lg font-semibold text-dark dark:text-white mb-3">
+                  {template.name}
+                </h3>
+                
+                {/* Butonlar - Sadece sahip değilse göster */}
+                {!loadingUserTemplates && !hasTemplate && (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={(e) => handleAcquireTemplate(template, e)}
+                      disabled={isAcquiring}
+                      className="flex-1 rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-green-600 dark:hover:bg-green-700"
+                    >
+                      {isAcquiring ? "Alınıyor..." : "Şablon Al"}
+                    </button>
+                  </div>
+                )}
+                
+                {loadingUserTemplates && (
+                  <div className="h-10 flex items-center justify-center">
+                    <div className="text-sm text-dark-4 dark:text-dark-6">Yükleniyor...</div>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       {templates.length === 0 && (
         <div className="text-center py-12">

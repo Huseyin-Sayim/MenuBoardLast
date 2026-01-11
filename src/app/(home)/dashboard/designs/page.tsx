@@ -1,6 +1,5 @@
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import { DesignStore } from "./_components/design-store";
 import { getAllTemplates } from "@/services/templateServices";
+import { DesignsPageContent } from "./_components/designs-page-content";
 
 type Template = {
   id: string;
@@ -68,16 +67,5 @@ async function getTemplates(): Promise<Template[]> {
 export default async function DesignsPage() {
   const templates = await getTemplates();
 
-  return (
-    <>
-      <Breadcrumb pageName="" />
-
-      <div className="mt-4 md:mt-6 2xl:mt-9">
-        <button className="bg-blue-500 p-3 border rounded-xl float-end m-5 text-amber-50">
-          Şablon Ekle
-        </button>
-        <DesignStore templates={templates} />
-      </div>
-    </>
-  );
+  return <DesignsPageContent templates={templates} />;
 }
