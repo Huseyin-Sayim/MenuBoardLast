@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAllTemplates, createTemplate } from "@/services/templateServices";
+import { getAllTemplates } from "@/services/templateServices";
 
 const getDefaultConfig = (component: string) => {
   if (component === 'template-1') {
@@ -44,7 +44,17 @@ export async function GET(req:Request) {
   try {
     const templates = await getAllTemplates();
 
-    const templatesWithDefaults = templates.map((template : any) => {
+    if (!userCokkies) {
+      return NextResponse.json(
+        { message: 'Kullanıcı oturumu bulunamadı.' },
+        { status: 401 }
+      )
+    }
+
+    const user = JSON.parse(userCokkies) as { id: string };
+    const templates = await getAllTemplates();
+
+    const templatesWithDefaults = templates.map((template) => {
       const defaultConfig = getDefaultConfig(template.component);
 
       return {
