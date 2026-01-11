@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { getAllTemplatesWithConfigs } from "@/services/templateService";
+import { getAllTemplates } from "@/services/templateServices";
 
 const getDefaultConfig = (component: string) => {
   if (component === 'template-1') {
@@ -54,7 +54,7 @@ export async function GET(req:Request) {
     }
 
     const user = JSON.parse(userCokkies) as { id: string };
-    const templates = await getAllTemplatesWithConfigs(user.id);
+    const templates = await getAllTemplates();
 
     const templatesWithDefaults = templates.map((template) => {
       const defaultConfig = getDefaultConfig(template.component);

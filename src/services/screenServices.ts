@@ -202,7 +202,6 @@ export const updateScreenConfig = async (screenId: string, configs: {mediaId?: s
         displayDuration: config.duration || 10
       };
 
-      // Media varsa bağla
       if (config.mediaId) {
         console.log(`Adding Media connection for mediaId: ${config.mediaId}`);
         data.Media = {
@@ -210,11 +209,9 @@ export const updateScreenConfig = async (screenId: string, configs: {mediaId?: s
         };
       }
 
-      // Template varsa bağla - templateId component değeri ise (template-1, template-2) gerçek ID'yi bul
       if (config.templateId) {
         let templateDbId = config.templateId;
-        
-        // Eğer template-1, template-2 gibi bir component değeri ise, map'ten gerçek ID'yi al
+
         if (config.templateId.startsWith('template-')) {
           const component = config.templateId; // template-1
           const foundId = templateComponentMap.get(component);
@@ -233,7 +230,6 @@ export const updateScreenConfig = async (screenId: string, configs: {mediaId?: s
         };
       }
 
-      // En az birisi olmalı
       if (!config.mediaId && !config.templateId) {
         console.error(`Config ${index + 1} has neither mediaId nor templateId`);
         throw new Error('Config için mediaId veya templateId gereklidir');
