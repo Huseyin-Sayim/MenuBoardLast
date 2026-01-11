@@ -481,7 +481,7 @@ export default function Template1Content({
           flex-direction: column;
           justify-content: space-between;
           height:100vh;
-          overflow-y: hidden;
+          overflow-y: auto;
         }
 
         .grid-layout {
