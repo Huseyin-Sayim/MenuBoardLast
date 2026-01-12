@@ -15,7 +15,10 @@ export async function saveTemplateConfig(
       const path = `/design/${templateId}`;
       const templateName = templateId === 'template-1' ? 'Şablon 1' : 
                    templateId === 'template-2' ? 'Şablon 2' : 
-                   templateId === 'template-3' ? 'Şablon 3' : 'Şablon';
+                   templateId === 'template-3' ? 'Şablon 3' : 
+                   templateId === 'template-4' ? 'Şablon 4' :
+                   templateId === 'template-5' ? 'Şablon 5' :
+                   templateId === 'template-6' ? 'Şablon 6' : 'Şablon';
       const component = templateId;
       
       let template = await prisma.template.findFirst({
@@ -137,7 +140,10 @@ export async function getTemplateConfig(userId: string, templateId: string, conf
       if (!template) {
         const name = templateId === 'template-1' ? 'Şablon 1' : 
                      templateId === 'template-2' ? 'Şablon 2' : 
-                     templateId === 'template-3' ? 'Şablon 3' : 'Şablon';
+                     templateId === 'template-3' ? 'Şablon 3' : 
+                     templateId === 'template-4' ? 'Şablon 4' :
+                     templateId === 'template-5' ? 'Şablon 5' :
+                   templateId === 'template-6' ? 'Şablon 6' : 'Şablon';
         const component = templateId;
         
         template = await prisma.template.create({
@@ -266,7 +272,7 @@ export async function acquireTemplate(userId: string, templateId: string) {
     
     // Her zaman yeni config oluştur (mevcut config kontrolü yok)
     let defaultConfig: any = {};
-    if (template.component === 'template-1') {
+    if (template.component === 'template-1' || template.component === 'template-5' || template.component === 'template-6') {
       defaultConfig = { category: "", data: [] };
     } else if (template.component === 'template-2') {
       defaultConfig = { categories: {}, data: {} };

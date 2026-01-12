@@ -163,7 +163,10 @@ export const updateScreenConfig = async (screenId: string, configs: {mediaId?: s
           if (!template) {
             const name = component === 'template-1' ? 'Şablon 1' : 
                          component === 'template-2' ? 'Şablon 2' : 
-                         component === 'template-3' ? 'Şablon 3' : 'Şablon';
+                         component === 'template-3' ? 'Şablon 3' : 
+                         component === 'template-4' ? 'Şablon 4' :
+                         component === 'template-5' ? 'Şablon 5' :
+                         component === 'template-6' ? 'Şablon 6' : 'Şablon';
             
             console.log(`Template not found, creating new template: ${name}, path: ${path}, component: ${component}`);
             

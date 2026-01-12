@@ -11,7 +11,7 @@ interface BurgerItem {
   category?: string;
 }
 
-interface Template1Props {
+interface Template5Props {
   burgerItems?: BurgerItem[];
   prices?: Record<string, string>;
   onPriceClick?: (index: string, name: string, price:string) => void;
@@ -26,7 +26,7 @@ interface Template1Props {
   onImageClick?: (gridIndex: number) => void;
 }
 
-export default function Template1Content({
+export default function Template5Content({
   burgerItems,
   prices,
   onPriceClick,
@@ -39,14 +39,15 @@ export default function Template1Content({
   selectedCategory,
   onCategoryChange,
   onImageClick,
-}: Template1Props) {
+}: Template5Props) {
   const [editingItemId, setEditingItemId] = useState<string | number | null>(
     null,
   );
   const [editingValue, setEditingValue] = useState<string>("");
 
 
-  const fixedBurgerItems: BurgerItem[] = Array.from({ length: 6 }, (_, gridIndex) => {
+  // Max 4 ürün
+  const fixedBurgerItems: BurgerItem[] = Array.from({ length: 4 }, (_, gridIndex) => {
     if (burgerItems && burgerItems[gridIndex] && burgerItems[gridIndex]?.name) {
       return burgerItems[gridIndex];
     }
@@ -64,10 +65,10 @@ export default function Template1Content({
     : Array.from(new Set(fixedBurgerItems.map((item) => item.category).filter((cat): cat is string => cat !== undefined && cat !== null))).map(cat => ({ id: cat, name: cat }));
 
   // Debug
-  console.log('Template1 - availableCategories:', availableCategories);
-  console.log('Template1 - availableProducts:', availableProducts);
-  console.log('Template1 - uniqueCategories:', uniqueCategories);
-  console.log('Template1 - fixedBurgerItems:', fixedBurgerItems);
+  console.log('Template5 - availableCategories:', availableCategories);
+  console.log('Template5 - availableProducts:', availableProducts);
+  console.log('Template5 - uniqueCategories:', uniqueCategories);
+  console.log('Template5 - fixedBurgerItems:', fixedBurgerItems);
 
   const filteredBurgers = fixedBurgerItems;
 
@@ -96,30 +97,28 @@ export default function Template1Content({
           <div className="dark-mask"></div>
         </div>
 
-        <div className="pane-hero">
-          <div className="badge-new">ÖZEL SEÇİM</div>
-          <h1 className="title-large">
-            {heroTitle &&
-              heroTitle.split(" ").map((word: string, index: number) => (
-                <span key={`${word}-${index}`}>
-                  {word}
-                  <br />
-                </span>
-              ))}
-          </h1>
+        {/* Üst kısım: Sol yazı, Sağ fotoğraf */}
+        <div className="header-section">
+          <div className="header-left">
+            <div className="badge-new">ÖZEL SEÇİM</div>
+            <h1 className="title-large">
+              {heroTitle &&
+                heroTitle.split(" ").map((word: string, index: number) => (
+                  <span key={`${word}-${index}`}>
+                    {` ${word}`}
+                  </span>
+                ))}
+            </h1>
+          </div>
+          <div className="header-right">
             <img src={heroIMG} className="hero-burger" alt="Hero Burger" />
+          </div>
         </div>
 
-        <div className="pane-menu">
+        {/* Alt kısım: Ürünler */}
+        <div className="products-section">
           {isEditable && uniqueCategories.length > 0 && (
-            <div
-              style={{
-
-                textAlign: "center",
-                zIndex: 10,
-                position: "relative",
-              }}
-            >
+            <div className="category-selector">
               <select
                 value={selectedCategory || ""}
                 onChange={(e) => {
@@ -160,7 +159,7 @@ export default function Template1Content({
             </div>
           )}
           <div className="grid-layout">
-            {filteredBurgers.map((burger,index) => (
+            {filteredBurgers.slice(0, 4).map((burger,index) => (
               <div key={`burger-${index}-${burger.name || index}`} className="menu-item-card">
                 <div 
                   className="thumb-box"
@@ -364,7 +363,7 @@ export default function Template1Content({
                 </div>
               </div>
             ))}
-          </div>  
+          </div>
         </div>
       </div>
 
@@ -375,17 +374,18 @@ export default function Template1Content({
           width: 100vw !important;
           height: 100vh !important;
           overflow: hidden !important;
-          background: #000 !important;
+          background: #000;
         }
 
         .fire-menu-container {
-          inset: 0;
-          display: grid;
-          grid-template-columns: 42% 58%;
+          position: relative;
+          display: flex;
+          flex-direction: column;
           font-family: 'Impact', 'Arial Black', sans-serif;
           color: white;
           width: 100%;
-          height: 100%;
+          height: 100vh;
+          overflow: hidden;
         }
 
         .bg-fire {
@@ -405,15 +405,31 @@ export default function Template1Content({
           inset: 0;
           background: radial-gradient(circle, rgba(227, 24, 24, 0.4) 0%, rgba(0, 0, 0, 0.9) 80%);
           mix-blend-mode: multiply;
+          z-index: 0;
         }
 
-        .pane-hero {
-          padding: 6vh;
+        .header-section {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2vh;
+          padding: 4vh;
+          position: relative;
+          z-index: 1;
+          min-height: 40vh;
+        }
+
+        .header-left {
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
-          position:relative;
-          z-index:1;
+          justify-content: center;
+          padding: 2vh;
+        }
+
+        .header-right {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 2vh;
         }
 
         .badge-new {
@@ -422,78 +438,56 @@ export default function Template1Content({
           padding: 4px 18px;
           width: fit-content;
           font-weight: 900;
+          font-size: 3vw;
           transform: rotate(-3deg);
           box-shadow: 4px 4px 0 #e31818;
-          margin-left: 3vh;
+          margin-bottom: 2vh;
         }
 
         .title-large {
-          font-size: 7vw;
-          line-height: 0.8;
+          font-size: 9vw;
+          line-height: 0.9;
           margin: 0;
-          margin-left: 5vh;
-          text-shadow: 6px 6px 0px #000;
+          text-shadow: 4px 4px 0px #000;
         }
 
         .title-large span { color: #ffcc00; }
 
-        .main-burger-wrapper {
-          border-radius: 20% !important;
-          position: relative;
-          display: flex;
-          justify-content: center;
-        }
-        
-        .hero-burger-container {
-          width: 100%;
-          height: 48vh;
-          background-color: rgba(255, 255, 255, 0.05); /* Arka planı hafif belirgin yapabilirsin */
-          border-radius: 50px; /* İstediğin yuvarlaklık */
-          overflow: hidden;    /* İçindeki resmin taşan kısımlarını keser */
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-left: -5vh;   /* Senin eski kodundaki kaydırma */
-        }
-
         .hero-burger {
-          width: 60vh; 
-          height: 45vh;
-          object-fit: cover; 
-          border-radius: 5% !important;
+          width: 100%;
+          max-width: 40vw;
+          height: auto;
+          max-height: 35vh;
+          object-fit: cover;
+          border-radius: 15px;
           object-position: center;
           display: block;
-          margin: 0 auto;
         }
 
-        .hours-label {
-          font-size: 0.8rem;
-          border: 1px solid rgba(255,255,255,0.4);
-          padding: 10px;
-          width: fit-content;
-          background: rgba(0,0,0,0.5);
-        }
-
-        .pane-menu {
-          width: 95%;
-          padding: 6vh;
+        .products-section {
+          flex: 1;
+          padding: 3vh 4vh;
+          position: relative;
+          z-index: 1;
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
-          height:100vh;
-          overflow-y: hidden;
+          overflow-y: auto;
+        }
+
+        .category-selector {
+          text-align: center;
+          margin-bottom: 3vh;
+          position: relative;
+          z-index: 10;
         }
 
         .grid-layout {
           width: 100%;
-          height: 95%;
-          margin-top: 5vh;
           display: grid;
           grid-template-columns: 1fr 1fr;
-          grid-template-rows: repeat(3, 1fr);
-          gap: 5vh 2vw;
-          margin-bottom: 0;
-          overflow: hidden;
+          grid-template-rows: repeat(2, 1fr);
+          gap: 2vh;
+          flex: 1;
         }
 
         .menu-item-card {
@@ -502,18 +496,25 @@ export default function Template1Content({
           gap: 15px;
           background: rgba(0,0,0,0.4);
           padding: 12px;
-          border-radius: 60px 15px 15px 60px;
           backdrop-filter: blur(5px);
-          border-left: 5px solid #ffcc00;
           min-width: 0;
           overflow: hidden;
         }
 
+        .grid-layout .menu-item-card:nth-child(odd) {
+          border-left: 5px solid #ffcc00;
+          border-radius: 60px 10px 10px 60px;
+        }
+
+        .grid-layout .menu-item-card:nth-child(even) {
+          border-right: 5px solid #ffcc00;
+          border-radius: 10px 60px 60px 10px;
+        }
+
         .thumb-box {
-          width: 16vh;
-          height: 16vh;
-          min-width: 16vh;
-          min-height: 16vh;
+          width: clamp(75px, 15vh, 150px);
+          height: clamp(75px, 15vh, 150px);
+          aspect-ratio: 1;
           border-radius: 50%;
           overflow: hidden;
           border: 3px solid #fff;
@@ -537,7 +538,7 @@ export default function Template1Content({
         }
 
         .item-txt h3 {
-          font-size: 2vw;
+          font-size: 5vw;
           margin: 0 0 5px 0;
           letter-spacing: -0.5px;
           word-wrap: break-word;
@@ -551,7 +552,7 @@ export default function Template1Content({
           padding: 2px 14px;
           border-radius: 20px;
           font-weight: 900;
-          font-size: 2rem;
+          font-size: 3rem;
         }
 
         .slogan-footer {
@@ -569,3 +570,4 @@ export default function Template1Content({
     </>
   );
 }
+

@@ -4,6 +4,8 @@ import Template1Content from "../template-1/component/template-1";
 import Template2Content from "../template-2/component/template-2";
 import Template3Content from "../template-3/component/template-3";
 import Template4Content from "../template-4/component/template-4";
+import Template5Content from "../template-5/component/template-5";
+import Template6Content from "../template-6/component/template-6";
 import { defaultBurgers } from "../template-data";
 import { menuItems } from "../template-data";
 import { notFound } from "next/navigation";
@@ -17,12 +19,10 @@ export default async function ConfigsPage({ searchParams }: Props) {
   const configId = params.configId;
   const isPreview = params.preview === 'true';
 
-  // ConfigId yoksa 404 döndür
   if (!configId) {
     notFound();
   }
 
-  // Preview modunda sadece default verileri göster
   if (isPreview) {
     return (
       <div className="w-full h-auto rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
@@ -32,11 +32,10 @@ export default async function ConfigsPage({ searchParams }: Props) {
   }
 
   try {
-    // ConfigId varsa public erişim (userId kontrolü olmadan)
     const config = await prisma.templateConfig.findUnique({
       where: { id: configId },
       include: {
-        Template: true, // Template bilgisini de getir
+        Template: true,
       },
     });
 
@@ -170,6 +169,98 @@ export default async function ConfigsPage({ searchParams }: Props) {
       case 'template-4': {
         return (
           <Template4Content />
+        );
+      }
+
+      case 'template-5': {
+        let burgerItems = defaultBurgers;
+
+        if (configData) {
+          const template5Data = configData as {
+            category?: string;
+            data?: Array<{ name: string; price: string; image?: string }>;
+          };
+
+          if (template5Data.data && Array.isArray(template5Data.data) && template5Data.data.length > 0) {
+            burgerItems = template5Data.data.map((item, index) => ({
+              id: index + 1,
+              name: item.name || '',
+              price: item.price ? item.price.replace(/[^\d]/g, '') : '0',
+              img: item.image || "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop",
+              heroIMG: item.image || "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=1000&auto=format&fit=crop",
+              heroTitle: item.name || 'Menü',
+              category: template5Data.category || '',
+            }));
+
+            // En az 4 item olmalı (template-5 için max 4)
+            while (burgerItems.length < 4) {
+              const defaultItem = defaultBurgers[burgerItems.length];
+              burgerItems.push(defaultItem || {
+                id: burgerItems.length + 1,
+                name: '',
+                price: '0',
+                img: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop",
+                heroIMG: "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=1000&auto=format&fit=crop",
+                heroTitle: 'Menü',
+                category: '',
+              });
+            }
+          }
+        }
+
+        // Template-5 için maksimum 4 ürün
+        if (Array.isArray(burgerItems) && burgerItems.length > 4) {
+          burgerItems = burgerItems.slice(0, 4);
+        }
+
+        return (
+          <Template5Content burgerItems={burgerItems} />
+        );
+      }
+
+      case 'template-6': {
+        let burgerItems = defaultBurgers;
+
+        if (configData) {
+          const template6Data = configData as {
+            category?: string;
+            data?: Array<{ name: string; price: string; image?: string }>;
+          };
+
+          if (template6Data.data && Array.isArray(template6Data.data) && template6Data.data.length > 0) {
+            burgerItems = template6Data.data.map((item, index) => ({
+              id: index + 1,
+              name: item.name || '',
+              price: item.price ? item.price.replace(/[^\d]/g, '') : '0',
+              img: item.image || "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop",
+              heroIMG: item.image || "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=1000&auto=format&fit=crop",
+              heroTitle: item.name || 'Menü',
+              category: template6Data.category || '',
+            }));
+
+            // En az 4 item olmalı (template-6 için max 4)
+            while (burgerItems.length < 4) {
+              const defaultItem = defaultBurgers[burgerItems.length];
+              burgerItems.push(defaultItem || {
+                id: burgerItems.length + 1,
+                name: '',
+                price: '0',
+                img: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop",
+                heroIMG: "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=1000&auto=format&fit=crop",
+                heroTitle: 'Menü',
+                category: '',
+              });
+            }
+          }
+        }
+
+        // Template-6 için maksimum 4 ürün
+        if (Array.isArray(burgerItems) && burgerItems.length > 4) {
+          burgerItems = burgerItems.slice(0, 4);
+        }
+
+        return (
+          <Template6Content burgerItems={burgerItems} />
         );
       }
 
