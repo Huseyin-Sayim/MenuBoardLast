@@ -25,7 +25,6 @@ export function DesignsPageContent({ templates }: DesignsPageContentProps) {
   const router = useRouter();
 
   useEffect(() => {
-    // Veritabanından kullanıcı bilgisini al ve role kontrolü yap
     const fetchUserRole = async () => {
       try {
         const response = await fetch("/api/userTemplate/role");
@@ -67,8 +66,8 @@ export function DesignsPageContent({ templates }: DesignsPageContentProps) {
 
       {isModalOpen && (
         <AddTemplateModal
-          onClose={() => setIsModalOpen(false)}
-          onSuccess={handleAddTemplateSuccess}
+          onCloseAction={() => setIsModalOpen(false)}
+          onSuccessAction={handleAddTemplateSuccess}
         />
       )}
     </>

@@ -80,8 +80,8 @@ type EditViewProps = {
   currentLocation?: string;
   screenWidth?: number;
   screenHeight?: number;
-  onSave: (designId: string, status: "Aktif" | "Pasif", location: string, playlist: Array<{ id: string; item: MediaItem | MenuBoardDesign; isDesign: boolean }>, screenConfig: ScreenConfig[]) => void;
-  onCancel: () => void;
+  onSaveAction: (designId: string, status: "Aktif" | "Pasif", location: string, playlist: Array<{ id: string; item: MediaItem | MenuBoardDesign; isDesign: boolean }>, screenConfig: ScreenConfig[]) => void;
+  onCancelAction: () => void;
 };
 
 const mockMenuBoardDesigns: MenuBoardDesign[] = [
@@ -294,8 +294,8 @@ export function EditView({
   screenHeight = 1080,
   initialMedia,
   initialPlaylist = [],
-  onSave,
-  onCancel,
+  onSaveAction,
+  onCancelAction,
 }: EditViewProps) {
   const [displayName, setDisplayName] = useState<string>("Yükleniyor...");
   const [selectedDesign, setSelectedDesign] = useState(currentDesign);
@@ -627,7 +627,7 @@ export function EditView({
       : mediaItems.filter((m) => m.type === mediaCategory);
 
   const handleSave = () => {
-    onSave(
+    onSaveAction(
       selectedDesign,
       selectedStatus,
       selectedLocation,
@@ -946,7 +946,7 @@ export function EditView({
       {/* Footer */}
       <div className="flex items-center justify-end gap-3 border-t border-stroke px-7.5 py-4 dark:border-stroke-dark">
         <button
-          onClick={onCancel}
+          onClick={onCancelAction}
           className="rounded-lg border border-stroke px-4 py-2 font-medium text-dark hover:bg-gray-2 dark:border-stroke-dark dark:text-white dark:hover:bg-dark-2"
         >
           İptal

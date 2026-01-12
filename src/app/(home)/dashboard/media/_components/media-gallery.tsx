@@ -153,8 +153,8 @@ export function MediaGallery({showActions=true,className,initialData,gridCols = 
   if (isUploadModalOpen && !selectionMode) {
     return (
       <MediaUploadView
-        onClose={() => setIsUploadModalOpen(false)}
-        onUploadSuccess={handleUploadSuccess}
+        onCloseAction={() => setIsUploadModalOpen(false)}
+        onUploadSuccessAction={handleUploadSuccess}
       />
     );
   }
@@ -165,10 +165,10 @@ export function MediaGallery({showActions=true,className,initialData,gridCols = 
       <MediaEditView
         selectedItem={selectedItem}
         allItems={mediaItems}
-        onSelect={setSelectedItem}
-        onDelete={handleDelete}
-        onUpdate={handleUpdate}
-        onClose={handleClose}
+        onSelectAction={setSelectedItem}
+        onDeleteAction={handleDelete}
+        onUpdateAction={handleUpdate}
+        onCloseAction={handleClose}
       />
     );
   }

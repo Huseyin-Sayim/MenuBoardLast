@@ -21,24 +21,24 @@ type MediaItem = {
 type MediaEditViewProps = {
   selectedItem: MediaItem;
   allItems: MediaItem[];
-  onSelect: (item: MediaItem) => void;
-  onDelete: (id: string) => void;
-  onUpdate: (
+  onSelectAction: (item: MediaItem) => void;
+  onDeleteAction: (id: string) => void;
+  onUpdateAction: (
     id: string,
     name: string,
     startTime?: number,
     endTime?: number,
   ) => void;
-  onClose: () => void;
+  onCloseAction: () => void;
 };
 
 export function MediaEditView({
   selectedItem,
   allItems,
-  onSelect,
-  onDelete,
-  onUpdate,
-  onClose,
+  onSelectAction,
+  onDeleteAction,
+  onUpdateAction,
+  onCloseAction,
 }: MediaEditViewProps) {
   const [selectedItems, setSelectedItem] = useState<MediaItem | null>(null);
   const [mediaItems, setMediaItems] = useState<MediaItem[]>(allItems);
@@ -111,7 +111,7 @@ export function MediaEditView({
           setIsEditingTrim(false);
         } else {
           // Düzenleme modu kapalıysa, tüm ekranı kapat
-          onClose();
+          onCloseAction();
         }
       }
     };
@@ -121,18 +121,18 @@ export function MediaEditView({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isEditingName, isEditingTrim, selectedItem.name, selectedItem.startTime, selectedItem.endTime, selectedItem.duration, onClose]);
+  }, [isEditingName, isEditingTrim, selectedItem.name, selectedItem.startTime, selectedItem.endTime, selectedItem.duration, onCloseAction]);
 
   const handleDelete = async (id: string) => {
     if (deleteConfirmId === id) {
-      onDelete(id);
+      onDeleteAction(id);
       await deleteMedia(id);
       setDeleteConfirmId(null);
       // Eğer silinen tasarım seçili tasarımsa, ilk tasarıma geç
       if (id === selectedItem.id && allItems.length > 1) {
         const remainingItems = allItems.filter((item) => item.id !== id);
         if (remainingItems.length > 0) {
-          onSelect(remainingItems[0]);
+          onSelectAction(remainingItems[0]);
         }
       }
     } else {
@@ -153,7 +153,7 @@ export function MediaEditView({
           Tasarımlarım
         </h2>
         <button
-          onClick={onClose}
+          onClick={onCloseAction}
           className="rounded-lg p-2 hover:bg-gray-2 dark:hover:bg-dark-2"
           aria-label="Kapat"
         >
@@ -285,14 +285,14 @@ export function MediaEditView({
                       onClick={() => {
                         if (editedName.trim() && editedName !== selectedItem.name) {
                           if (selectedItem.type === "video") {
-                            onUpdate(
+                            onUpdateAction(
                               selectedItem.id,
                               editedName.trim(),
                               startTime,
                               endTime,
                             );
                           } else {
-                            onUpdate(selectedItem.id, editedName.trim());
+                            onUpdateAction(selectedItem.id, editedName.trim());
                           }
                         }
                         setIsEditingName(false);
@@ -340,7 +340,7 @@ export function MediaEditView({
                       ? "border-primary bg-primary/5 dark:bg-primary/10"
                       : "border-stroke hover:border-primary/50 dark:border-stroke-dark dark:hover:border-primary/50 cursor-pointer"
                   )}
-                  onClick={() => !isSelected && onSelect(item)}
+                  onClick={() => !isSelected && onSelectAction(item)}
                 >
                   <div className="capitalize relative h-20 w-32 shrink-0 overflow-hidden rounded-lg">
                     {item.type === "video" ? (
@@ -412,7 +412,7 @@ export function MediaEditView({
       {/* Footer */}
       <div className="flex items-center justify-end gap-3 border-t border-stroke px-7.5 py-4 dark:border-stroke-dark">
         <button
-          onClick={onClose}
+          onClick={onCloseAction}
           className="rounded-lg border border-stroke px-4 py-2 font-medium text-dark hover:bg-gray-2 dark:border-stroke-dark dark:text-white dark:hover:bg-dark-2"
         >
           Kapat

@@ -1,7 +1,6 @@
 "use client";
 
 import { ArrowLeftIcon } from "@/assets/icons";
-import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 
 interface VerificationStepProps {
@@ -30,12 +29,10 @@ export default function VerificationStep({
     newCode[index] = value;
     setCode(newCode);
 
-    // Otomatik olarak bir sonraki input'a geç
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
 
-    // Tüm kodlar doldurulduğunda otomatik submit
     if (newCode.every((digit) => digit !== "") && newCode.join("").length === 6) {
       handleSubmit(newCode.join(""));
     }
@@ -65,7 +62,6 @@ export default function VerificationStep({
     if (codeToSubmit.length !== 6) return;
 
     setLoading(true);
-    // Simüle edilmiş API çağrısı
     setTimeout(() => {
       setLoading(false);
       onSubmit(codeToSubmit);
@@ -105,7 +101,7 @@ export default function VerificationStep({
             {code.map((digit, index) => (
               <input
                 key={index}
-                ref={(el) => (inputRefs.current[index] = el)}
+                ref={(el) => { inputRefs.current[index] = el; }}
                 type="text"
                 inputMode="numeric"
                 maxLength={1}

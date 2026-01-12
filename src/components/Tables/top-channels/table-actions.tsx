@@ -6,20 +6,20 @@ import { useState } from "react";
 
 type TableActionsProps = {
   screenName: string;
-  onEdit: (screenName: string) => void;
-  onDelete: (screenName: string) => void;
+  onEditAction: (screenName: string) => void;
+  onDeleteAction: (screenName: string) => void;
 };
 
 export function TableActions({
   screenName,
-  onEdit,
-  onDelete,
+  onEditAction,
+  onDeleteAction,
 }: TableActionsProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleDelete = () => {
     if (showDeleteConfirm) {
-      onDelete(screenName);
+      onDeleteAction(screenName);
       setShowDeleteConfirm(false);
     } else {
       setShowDeleteConfirm(true);
@@ -32,7 +32,7 @@ export function TableActions({
     <>
       <TableCell>
         <button
-          onClick={() => onEdit(screenName)}
+          onClick={() => onEditAction(screenName)}
           className="mx-auto flex items-center justify-center rounded-lg p-2 text-primary hover:bg-primary/10 dark:hover:bg-primary/20"
           aria-label="Düzenle"
         >

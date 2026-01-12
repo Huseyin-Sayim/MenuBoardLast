@@ -18,6 +18,7 @@ interface GalleryProps {
   userRole: 'admin' | 'user';
   showActions?: boolean;
 }
+export const dynamic = "force-dynamic";
 
 export function Gallery({ initialData, userRole, showActions = true }: GalleryProps) {
   const [images, setImages] = useState<GalleryImage[]>(initialData);
