@@ -435,6 +435,7 @@ export function EditView({
   const maxHeight = isPortrait ? "400px" : "none";
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const [previewScale, setPreviewScale] = useState<number>(1);
+  
 
   // DnD Kit sensors
   const sensors = useSensors(

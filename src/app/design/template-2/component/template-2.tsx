@@ -308,7 +308,7 @@ export default function Template2Content({
       <style>{`
         .template-2-container {
           width: 100%;
-          height: 100%;
+          height: 95.5vh;
           margin: 0;
           padding: 2rem;
           font-family: 'Georgia', serif;
