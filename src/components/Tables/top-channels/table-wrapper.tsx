@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { EditView, ScreenConfig } from "./edit-view";
 import { TableActions } from "./table-actions";
 import Cookies from "js-cookie";
@@ -207,9 +207,14 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
     setInitialPlaylist([]);
   };
 
-  const handleAddScreenSuccess = () => {
+  const handleCloseModal = useCallback(() => {
+    setIsAddModalOpen(false);
+  }, []);
+
+  const handleAddScreenSuccess = useCallback(() => {
     // window.location.reload();
-  };
+    router.refresh();
+  }, [router]);
 
   if (isEditing) {
     return (
@@ -219,8 +224,8 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
           currentDesign="1"
           screenWidth={selectedScreenData?.width}
           screenHeight={selectedScreenData?.height}
-          onSave={handleSaveDesign}
-          onCancel={handleCancel}
+          onSaveAction={handleSaveDesign}
+          onCancelAction={handleCancel}
           initialMedia={initialMedia}
           initialPlaylist={initialPlaylist}
         />
@@ -301,8 +306,8 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
               {showActions && (
                 <TableActions
                   screenName={screen.id}
-                  onEdit={handleEdit}
-                  onDelete={() => handleDelete(screen.name, screen.id)}
+                  onEditAction={handleEdit}
+                  onDeleteAction={() => handleDelete(screen.name, screen.id)}
                 />
               )}
             </TableRow>
@@ -312,8 +317,8 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
 
       {isAddModalOpen && (
         <AddScreenModal
-          onClose={() => setIsAddModalOpen(false)}
-          onSuccess={handleAddScreenSuccess}
+          onCloseAction={handleCloseModal}
+          onSuccessAction={handleAddScreenSuccess}
         />
       )}
     </div>

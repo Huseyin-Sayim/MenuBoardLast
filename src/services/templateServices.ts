@@ -24,18 +24,9 @@ export async function saveTemplateConfig(
       let template = await prisma.template.findFirst({
         where: { path: path },
       });
-      
+
       if (!template) {
-        template = await prisma.template.create({
-          data: {
-            name: templateName,
-            path,
-            component,
-          },
-        });
-        console.log('Template oluşturuldu:', template);
-      } else {
-        console.log('Template bulundu:', template);
+        throw new Error(`Template bulunamadı: ${templateId}. Lütfen önce template'i oluşturun.`);
       }
       
       dbTemplateId = template.id;
@@ -127,7 +118,6 @@ export async function getTemplateConfig(userId: string, templateId: string, conf
       return config;
     }
     
-    // Eski davranış: templateId ile ilk config'i getir (geriye uyumluluk için)
     let dbTemplateId = templateId;
     
     if (templateId.startsWith('template-')) {
@@ -136,23 +126,9 @@ export async function getTemplateConfig(userId: string, templateId: string, conf
       let template = await prisma.template.findFirst({
         where: { path: path },
       });
-      
+
       if (!template) {
-        const name = templateId === 'template-1' ? 'Şablon 1' : 
-                     templateId === 'template-2' ? 'Şablon 2' : 
-                     templateId === 'template-3' ? 'Şablon 3' : 
-                     templateId === 'template-4' ? 'Şablon 4' :
-                     templateId === 'template-5' ? 'Şablon 5' :
-                   templateId === 'template-6' ? 'Şablon 6' : 'Şablon';
-        const component = templateId;
-        
-        template = await prisma.template.create({
-          data: {
-            name,
-            path,
-            component,
-          },
-        });
+        throw new Error(`Template bulunamadı: ${templateId}. Lütfen önce template'i oluşturun.`);
       }
       
       dbTemplateId = template.id;
@@ -164,7 +140,7 @@ export async function getTemplateConfig(userId: string, templateId: string, conf
         templateId: dbTemplateId,
       },
       orderBy: {
-        createdAt: 'desc', // En yeni config'i getir
+        createdAt: 'desc',
       },
     });
   } catch (err : any) {
@@ -174,7 +150,6 @@ export async function getTemplateConfig(userId: string, templateId: string, conf
 
 }
 
-// Bir template için tüm config'leri getir
 export async function getAllTemplateConfigs(userId: string, templateId: string) {
   try {
     let dbTemplateId = templateId;

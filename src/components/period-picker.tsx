@@ -28,7 +28,7 @@ export function PeriodPicker<TItem extends string>({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Dropdown isOpen={isOpen} setIsOpen={setIsOpen}>
+    <Dropdown isOpen={isOpen} setIsOpenAction={setIsOpen}>
       <DropdownTrigger
         className={cn(
           "flex h-8 w-full items-center justify-between gap-x-1 rounded-md border border-[#E8E8E8] bg-white px-3 py-2 text-sm font-medium text-dark-5 outline-none ring-offset-white disabled:cursor-not-allowed disabled:opacity-50 data-[placeholder]:text-neutral-500 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:ring-offset-neutral-950 dark:focus:ring-neutral-300 dark:data-[placeholder]:text-neutral-400 [&>span]:line-clamp-1 [&[data-state='open']>svg]:rotate-0",

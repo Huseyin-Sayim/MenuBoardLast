@@ -5,11 +5,11 @@ import { useState, useRef, DragEvent, ChangeEvent } from "react";
 import Cookies from "js-cookie";
 
 type MediaUploadViewProps = {
-  onClose: () => void;
-  onUploadSuccess: () => void;
+  onCloseAction: () => void;
+  onUploadSuccessAction: () => void;
 };
 
-export function MediaUploadView({ onClose, onUploadSuccess }: MediaUploadViewProps) {
+export function MediaUploadView({ onCloseAction, onUploadSuccessAction }: MediaUploadViewProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [previewUrl, setPreviewUrl] = useState<string>("");
@@ -112,7 +112,7 @@ export function MediaUploadView({ onClose, onUploadSuccess }: MediaUploadViewPro
 
       const result = await uploadPromise;
       setUploadProgress(100);
-      onUploadSuccess();
+      onUploadSuccessAction();
 
     } catch (error: any) {
       console.error("Upload error:", error);
@@ -131,7 +131,7 @@ export function MediaUploadView({ onClose, onUploadSuccess }: MediaUploadViewPro
       <div className="border-b border-stroke px-7.5 py-4 dark:border-stroke-dark">
         <div className="flex items-center justify-between">
           <h2 className="text-body-2xlg font-bold text-dark dark:text-white">Yeni Medya Ekle</h2>
-          <button onClick={onClose} className="p-2 text-dark-4 hover:text-dark">
+          <button onClick={onCloseAction} className="p-2 text-dark-4 hover:text-dark">
             <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -211,7 +211,7 @@ export function MediaUploadView({ onClose, onUploadSuccess }: MediaUploadViewPro
         {uploadError && <div className="mt-4 text-sm text-red-500">{uploadError}</div>}
 
         <div className="mt-6 flex justify-end gap-3 border-t pt-6">
-          <button onClick={onClose} className="px-6 py-2 text-sm border rounded-lg">İptal</button>
+          <button onClick={onCloseAction} className="px-6 py-2 text-sm border rounded-lg">İptal</button>
           <button
             onClick={handleUpload}
             disabled={!selectedFile || isUploading}

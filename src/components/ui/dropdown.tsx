@@ -30,10 +30,10 @@ function useDropdownContext() {
 type DropdownProps = {
   children: React.ReactNode;
   isOpen: boolean;
-  setIsOpen: SetStateActionType<boolean>;
+  setIsOpenAction: SetStateActionType<boolean>;
 };
 
-export function Dropdown({ children, isOpen, setIsOpen }: DropdownProps) {
+export function Dropdown({ children, isOpen, setIsOpenAction }: DropdownProps) {
   const triggerRef = useRef<HTMLElement>(null);
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
@@ -57,11 +57,11 @@ export function Dropdown({ children, isOpen, setIsOpen }: DropdownProps) {
   }, [isOpen]);
 
   function handleClose() {
-    setIsOpen(false);
+    setIsOpenAction(false);
   }
 
   function handleOpen() {
-    setIsOpen(true);
+    setIsOpenAction(true);
   }
 
   return (

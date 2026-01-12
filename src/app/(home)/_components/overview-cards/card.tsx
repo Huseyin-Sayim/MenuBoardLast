@@ -4,7 +4,7 @@ import type { JSX, SVGProps } from "react";
 type PropsType = {
   label: string;
   data: {
-    value: number | string;
+    value:  string;
     growthRate: number;
   };
   Icon: (props: SVGProps<SVGSVGElement>) => JSX.Element;

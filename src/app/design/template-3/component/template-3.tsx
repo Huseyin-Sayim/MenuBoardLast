@@ -3,11 +3,11 @@ import React from "react";
 
 type Template3ContentProps = {
   prices?: Record<string, string>;
-  onPriceClick?: (itemName: string, currentPrice: string) => void;
+  onPriceClickAction?: (itemName: string, currentPrice: string) => void;
   isEditable?: boolean;
 };
 
-export default function Template3Content({ prices, onPriceClick, isEditable = false }: Template3ContentProps = {}) {
+export default function Template3Content({ prices, onPriceClickAction, isEditable = false }: Template3ContentProps = {}) {
   const menuItems = [
     { name: "Serpme Kahvaltı", price: "₺120" },
     { name: "Menemen", price: "₺45" },
@@ -37,12 +37,12 @@ export default function Template3Content({ prices, onPriceClick, isEditable = fa
               <li className="minimal-list-item">
                 <span className="item-text">Serpme Kahvaltı</span>
                 <span className="item-dot"></span>
-                {isEditable && onPriceClick ? (
+                {isEditable && onPriceClickAction ? (
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onPriceClick("Serpme Kahvaltı", menuItems.find(m => m.name === "Serpme Kahvaltı")?.price || "₺120");
+                      onPriceClickAction("Serpme Kahvaltı", menuItems.find(m => m.name === "Serpme Kahvaltı")?.price || "₺120");
                     }}
                     className="item-price"
                     style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
@@ -56,12 +56,12 @@ export default function Template3Content({ prices, onPriceClick, isEditable = fa
               <li className="minimal-list-item">
                 <span className="item-text">Menemen</span>
                 <span className="item-dot"></span>
-                {isEditable && onPriceClick ? (
+                {isEditable && onPriceClickAction ? (
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onPriceClick("Menemen", menuItems.find(m => m.name === "Menemen")?.price || "₺45");
+                      onPriceClickAction("Menemen", menuItems.find(m => m.name === "Menemen")?.price || "₺45");
                     }}
                     className="item-price"
                     style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
@@ -75,12 +75,12 @@ export default function Template3Content({ prices, onPriceClick, isEditable = fa
               <li className="minimal-list-item">
                 <span className="item-text">Omlet</span>
                 <span className="item-dot"></span>
-                {isEditable && onPriceClick ? (
+                {isEditable && onPriceClickAction ? (
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onPriceClick("Omlet", menuItems.find(m => m.name === "Omlet")?.price || "₺40");
+                      onPriceClickAction("Omlet", menuItems.find(m => m.name === "Omlet")?.price || "₺40");
                     }}
                     className="item-price"
                     style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
@@ -100,12 +100,12 @@ export default function Template3Content({ prices, onPriceClick, isEditable = fa
               <li className="minimal-list-item">
                 <span className="item-text">Mercimek Çorbası</span>
                 <span className="item-dot"></span>
-                {isEditable && onPriceClick ? (
+                {isEditable && onPriceClickAction ? (
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onPriceClick("Mercimek Çorbası", menuItems.find(m => m.name === "Mercimek Çorbası")?.price || "₺35");
+                      onPriceClickAction("Mercimek Çorbası", menuItems.find(m => m.name === "Mercimek Çorbası")?.price || "₺35");
                     }}
                     className="item-price"
                     style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
@@ -119,12 +119,12 @@ export default function Template3Content({ prices, onPriceClick, isEditable = fa
               <li className="minimal-list-item">
                 <span className="item-text">Izgara Köfte</span>
                 <span className="item-dot"></span>
-                {isEditable && onPriceClick ? (
+                {isEditable && onPriceClickAction ? (
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onPriceClick("Izgara Köfte", menuItems.find(m => m.name === "Izgara Köfte")?.price || "₺85");
+                      onPriceClickAction("Izgara Köfte", menuItems.find(m => m.name === "Izgara Köfte")?.price || "₺85");
                     }}
                     className="item-price"
                     style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
@@ -138,12 +138,12 @@ export default function Template3Content({ prices, onPriceClick, isEditable = fa
               <li className="minimal-list-item">
                 <span className="item-text">Salata Tabağı</span>
                 <span className="item-dot"></span>
-                {isEditable && onPriceClick ? (
+                {isEditable && onPriceClickAction ? (
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onPriceClick("Salata Tabağı", menuItems.find(m => m.name === "Salata Tabağı")?.price || "₺55");
+                      onPriceClickAction("Salata Tabağı", menuItems.find(m => m.name === "Salata Tabağı")?.price || "₺55");
                     }}
                     className="item-price"
                     style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
@@ -163,12 +163,12 @@ export default function Template3Content({ prices, onPriceClick, isEditable = fa
               <li className="minimal-list-item">
                 <span className="item-text">Balık Tava</span>
                 <span className="item-dot"></span>
-                {isEditable && onPriceClick ? (
+                {isEditable && onPriceClickAction ? (
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onPriceClick("Balık Tava", menuItems.find(m => m.name === "Balık Tava")?.price || "₺130");
+                      onPriceClickAction("Balık Tava", menuItems.find(m => m.name === "Balık Tava")?.price || "₺130");
                     }}
                     className="item-price"
                     style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
@@ -182,12 +182,12 @@ export default function Template3Content({ prices, onPriceClick, isEditable = fa
               <li className="minimal-list-item">
                 <span className="item-text">Kuzu Tandır</span>
                 <span className="item-dot"></span>
-                {isEditable && onPriceClick ? (
+                {isEditable && onPriceClickAction ? (
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onPriceClick("Kuzu Tandır", menuItems.find(m => m.name === "Kuzu Tandır")?.price || "₺150");
+                      onPriceClickAction("Kuzu Tandır", menuItems.find(m => m.name === "Kuzu Tandır")?.price || "₺150");
                     }}
                     className="item-price"
                     style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
@@ -201,12 +201,12 @@ export default function Template3Content({ prices, onPriceClick, isEditable = fa
               <li className="minimal-list-item">
                 <span className="item-text">Mantı</span>
                 <span className="item-dot"></span>
-                {isEditable && onPriceClick ? (
+                {isEditable && onPriceClickAction ? (
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onPriceClick("Mantı", menuItems.find(m => m.name === "Mantı")?.price || "₺65");
+                      onPriceClickAction("Mantı", menuItems.find(m => m.name === "Mantı")?.price || "₺65");
                     }}
                     className="item-price"
                     style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}

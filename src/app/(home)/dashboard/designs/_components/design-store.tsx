@@ -23,14 +23,12 @@ export function DesignStore({ templates }: DesignStoreProps) {
   const [acquiringTemplateId, setAcquiringTemplateId] = useState<string | null>(null);
   const router = useRouter();
 
-  // Kullanıcının sahip olduğu template'leri çek
   useEffect(() => {
     const fetchUserTemplates = async () => {
       try {
         const response = await fetch("/api/userTemplate");
         if (response.ok) {
           const result = await response.json();
-          // Template objelerinden sadece ID'leri çıkar
           const templateIds = (result.data || []).map((t: any) => t.id);
           setUserTemplateIds(templateIds);
         } else {
@@ -46,11 +44,10 @@ export function DesignStore({ templates }: DesignStoreProps) {
     fetchUserTemplates();
   }, []);
 
-  // Şablon al
   const handleAcquireTemplate = async (template: Template, e: React.MouseEvent) => {
-    e.stopPropagation(); // Kart'a tıklama event'ini durdur
+    e.stopPropagation();
     
-    if (acquiringTemplateId) return; // Zaten bir istek devam ediyorsa
+    if (acquiringTemplateId) return;
     
     setAcquiringTemplateId(template.id);
     
@@ -65,14 +62,12 @@ export function DesignStore({ templates }: DesignStoreProps) {
       const result = await response.json();
 
       if (response.ok) {
-        // Oluşturulan configId ve component ile yönlendir
         const configId = result.data?.id;
         const component = result.data?.component || template.component;
         
         if (configId) {
           router.push(`/dashboard/designTemplate/${component}?configId=${configId}`);
         } else {
-          // Fallback: component ile yönlendir (configId yoksa)
           router.push(`/dashboard/designTemplate/${component}`);
         }
       } else {
