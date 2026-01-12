@@ -80,8 +80,8 @@ export function TableWrapper({ data, className, showActions = true }: TableWrapp
         <EditView
           screenName={selectedScreen}
           currentDesign="1"
-          onSave={handleSaveDesign}
-          onCancel={handleCancel}
+          onSaveAction={handleSaveDesign}
+          onCancelAction={handleCancel}
           initialMedia={selectedScreenData?.logo || []}
         />
       </div>
@@ -157,8 +157,8 @@ export function TableWrapper({ data, className, showActions = true }: TableWrapp
               {showActions && (
                 <TableActions
                   screenName={channel.name}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
+                  onEditAction={handleEdit}
+                  onDeleteAction={handleDelete}
                 />
               )}
             </TableRow>
