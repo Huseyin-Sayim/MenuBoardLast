@@ -4,11 +4,11 @@ import { useState } from "react";
 import InputGroup from "@/components/FormElements/InputGroup";
 
 type AddTemplateModalProps = {
-  onClose: () => void;
-  onSuccess: () => void;
+  onCloseAction: () => void;
+  onSuccessAction: () => void;
 };
 
-export function AddTemplateModal({ onClose, onSuccess }: AddTemplateModalProps) {
+export function AddTemplateModal({ onCloseAction, onSuccessAction }: AddTemplateModalProps) {
   const [name, setName] = useState("");
   const [path, setPath] = useState("");
   const [component, setComponent] = useState("");
@@ -38,8 +38,8 @@ export function AddTemplateModal({ onClose, onSuccess }: AddTemplateModalProps) 
       const result = await response.json();
 
       if (response.ok && result.data) {
-        onSuccess();
-        onClose();
+        onSuccessAction();
+        onCloseAction();
       } else {
         setError(result.message || "Şablon eklenirken bir hata oluştu");
       }
@@ -61,7 +61,7 @@ export function AddTemplateModal({ onClose, onSuccess }: AddTemplateModalProps) 
               Şablon Ekle
             </h2>
             <button
-              onClick={onClose}
+              onClick={onCloseAction}
               className="flex items-center justify-center rounded-lg p-2 text-dark-4 transition-all hover:bg-gray-2 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-2 dark:hover:text-white"
             >
               <svg
@@ -123,7 +123,7 @@ export function AddTemplateModal({ onClose, onSuccess }: AddTemplateModalProps) 
           <div className="flex items-center justify-end gap-3">
             <button
               type="button"
-              onClick={onClose}
+              onClick={onCloseAction}
               disabled={isSubmitting}
               className="rounded-lg border border-stroke px-4 py-2 font-medium text-dark hover:bg-gray-2 dark:border-stroke-dark dark:text-white dark:hover:bg-dark-2 disabled:opacity-50"
             >
