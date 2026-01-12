@@ -12,10 +12,8 @@ export default async function Template2Page({ searchParams }: Props) {
   const isPreview = params.preview === 'true';
   const configId = params.configId;
   
-  // Preview modunda sadece default ayarları göster
   let menuItemsData = menuItems;
   
-  // Preview değilse kullanıcı config'ini kontrol et
   if (!isPreview) {
     const cookieStore = await cookies();
     const userCookie = cookieStore.get('user')?.value;

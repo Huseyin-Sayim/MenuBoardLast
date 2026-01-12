@@ -375,7 +375,7 @@ export default function Template1Content({
           width: 100vw !important;
           height: 100vh !important;
           overflow: hidden !important;
-          background: #000 !important;
+          background: #000;
         }
 
         .fire-menu-container {
@@ -481,7 +481,7 @@ export default function Template1Content({
           flex-direction: column;
           justify-content: space-between;
           height:100vh;
-          overflow-y: hidden;
+          overflow-y: auto;
         }
 
         .grid-layout {
@@ -492,7 +492,7 @@ export default function Template1Content({
           grid-template-columns: 1fr 1fr;
           grid-template-rows: repeat(3, 1fr);
           gap: 5vh 2vw;
-          margin-bottom: 0;
+          margin-bottom: 3vh;
           overflow: hidden;
         }
 
