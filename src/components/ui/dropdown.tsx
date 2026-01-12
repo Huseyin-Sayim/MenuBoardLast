@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 
 import { useClickOutside } from "@/hooks/use-click-outside";
 import { cn } from "@/lib/utils";

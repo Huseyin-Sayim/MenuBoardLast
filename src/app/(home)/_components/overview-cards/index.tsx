@@ -13,6 +13,7 @@ export async function OverviewCardsGroup() {
         data={{
           ...screen,
           value: compactFormat(screen.value),
+          growthRate: 0
         }}
         Icon={icons.Views}
       />
@@ -22,6 +23,7 @@ export async function OverviewCardsGroup() {
         data={{
           ...design,
           value: "$" + compactFormat(design.value),
+          growthRate: 0
         }}
         Icon={icons.Profit}
       />
@@ -31,11 +33,10 @@ export async function OverviewCardsGroup() {
         data={{
           ...gallery,
           value: "$" + compactFormat(gallery.value),
+          growthRate: 0
         }}
         Icon={icons.Gallery}
       />
-
-   
     </div>
   );
 }

@@ -82,6 +82,7 @@ export function TableWrapper({ data, className, showActions = true }: TableWrapp
           currentDesign="1"
           onSave={handleSaveDesign}
           onCancel={handleCancel}
+          initialMedia={selectedScreenData?.logo || []}
         />
       </div>
     );

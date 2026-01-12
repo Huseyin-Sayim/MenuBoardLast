@@ -14,7 +14,7 @@ export default async function MediaPage() {
 
   const rawData = await getMedia(id)
 
-  const formattedData = rawData.map((item) => {
+  const formattedData = rawData.map((item: any) => {
     const isVideo = ["mp4", "webm", "ogg", "mov"].includes(
       item.extension.toLowerCase().replace(".", "")
     );

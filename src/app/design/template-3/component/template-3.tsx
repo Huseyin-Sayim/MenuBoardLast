@@ -1,4 +1,5 @@
-"use client";
+"use client"
+import React from "react";
 
 type Template3ContentProps = {
   prices?: Record<string, string>;
