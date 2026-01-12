@@ -58,9 +58,7 @@ export default function DesignTemplatePage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="mb-6 text-3xl font-bold text-dark dark:text-white">
-        Şablonlar
-      </h1>
+     
 
       {templates.length === 0 ? (
         <div className="text-center py-12">
@@ -69,40 +67,48 @@ export default function DesignTemplatePage() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {templates.map((template) => (
-            <div
-              key={template.id}
-              className="group cursor-pointer overflow-hidden rounded-lg border border-stroke bg-white shadow-sm transition-all hover:shadow-lg dark:border-stroke-dark dark:bg-gray-dark"
-              onClick={() => handleTemplateClick(template.component, template.configId)}
-            >
-              {/* Önizleme */}
-              <div className="relative aspect-video w-full overflow-hidden bg-gray-2 dark:bg-dark-2">
-                <iframe
-                  src={`${template.path}${template.path.includes('?') ? '&' : '?'}configId=${template.configId}`}
-                  className="absolute inset-0 border-0"
-                  style={{
-                    transform: `scale(${Math.min(400 / 1920, 225 / 1080)})`,
-                    transformOrigin: "top left",
-                    width: "1920px",
-                    height: "1080px",
-                  }}
-                  title={`${template.name} Önizleme`}
-                  scrolling="no"
-                />
-              </div>
+        <div className="relative bg-white p-6 rounded-lg shadow-md max-h-[80vh] overflow-x-auto">
+            {/* Üst gradient overlay */}
+            <div className="absolute top-0 left-0 right-0 h-13 bg-gradient-to-b from-white to-transparent pointer-events-none z-10 rounded-t-lg"></div>
+            
+            <h1 className="mb-6 text-3xl font-bold text-dark dark:text-white">
+              Şablonlar
+            </h1>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {templates.map((template) => (
+              <div
+                key={template.id}
+                className="group cursor-pointer overflow-hidden rounded-lg border border-stroke bg-white shadow-sm transition-all hover:shadow-lg dark:border-stroke-dark dark:bg-gray-dark"
+                onClick={() => handleTemplateClick(template.component, template.configId)}
+              >
+                {/* Önizleme */}
+                <div className="relative aspect-video w-full overflow-hidden bg-gray-2 dark:bg-dark-2">
+                  <iframe
+                    src={`${template.path}${template.path.includes('?') ? '&' : '?'}configId=${template.configId}`}
+                    className="absolute inset-0 border-0"
+                    style={{
+                      transform: `scale(${Math.min(400 / 1920, 225 / 1080)})`,
+                      transformOrigin: "top left",
+                      width: "1920px",
+                      height: "1080px",
+                    }}
+                    title={`${template.name} Önizleme`}
+                    scrolling="no"
+                  />
+                </div>
 
-              {/* Bilgi */}
-              <div className="border-t border-stroke p-4 dark:border-stroke-dark">
-                <h3 className="text-lg font-semibold text-dark dark:text-white">
-                  {template.name}
-                </h3>
-                <p className="mt-1 text-sm text-dark-4 dark:text-dark-6">
-                  Şablonu görüntülemek için tıklayın
-                </p>
+                {/* Bilgi */}
+                <div className="border-t border-stroke p-4 dark:border-stroke-dark">
+                  <h3 className="text-lg font-semibold text-dark dark:text-white">
+                    {template.name}
+                  </h3>
+                  <p className="mt-1 text-sm text-dark-4 dark:text-dark-6">
+                    Şablonu görüntülemek için tıklayın
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </div>

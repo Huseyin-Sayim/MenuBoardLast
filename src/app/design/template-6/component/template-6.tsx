@@ -11,22 +11,22 @@ interface BurgerItem {
   category?: string;
 }
 
-interface Template1Props {
+interface Template6Props {
   burgerItems?: BurgerItem[];
   prices?: Record<string, string>;
   onPriceClick?: (index: string, name: string, price:string) => void;
   isEditable?: boolean;
   selectedCategory?: string;
   onCategoryChange?: (value: ((prevState: string) => string) | string) => void;
-  availableProducts?: Array<{_id:string; name:string, pricing: any}>
+  availableProducts?: Array<{_id:string; name:string, pricing: any; image?: string; img?: string; imageUrl?: string}>
   availableCategories?: Array<{_id: string; name: string}>;
   onProductSelect?: (gridIndex: number, productId: string) => void;
   onPriceTypeSelect?: (gridIndex: number, priceType: string) => void;
-  selectedProducts?: Array<{name: string; price: string; productId?: string; priceType?: string}>;
+  selectedProducts?: Array<{name: string; price: string; productId?: string; priceType?: string; image?: string}>;
   onImageClick?: (gridIndex: number) => void;
 }
 
-export default function Template1Content({
+export default function Template6Content({
   burgerItems,
   prices,
   onPriceClick,
@@ -39,14 +39,15 @@ export default function Template1Content({
   selectedCategory,
   onCategoryChange,
   onImageClick,
-}: Template1Props) {
+}: Template6Props) {
   const [editingItemId, setEditingItemId] = useState<string | number | null>(
     null,
   );
   const [editingValue, setEditingValue] = useState<string>("");
 
 
-  const fixedBurgerItems: BurgerItem[] = Array.from({ length: 6 }, (_, gridIndex) => {
+  // Max 4 ürün
+  const fixedBurgerItems: BurgerItem[] = Array.from({ length: 4 }, (_, gridIndex) => {
     if (burgerItems && burgerItems[gridIndex] && burgerItems[gridIndex]?.name) {
       return burgerItems[gridIndex];
     }
@@ -62,12 +63,6 @@ export default function Template1Content({
   const uniqueCategories = availableCategories && availableCategories.length > 0
     ? availableCategories.map(cat => ({ id: cat._id, name: cat.name }))
     : Array.from(new Set(fixedBurgerItems.map((item) => item.category).filter((cat): cat is string => cat !== undefined && cat !== null))).map(cat => ({ id: cat, name: cat }));
-
-  // Debug
-  console.log('Template1 - availableCategories:', availableCategories);
-  console.log('Template1 - availableProducts:', availableProducts);
-  console.log('Template1 - uniqueCategories:', uniqueCategories);
-  console.log('Template1 - fixedBurgerItems:', fixedBurgerItems);
 
   const filteredBurgers = fixedBurgerItems;
 
@@ -87,39 +82,32 @@ export default function Template1Content({
 
   return (
     <>
-      <div className="fire-menu-container">
-        <div className="bg-fire">
-          <img
-            src="https://static.vecteezy.com/system/resources/previews/027/179/070/non_2x/realistic-colored-flame-fire-concept-vector.jpg"
-            alt="Fire"
-          />
-          <div className="dark-mask"></div>
+      <div className="minimal-menu-container">
+        <div className="background-layer"></div>
+
+        {/* Üst Hero Bölümü - Tam Genişlik */}
+        <div className="hero-section">
+          <div className="hero-image-container">
+            <img src={heroIMG} className="hero-image" alt="Hero" />
+            <div className="hero-overlay"></div>
+          </div>
+          <div className="hero-content">
+            <div className="badge-minimal">ÖZEL SEÇİM</div>
+            <h1 className="title-minimal">
+              {heroTitle &&
+                heroTitle.split(" ").map((word: string, index: number) => (
+                  <span key={`${word}-${index}`}>
+                    {word}
+                  </span>
+                ))}
+            </h1>
+          </div>
         </div>
 
-        <div className="pane-hero">
-          <div className="badge-new">ÖZEL SEÇİM</div>
-          <h1 className="title-large">
-            {heroTitle &&
-              heroTitle.split(" ").map((word: string, index: number) => (
-                <span key={`${word}-${index}`}>
-                  {word}
-                  <br />
-                </span>
-              ))}
-          </h1>
-            <img src={heroIMG} className="hero-burger" alt="Hero Burger" />
-        </div>
-
-        <div className="pane-menu">
+        {/* Alt Ürünler Bölümü */}
+        <div className="products-section">
           {isEditable && uniqueCategories.length > 0 && (
-            <div
-              style={{
-
-                textAlign: "center",
-                zIndex: 10,
-                position: "relative",
-              }}
-            >
+            <div className="category-selector">
               <select
                 value={selectedCategory || ""}
                 onChange={(e) => {
@@ -128,22 +116,23 @@ export default function Template1Content({
                   }
                 }}
                 style={{
-                  padding: "10px 20px",
-                  fontSize: "1.2rem",
-                  borderRadius: "20px",
-                  border: "2px solid #ffcc00",
-                  backgroundColor: "rgba(0,0,0,0.7)",
-                  color: "#ffcc00",
-                  fontFamily: "Impact, Arial Black, sans-serif",
-                  fontWeight: "bold",
+                  padding: "12px 24px",
+                  fontSize: "1.1rem",
+                  borderRadius: "30px",
+                  border: "2px solid rgba(255,255,255,0.3)",
+                  backgroundColor: "rgba(0,0,0,0.4)",
+                  color: "#fff",
+                  fontFamily: "'Poppins', 'Arial', sans-serif",
+                  fontWeight: "500",
                   cursor: "pointer",
                   outline: "none",
                   minWidth: "200px",
+                  backdropFilter: "blur(10px)",
                 }}
               >
                 <option
                   value=""
-                  style={{ backgroundColor: "#000", color: "#ffcc00" }}
+                  style={{ backgroundColor: "#1a1a1a", color: "#fff" }}
                 >
                   Tüm Kategoriler
                 </option>
@@ -151,7 +140,7 @@ export default function Template1Content({
                   <option
                     key={category.id}
                     value={category.id}
-                    style={{ backgroundColor: "#000", color: "#ffcc00" }}
+                    style={{ backgroundColor: "#1a1a1a", color: "#fff" }}
                   >
                     {category.name}
                   </option>
@@ -159,11 +148,12 @@ export default function Template1Content({
               </select>
             </div>
           )}
-          <div className="grid-layout">
-            {filteredBurgers.map((burger,index) => (
-              <div key={`burger-${index}-${burger.name || index}`} className="menu-item-card">
+          
+          <div className="products-list">
+            {filteredBurgers.slice(0, 4).map((burger,index) => (
+              <div key={`burger-${index}-${burger.name || index}`} className="product-card-horizontal">
                 <div 
-                  className="thumb-box"
+                  className="product-image-wrapper"
                   onClick={() => {
                     if (isEditable && onImageClick) {
                       onImageClick(index);
@@ -174,25 +164,25 @@ export default function Template1Content({
                     position: 'relative'
                   }}
                 >
-                  <img src={burger.img} alt={burger.name} />
+                  <img src={burger.img} alt={burger.name} className="product-image" />
                   {isEditable && onImageClick && (
                     <div
                       style={{
                         position: 'absolute',
                         top: '8px',
                         right: '8px',
-                        backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                        borderRadius: '4px',
+                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                        borderRadius: '8px',
                         padding: '4px 8px',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '4px',
-                        fontSize: '12px',
+                        fontSize: '11px',
                         color: 'white',
                         pointerEvents: 'none'
                       }}
                     >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
                         <circle cx="12" cy="13" r="4" />
                       </svg>
@@ -200,7 +190,7 @@ export default function Template1Content({
                     </div>
                   )}
                 </div>
-                <div className="item-txt">
+                <div className="product-name-section">
                   {isEditable && availableProducts && availableProducts.length > 0 ? (
                     <select
                       value={burger.name || ""}
@@ -213,19 +203,19 @@ export default function Template1Content({
                       style={{
                         width: "100%",
                         maxWidth: "100%",
-                        padding: "8px",
-                        fontSize: "1.5vw",
-                        backgroundColor: "rgba(0,0,0,0.7)",
-                        color: "#ffcc00",
-                        border: "2px solid #ffcc00",
-                        borderRadius: "8px",
-                        fontFamily: "Impact, Arial Black, sans-serif",
-                        fontWeight: "bold",
-                        marginBottom: "5px",
+                        padding: "8px 12px",
+                        fontSize: "2.2vw",
+                        backgroundColor: "rgba(0,0,0,0.5)",
+                        color: "#fff",
+                        border: "2px solid rgba(255,255,255,0.2)",
+                        borderRadius: "12px",
+                        fontFamily: "'Poppins', 'Arial', sans-serif",
+                        fontWeight: "600",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
                         boxSizing: "border-box",
+                        backdropFilter: "blur(10px)",
                       }}
                     >
                       <option value="">Ürün Seçin</option>
@@ -236,8 +226,10 @@ export default function Template1Content({
                       ))}
                     </select>
                   ) : (
-                    <h3>{burger.name || "Ürün Seçin"}</h3>
+                    <h3 className="product-name">{burger.name || "Ürün Seçin"}</h3>
                   )}
+                </div>
+                <div className="product-price-section">
                   {isEditable && onPriceTypeSelect && availableProducts && burger.name && burger.name.trim() !== '' ? (
                     (() => {
                       const currentProduct = selectedProducts?.find(p => p && p.name && p.name === burger.name);
@@ -252,19 +244,17 @@ export default function Template1Content({
                           onChange={(e) => {
                             onPriceTypeSelect(index, e.target.value);
                           }}
-                          className="price-pill"
+                          className="price-tag"
                           style={{
                             cursor: "pointer",
                             border: "none",
-                            background: "#ffcc00",
+                            background: "rgba(255,255,255,0.95)",
                             color: "#000",
-                            padding: "2px 14px",
-                            borderRadius: "20px",
-                            fontWeight: "900",
-                            fontSize: "1.5rem",
-                            marginTop: "5px",
+                            padding: "8px 20px",
+                            borderRadius: "25px",
+                            fontWeight: "700",
+                            fontSize: "2rem",
                             width: "100%",
-                            maxWidth: "100%",
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             whiteSpace: "nowrap",
@@ -273,7 +263,6 @@ export default function Template1Content({
                         >
                           {Object.entries(apiProduct.pricing)
                             .filter(([key, value]: [string, any]) => {
-                              // Sadece belirli fiyat tiplerini göster (whitelist)
                               const allowedPriceTypes = [
                                 'packageSalePrice',
                                 'thirdFastSalePrice',
@@ -283,7 +272,6 @@ export default function Template1Content({
                                 'purchasePrice'
                               ];
                               
-                              // Whitelist'te var mı ve price > 0 mı kontrol et
                               return allowedPriceTypes.includes(key) && 
                                      value && 
                                      typeof value.price === "number" && 
@@ -330,17 +318,20 @@ export default function Template1Content({
                           }
                         }}
                         autoFocus
-                        className="price-pill"
+                        className="price-tag"
                         style={{
-                          color: "white",
+                          color: "#000",
                           cursor: "text",
-                          border: "1px solid white",
-                          background: "inherit",
+                          border: "2px solid rgba(255,255,255,0.5)",
+                          background: "rgba(255,255,255,0.9)",
                           font: "inherit",
-                          padding: "2px 14px",
+                          padding: "8px 20px",
                           outline: "none",
                           width: "auto",
-                          minWidth: "60px",
+                          minWidth: "100px",
+                          borderRadius: "25px",
+                          fontSize: "2rem",
+                          fontWeight: "700",
                         }}
                       />
                     ) : (
@@ -351,20 +342,20 @@ export default function Template1Content({
                           setEditingValue(currentPrice.replace("₺", ""));
                           setEditingItemId(burger.name);
                         }}
-                        className="price-pill"
+                        className="price-tag"
                       >
                         {prices?.[burger.name] || `₺${burger.price}`}
                       </button>
                     )
                   ) : (
-                    <span className="price-pill">
+                    <span className="price-tag">
                       {prices?.[burger.name] || `₺${burger.price}`}
                     </span>
                   )}
                 </div>
               </div>
             ))}
-          </div>  
+          </div>
         </div>
       </div>
 
@@ -375,195 +366,183 @@ export default function Template1Content({
           width: 100vw !important;
           height: 100vh !important;
           overflow: hidden !important;
-          background: #000 !important;
+          background: #0a0a0a;
         }
 
-        .fire-menu-container {
-          inset: 0;
-          display: grid;
-          grid-template-columns: 42% 58%;
-          font-family: 'Impact', 'Arial Black', sans-serif;
+        .minimal-menu-container {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          font-family: 'Poppins', 'Arial', sans-serif;
           color: white;
           width: 100%;
-          height: 100%;
+          height: 100vh;
+          overflow: hidden;
         }
 
-        .bg-fire {
+        .background-layer {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+        }
+
+        /* Hero Bölümü - Tam Genişlik, Üstte */
+        .hero-section {
+          position: relative;
+          width: 100%;
+          height: 30vh;
+          z-index: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+        }
+
+        .hero-image-container {
           position: absolute;
           inset: 0;
           z-index: 0;
         }
 
-        .bg-fire img {
+        .hero-image {
           width: 100%;
           height: 100%;
           object-fit: cover;
         }
 
-        .dark-mask {
+        .hero-overlay {
           position: absolute;
           inset: 0;
-          background: radial-gradient(circle, rgba(227, 24, 24, 0.4) 0%, rgba(0, 0, 0, 0.9) 80%);
-          mix-blend-mode: multiply;
+          background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.8) 100%);
         }
 
-        .pane-hero {
-          padding: 6vh;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          position:relative;
-          z-index:1;
-        }
-
-        .badge-new {
-          background: #fff;
-          color: #000;
-          padding: 4px 18px;
-          width: fit-content;
-          font-weight: 900;
-          transform: rotate(-3deg);
-          box-shadow: 4px 4px 0 #e31818;
-          margin-left: 3vh;
-        }
-
-        .title-large {
-          font-size: 7vw;
-          line-height: 0.8;
-          margin: 0;
-          margin-left: 5vh;
-          text-shadow: 6px 6px 0px #000;
-        }
-
-        .title-large span { color: #ffcc00; }
-
-        .main-burger-wrapper {
-          border-radius: 20% !important;
+        .hero-content {
           position: relative;
-          display: flex;
-          justify-content: center;
-        }
-        
-        .hero-burger-container {
-          width: 100%;
-          height: 48vh;
-          background-color: rgba(255, 255, 255, 0.05); /* Arka planı hafif belirgin yapabilirsin */
-          border-radius: 50px; /* İstediğin yuvarlaklık */
-          overflow: hidden;    /* İçindeki resmin taşan kısımlarını keser */
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-left: -5vh;   /* Senin eski kodundaki kaydırma */
+          z-index: 2;
+          padding: 4vh 5vw;
+          text-align: center;
         }
 
-        .hero-burger {
-          width: 60vh; 
-          height: 45vh;
-          object-fit: cover; 
-          border-radius: 5% !important;
-          object-position: center;
-          display: block;
-          margin: 0 auto;
-        }
-
-        .hours-label {
-          font-size: 0.8rem;
-          border: 1px solid rgba(255,255,255,0.4);
-          padding: 10px;
+        .badge-minimal {
+          background: rgba(255,255,255,0.2);
+          color: #fff;
+          padding: 8px 24px;
           width: fit-content;
-          background: rgba(0,0,0,0.5);
+          margin: 0 auto 2vh;
+          font-weight: 600;
+          font-size: 0.9vw;
+          border-radius: 50px;
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255,255,255,0.3);
+          letter-spacing: 2px;
+          text-transform: uppercase;
         }
 
-        .pane-menu {
-          width: 95%;
-          padding: 6vh;
+        .title-minimal {
+          font-size: 6.5vw;
+          line-height: 1.1;
+          margin: 0;
+          font-weight: 300;
+          color: #fff;
+          letter-spacing: -1px;
+        }
+
+        .title-minimal span {
+          display: inline-block;
+          margin: 0 0.5vw;
+        }
+
+        /* Ürünler Bölümü - Alt Yarı */
+        .products-section {
+          flex: 1;
+          padding: 4vh 5vw;
+          position: relative;
+          z-index: 1;
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
-          height:100vh;
-          overflow-y: hidden;
+          overflow-y: auto;
         }
 
-        .grid-layout {
+        .category-selector {
+          text-align: center;
+          margin-bottom: 3vh;
+          position: relative;
+          z-index: 10;
+        }
+
+        /* Ürünler Liste - Alt Alta */
+        .products-list {
           width: 100%;
-          height: 95%;
-          margin-top: 5vh;
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          grid-template-rows: repeat(3, 1fr);
-          gap: 5vh 2vw;
-          margin-bottom: 0;
-          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          gap: 2vh;
+          flex: 1;
         }
 
-        .menu-item-card {
+        /* Ürün Kartları - Yatay Düzen (İnce Uzun) */
+        .product-card-horizontal {
           display: flex;
           align-items: center;
-          gap: 15px;
-          background: rgba(0,0,0,0.4);
-          padding: 12px;
-          border-radius: 60px 15px 15px 60px;
-          backdrop-filter: blur(5px);
-          border-left: 5px solid #ffcc00;
-          min-width: 0;
+          background: rgba(255,255,255,0.05);
+          border-radius: 16px;
+          overflow: hidden;
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255,255,255,0.1);
+          transition: all 0.3s ease;
+          height: 14vh;
+          min-height: 100px;
+        }
+
+        .product-image-wrapper {
+          width: 15vh;
+          min-width: 100px;
+          height: 100%;
+          flex-shrink: 0;
+          position: relative;
           overflow: hidden;
         }
 
-        .thumb-box {
-          width: 16vh;
-          height: 16vh;
-          min-width: 16vh;
-          min-height: 16vh;
-          border-radius: 50%;
+        .product-image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .product-name-section {
+          flex: 1;
+          padding: 0 3vw;
+          display: flex;
+          align-items: center;
+          min-width: 0;
+        }
+
+        .product-name {
+          font-size: 2.8vw;
+          margin: 0;
+          font-weight: 600;
+          color: #fff;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          white-space: nowrap;
           overflow: hidden;
-          border: 3px solid #fff;
+          text-overflow: ellipsis;
+        }
+
+        .product-price-section {
+          padding-right: 3vw;
           flex-shrink: 0;
           display: flex;
           align-items: center;
-          justify-content: center;
         }
 
-        .thumb-box img { 
-          width: 100%; 
-          height: 100%; 
-          object-fit: cover; 
-          display: block;
-        }
-
-        .item-txt {
-          flex: 1;
-          min-width: 0;
-          overflow: hidden;
-        }
-
-        .item-txt h3 {
-          font-size: 2vw;
-          margin: 0 0 5px 0;
-          letter-spacing: -0.5px;
-          word-wrap: break-word;
-          overflow-wrap: break-word;
-          hyphens: auto;
-        }
-
-        .price-pill {
-          background: #ffcc00;
+        .price-tag {
+          background: rgba(255,255,255,0.95);
           color: #000;
-          padding: 2px 14px;
-          border-radius: 20px;
-          font-weight: 900;
+          padding: 8px 20px;
+          border-radius: 25px;
+          font-weight: 700;
           font-size: 2rem;
-        }
-
-        .slogan-footer {
-          background: #fff;
-          color: #e31818;
-          padding: 2vh;
-          text-align: center;
-          border-radius: 12px;
-          font-size: 1.6vw;
-          font-weight: 900;
-          text-transform: uppercase;
-          z-index: 1;
+          white-space: nowrap;
         }
       `}</style>
     </>

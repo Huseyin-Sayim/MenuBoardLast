@@ -3,6 +3,8 @@
 import {useParams, useRouter, useSearchParams} from "next/navigation";
 import Template1Content from "@/app/design/template-1/component/template-1";
 import Template2Content from "@/app/design/template-2/component/template-2";
+import Template5Content from "@/app/design/template-5/component/template-5";
+import Template6Content from "@/app/design/template-6/component/template-6";
 import {defaultBurgers,menuItems} from "@/app/design/template-data";
 import { useEffect, useState } from "react";
 import { useTemplateConfig, useUpdateTemplateConfig } from "@/hooks/use-template-config";
@@ -121,7 +123,7 @@ export default function TemplatePage () {
         console.error('Ürünler çekilirken hata:', error);
       }
     };
-    if (templateId === "template-1") {
+    if (templateId === "template-1" || templateId === "template-5" || templateId === "template-6") {
       fetchProducts();
     }
   }, [selectedCategory, templateId]);
@@ -387,6 +389,172 @@ export default function TemplatePage () {
           }
         }}
       />
+    },
+    "template-5": {
+      id: "template-5",
+      name: "Şablon 5",
+      component: <Template5Content
+        burgerItems={selectedProducts.length > 0
+          ? selectedProducts.slice(0, 4).map((p, i) => ({
+              id: i + 1,
+              name: p?.name || '',
+              price: p?.price ? p.price.replace(/[^\d]/g, '') : '0',
+              img: p?.image || "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop",
+              category: selectedCategory
+            }))
+          : defaultBurgers.slice(0, 4)}
+        isEditable={true}
+        availableProducts={availableProducts}
+        availableCategories={availableCategories}
+        onProductSelect={(gridIndex: number, productId: string) => {
+          const product = availableProducts.find(p => p._id === productId);
+          if (product && product.pricing.basePrice) {
+            const formattedPrice = formatPrice(
+              product.pricing.basePrice.currency,
+              product.pricing.basePrice.price
+            );
+            const productImage = product.image || product.img || product.imageUrl || undefined;
+            handleProductChange(gridIndex, product.name, formattedPrice, productId, 'basePrice', productImage);
+          }
+        }}
+        onPriceTypeSelect={(gridIndex: number, priceType: string) => {
+          const selectedProduct = selectedProducts[gridIndex];
+          if (selectedProduct && selectedProduct.productId) {
+            const product = availableProducts.find(p => p._id === selectedProduct.productId);
+            if (product && product.pricing[priceType]) {
+              const formattedPrice = formatPrice(
+                product.pricing[priceType].currency,
+                product.pricing[priceType].price
+              );
+              const currentImage = selectedProduct.image || product.image || product.img || product.imageUrl || undefined;
+              handleProductChange(gridIndex, selectedProduct.name, formattedPrice, selectedProduct.productId, priceType, currentImage);
+            }
+          }
+        }}
+        prices={selectedProducts.slice(0, 4).reduce((acc, p) => {
+          acc[p.name] = p.price;
+          return acc;
+        }, {} as Record<string, string>)}
+        onPriceClick={(index: string, name: string, price: string) => {
+          const idx = parseInt(index);
+          const currentProduct = selectedProducts[idx];
+          handleProductChange(idx, name, price, currentProduct?.productId, currentProduct?.priceType, currentProduct?.image)
+        }}
+        selectedProducts={selectedProducts.slice(0, 4)}
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
+        onImageClick={(gridIndex: number) => {
+          setSelectedImageIndex(gridIndex);
+          setSelectedImageCategorySlot(null);
+          if (availableMedia.length === 0) {
+            const loadGallery = async () => {
+              try {
+                const response = await fetch(`/api/gallery`);
+                if (response.ok) {
+                  const result = await response.json();
+                  const rawData = result.data || [];
+                  const formattedData = rawData.map((item: any) => ({
+                    id: item.id,
+                    name: item.name,
+                    type: "image" as "image" | "video",
+                    url: item.url,
+                    uploadedAt: new Date(item.createdAt).toLocaleDateString("tr-TR"),
+                    duration: 0,
+                  }));
+                  setAvailableMedia(formattedData);
+                }
+              } catch (error) {
+                console.error('Galeri yüklenirken hata:', error);
+              }
+            };
+            loadGallery();
+          }
+          setIsImageSelectorOpen(true);
+        }}
+      />
+    },
+    "template-6": {
+      id: "template-6",
+      name: "Şablon 6",
+      component: <Template6Content
+        burgerItems={selectedProducts.length > 0
+          ? selectedProducts.slice(0, 4).map((p, i) => ({
+              id: i + 1,
+              name: p?.name || '',
+              price: p?.price ? p.price.replace(/[^\d]/g, '') : '0',
+              img: p?.image || "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop",
+              category: selectedCategory
+            }))
+          : defaultBurgers.slice(0, 4)}
+        isEditable={true}
+        availableProducts={availableProducts}
+        availableCategories={availableCategories}
+        onProductSelect={(gridIndex: number, productId: string) => {
+          const product = availableProducts.find(p => p._id === productId);
+          if (product && product.pricing.basePrice) {
+            const formattedPrice = formatPrice(
+              product.pricing.basePrice.currency,
+              product.pricing.basePrice.price
+            );
+            const productImage = product.image || product.img || product.imageUrl || undefined;
+            handleProductChange(gridIndex, product.name, formattedPrice, productId, 'basePrice', productImage);
+          }
+        }}
+        onPriceTypeSelect={(gridIndex: number, priceType: string) => {
+          const selectedProduct = selectedProducts[gridIndex];
+          if (selectedProduct && selectedProduct.productId) {
+            const product = availableProducts.find(p => p._id === selectedProduct.productId);
+            if (product && product.pricing[priceType]) {
+              const formattedPrice = formatPrice(
+                product.pricing[priceType].currency,
+                product.pricing[priceType].price
+              );
+              const currentImage = selectedProduct.image || product.image || product.img || product.imageUrl || undefined;
+              handleProductChange(gridIndex, selectedProduct.name, formattedPrice, selectedProduct.productId, priceType, currentImage);
+            }
+          }
+        }}
+        prices={selectedProducts.slice(0, 4).reduce((acc, p) => {
+          acc[p.name] = p.price;
+          return acc;
+        }, {} as Record<string, string>)}
+        onPriceClick={(index: string, name: string, price: string) => {
+          const idx = parseInt(index);
+          const currentProduct = selectedProducts[idx];
+          handleProductChange(idx, name, price, currentProduct?.productId, currentProduct?.priceType, currentProduct?.image)
+        }}
+        selectedProducts={selectedProducts.slice(0, 4)}
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
+        onImageClick={(gridIndex: number) => {
+          setSelectedImageIndex(gridIndex);
+          setSelectedImageCategorySlot(null);
+          if (availableMedia.length === 0) {
+            const loadGallery = async () => {
+              try {
+                const response = await fetch(`/api/gallery`);
+                if (response.ok) {
+                  const result = await response.json();
+                  const rawData = result.data || [];
+                  const formattedData = rawData.map((item: any) => ({
+                    id: item.id,
+                    name: item.name,
+                    type: "image" as "image" | "video",
+                    url: item.url,
+                    uploadedAt: new Date(item.createdAt).toLocaleDateString("tr-TR"),
+                    duration: 0,
+                  }));
+                  setAvailableMedia(formattedData);
+                }
+              } catch (error) {
+                console.error('Galeri yüklenirken hata:', error);
+              }
+            };
+            loadGallery();
+          }
+          setIsImageSelectorOpen(true);
+        }}
+      />
     }
   }
 
@@ -451,7 +619,9 @@ export default function TemplatePage () {
                   }
                 : {
                     category: selectedCategory || "",
-                    data: selectedProducts.length > 0 ? selectedProducts : []
+                    data: templateId === "template-5" 
+                      ? (selectedProducts.length > 0 ? selectedProducts.slice(0, 4) : [])
+                      : (selectedProducts.length > 0 ? selectedProducts : [])
                   };
               
               updateConfig.mutate(
