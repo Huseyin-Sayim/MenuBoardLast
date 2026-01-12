@@ -1,7 +1,6 @@
 import { PeriodPicker } from "@/components/period-picker";
 import { standardFormat } from "@/lib/format-number";
 import { cn } from "@/lib/utils";
-import { PaymentsOverviewChart } from "./chart";
 
 type PropsType = {
   timeFrame?: string;
