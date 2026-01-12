@@ -1,3 +1,5 @@
+"use client";
+
 import Template3Content from "./component/template-3";
 
 type Props = {
@@ -5,7 +7,6 @@ type Props = {
 };
 
 export default async function Template3Page({ searchParams }: Props) {
-  // Preview parametresi eklendi (template-3'te config yok ama tutarlılık için)
   const params = await searchParams;
   const isPreview = params.preview === 'true';
   

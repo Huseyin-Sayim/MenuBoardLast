@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 
 import { PencilSquareIcon, TrashIcon } from "@/assets/icons";
 import { TableCell } from "@/components/ui/table";

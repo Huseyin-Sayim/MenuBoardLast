@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 
 import { TrashIcon } from "@/assets/icons";
 import { cn } from "@/lib/utils";

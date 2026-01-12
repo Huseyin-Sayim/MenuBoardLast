@@ -2,9 +2,6 @@
 
 import React from 'react';
 
-
-
-
 const BurgerPromo = () => {
   // Arka plan ve ürün görselleri yolları
   const bgImage = "/images/cover/bg.jpg";
