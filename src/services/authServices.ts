@@ -5,17 +5,17 @@ import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken";
 
 
-const ACCES_TOKEN_SECRET : string | null = process.env.ACCES_TOKEN_SECRET || null;
-const REFRESH_TOKEN_SECRET : string | null = process.env.REFRESH_TOKEN_SECRET || null;
+const ACCESS_TOKEN_SECRET: string | null = process.env.ACCESS_TOKEN_SECRET || null;
+const REFRESH_TOKEN_SECRET: string | null = process.env.REFRESH_TOKEN_SECRET || null;
 
 export const register = async (data: { name: string; email: string; password: string; phoneNumber: string }) => {
-  const {name, email, password, phoneNumber} = data;
+  const { name, email, password, phoneNumber } = data;
 
-  const user : {id: string; name: string; email: string; password: string; phoneNumber: string } | null = await prisma.user.findFirst({
+  const user: { id: string; name: string; email: string; password: string; phoneNumber: string } | null = await prisma.user.findFirst({
     where: {
       OR: [
-        {email : email},
-        {phoneNumber : phoneNumber}
+        { email: email },
+        { phoneNumber: phoneNumber }
       ]
     }
   })
@@ -48,18 +48,18 @@ export const register = async (data: { name: string; email: string; password: st
   return newUser;
 }
 
-export const logout = async (data: {token : string}) =>{
+export const logout = async (data: { token: string }) => {
   try {
-      const { token } = data
-      if (!token) {
-        throw new Error('Token bulunamadı !!')
-      }
+    const { token } = data
+    if (!token) {
+      throw new Error('Token bulunamadı !!')
+    }
 
-      const deletedToken= await  prisma.refreshToken.delete({
-        where: {
-          token: token
-        }
-      })
+    const deletedToken = await prisma.refreshToken.delete({
+      where: {
+        token: token
+      }
+    })
     return deletedToken;
 
 
@@ -67,16 +67,16 @@ export const logout = async (data: {token : string}) =>{
     if (err.code === 'P2025') {
       console.log('Token zaten silinmiş veya bulunamadı');
       return null;
-  }
+    }
     console.error('Çıkış yaparken bir hata oluştu:', err);
     throw new Error(err.message || 'Token silinirken bir hata oluştu');
   }
 }
 
-export const login = async (data : { userData: {email:string; password: string}; devices: string }) => {
+export const login = async (data: { userData: { email: string; password: string }; devices: string }) => {
   try {
-    const {userData, devices} = data;
-    const {email, password} = userData;
+    const { userData, devices } = data;
+    const { email, password } = userData;
 
     if (!password || !email) {
       throw new Error('Şifre ve email boş olamaz');
@@ -86,10 +86,9 @@ export const login = async (data : { userData: {email:string; password: string};
       throw new Error('Geçerli bir email adresi giriniz');
     }
 
-    // Kullanıcıyı veritabanında ara
     const user = await prisma.user.findUnique({
       where: {
-        email : email
+        email: email
       }
     })
 
@@ -102,7 +101,7 @@ export const login = async (data : { userData: {email:string; password: string};
     }
 
     // Şifre kontrolü
-    let userPassword : string = user.password;
+    let userPassword: string = user.password;
     let isMatch: boolean = await bcrypt.compare(password, userPassword);
 
     if (!isMatch) {
@@ -110,9 +109,9 @@ export const login = async (data : { userData: {email:string; password: string};
     }
 
     // Environment variable kontrolleri
-    if (!ACCES_TOKEN_SECRET) {
-      console.error('❌ ACCES_TOKEN_SECRET tanımlı değil!');
-      throw new Error("Sunucu yapılandırma hatası: ACCES_TOKEN_SECRET tanımlanmamış. Lütfen sistem yöneticisine başvurun.");
+    if (!ACCESS_TOKEN_SECRET) {
+      console.error('❌ ACCESS_TOKEN_SECRET tanımlı değil!');
+      throw new Error("Sunucu yapılandırma hatası: ACCESS_TOKEN_SECRET tanımlanmamış. Lütfen sistem yöneticisine başvurun.");
     }
 
     if (!REFRESH_TOKEN_SECRET) {
@@ -122,15 +121,15 @@ export const login = async (data : { userData: {email:string; password: string};
 
     // Token oluşturma
     const accessToken = jwt.sign(
-      {userId: user.id, email: user.email, role: user.role},
-      ACCES_TOKEN_SECRET,
-      {expiresIn: '15m'}
+      { userId: user.id, email: user.email, role: user.role },
+      ACCESS_TOKEN_SECRET,
+      { expiresIn: '15m' }
     );
 
     const refreshToken = jwt.sign(
-      {userId: user.id, email: user.email, role: user.role},
+      { userId: user.id, email: user.email, role: user.role },
       REFRESH_TOKEN_SECRET,
-      {expiresIn: '7d'}
+      { expiresIn: '7d' }
     );
 
     // Refresh token'ı veritabanına kaydet
@@ -155,7 +154,7 @@ export const login = async (data : { userData: {email:string; password: string};
     }
 
     return {
-      user: {id: user.id, name: user.name, email: user.email, role: user.role},
+      user: { id: user.id, name: user.name, email: user.email, role: user.role },
       accessToken: accessToken,
       refreshToken: refreshToken
     }
@@ -165,7 +164,7 @@ export const login = async (data : { userData: {email:string; password: string};
       code: error.code,
       name: error.name
     });
-    
+
     // Hata mesajını yeniden fırlat (zaten açıklayıcı mesajlar ekledik)
     throw error;
   }

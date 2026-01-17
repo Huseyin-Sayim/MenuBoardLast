@@ -20,8 +20,9 @@ export async function POST (req: Request){
       return NextResponse.json({ message: "Geçersiz refresh token" }, { status: 403 });
     }
 
-    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!) as {userId: string};
-
+    // const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!) as {userId: string};
+    // Sadece veritabanı kontrolü yeterli istendiği için verify kaldırıldı.
+    
     const newAccessToken = jwt.sign(
       { userId: savedToken.user.id, email: savedToken.user.email },
       process.env.ACCESS_TOKEN_SECRET!,
