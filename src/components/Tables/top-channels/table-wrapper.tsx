@@ -40,7 +40,7 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
   const [selectedScreenId, setSelectedScreenId] = useState<string>("");
   const [selectedScreenData, setSelectedScreenData] = useState<Screen | null>(null);
   const [screens, setScreens] = useState<Screen[]>(data);
-  const [initialPlaylist, setInitialPlaylist] = useState<Array<{ id: string; item: MediaItem | any; isDesign: boolean ; duration:number}>>([]);
+  const [initialPlaylist, setInitialPlaylist] = useState<Array<{ id: string; item: MediaItem | any; isDesign: boolean; duration: number }>>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const router = useRouter();
 
@@ -48,14 +48,14 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
     const screen = screens.find((s) => s.id === screenId);
     setSelectedScreenId(screenId);
     setSelectedScreenData(screen || null);
-    
+
     // DB'den screen config'leri çek
     try {
       const response = await fetch(`/api/screens/${screenId}/config`);
       if (response.ok) {
         const result = await response.json();
         const configs = result.data || [];
-        
+
         const playlistItems = configs.map((config: any) => {
           // Media varsa
           if (config.Media) {
@@ -70,17 +70,17 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
               };
             }
           }
-          
+
           // TemplateConfig varsa (her config ayrı)
           if (config.TemplateConfig) {
             const templateConfig = config.TemplateConfig;
             const template = templateConfig.Template || config.Template;
-            
+
             if (template) {
               // Config için benzersiz isim oluştur (template ismi + config ID'sinin son 4 karakteri)
               const configSuffix = templateConfig.id.slice(-4);
               const configName = `${template.name} - ${configSuffix}`;
-              
+
               const templateAsDesign = {
                 id: templateConfig.id, // Config ID'sini kullan
                 name: configName, // Benzersiz isim
@@ -90,7 +90,7 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
                 path: template.path,
                 configId: templateConfig.id // Config ID'sini ekle (iframe için)
               };
-              
+
               return {
                 id: `config-${templateConfig.id}`, // config-{configId} formatında
                 item: templateAsDesign,
@@ -99,7 +99,7 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
               };
             }
           }
-          
+
           // Eski format: Template varsa (geriye uyumluluk)
           if (config.Template) {
             const template = config.Template;
@@ -112,13 +112,13 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
               type: "image" as const,
               path: template.path // Path bilgisini ekle
             };
-            
+
             // Template ID'sini component değerine göre oluştur
             const templateComponent = template.component || template.id;
-            const templateId = templateComponent.startsWith('template-') 
-              ? templateComponent 
+            const templateId = templateComponent.startsWith('template-')
+              ? templateComponent
               : `template-${templateComponent}`;
-            
+
             return {
               id: `template-${templateComponent}`,
               item: templateAsDesign,
@@ -126,10 +126,10 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
               duration: config.displayDuration ?? 10
             };
           }
-          
+
           return null;
         }).filter((item: any) => item !== null);
-        
+
         setInitialPlaylist(playlistItems);
       } else {
         setInitialPlaylist([]);
@@ -138,7 +138,7 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
       console.error('Screen config çekilirken hata:', error);
       setInitialPlaylist([]);
     }
-    
+
     // API çağrısı tamamlandıktan sonra edit modunu aç
     setIsEditing(true);
   };
@@ -149,8 +149,8 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
   };
 
   const handleSaveDesign = async (
-    designId: string, 
-    status: "Aktif" | "Pasif", 
+    designId: string,
+    status: "Aktif" | "Pasif",
     location: string,
     playlist: Array<{ id: string; item: any; isDesign: boolean }>,
     screenConfig: ScreenConfig[]
@@ -169,7 +169,7 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
         duration: config.duration
       }));
 
-      console.log("API'ye giden paket: ",JSON.stringify(configsToSave, null, 2));
+      console.log("API'ye giden paket: ", JSON.stringify(configsToSave, null, 2));
 
       const response = await fetch(`/api/screens/${selectedScreenId}/config`, {
         method: 'PUT',
@@ -193,7 +193,7 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
         screen.id === selectedScreenId ? { ...screen, status } : screen
       )
     );
-    
+
     setIsEditing(false);
     setSelectedScreenId("");
     setSelectedScreenData(null);
@@ -236,21 +236,21 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
   return (
     <div
       className={cn(
-         "max-h-[550px] overflow-y-auto grid rounded-[10px] bg-white px-7.5 pb-4 pt-7.5 shadow-1 dark:bg-gray-dark dark:shadow-card",
+        "rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card h-[75vh] overflow-y-auto flex flex-col",
         className,
       )}
     >
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className=" text-body-2xlg font-bold text-dark dark:text-white">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-body-2xlg font-bold text-dark dark:text-white">
           Ekranlar
         </h2>
         {showActions && (
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-white transition-all hover:bg-primary/90"
+            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-1.5 text-sm font-medium text-white transition-all hover:bg-primary/90"
           >
             <svg
-              className="size-5"
+              className="size-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -258,7 +258,7 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
+                strokeWidth={3}
                 d="M12 4v16m8-8H4"
               />
             </svg>

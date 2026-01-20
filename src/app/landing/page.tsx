@@ -6,7 +6,7 @@ import { Logo } from "@/components/logo";
 
 
 export const metadata: Metadata = {
-  title: "Menü Tahtası Yönetim Paneli",
+  title: "Menü Board Yönetim Paneli",
   description:
     "Ekranlarınızı ve tasarımlarınızı kolayca yönetin. Modern ve kullanıcı dostu menü tahtası yönetim sistemi.",
 };

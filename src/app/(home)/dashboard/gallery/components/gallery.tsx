@@ -179,7 +179,7 @@ export function Gallery({ initialData, userRole, showActions = true }: GalleryPr
   };
 
   return (
-    <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
+    <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card h-[75vh] overflow-y-auto flex flex-col">
       {/* Başlık ve Admin Butonu */}
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-body-2xlg font-bold text-dark dark:text-white">
@@ -188,7 +188,7 @@ export function Gallery({ initialData, userRole, showActions = true }: GalleryPr
         {showActions && userRole === 'admin' && (
           <button
             onClick={() => setIsUploadModalOpen(true)}
-            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary/90"
+            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-1.5 text-sm font-medium text-white transition hover:bg-primary/90"
           >
             <svg
               width="16"
@@ -200,7 +200,7 @@ export function Gallery({ initialData, userRole, showActions = true }: GalleryPr
             >
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
             </svg>
-            Resim Ekle
+            Fotoğraf Ekle
           </button>
         )}
       </div>
@@ -365,41 +365,41 @@ export function Gallery({ initialData, userRole, showActions = true }: GalleryPr
 
       {/* Galeri Grid - Admin için silme butonlu, User için sadece görüntüleme */}
       {/* Maksimum 3 satır göster (yan yana 6 fotoğraf), fazlası için scroll */}
-      <div className="max-h-[450px] overflow-y-auto">
-        <div className="grid grid-cols-6 gap-4">
-          {images.map((image) => (
-            <div
-              key={image.id}
-              className="group relative aspect-square overflow-hidden rounded-lg border border-stroke bg-gray-2 dark:border-stroke-dark dark:bg-dark-2"
-            >
-              <Image
-                src={image.url}
-                alt={image.name}
-                fill
-                className="object-cover transition-transform group-hover:scale-110"
-              />
-              {/* Silme Butonu - Sadece Admin için */}
-              {showActions && userRole === 'admin' && (
-                <button
-                  onClick={() => handleDelete(image.id)}
-                  className="absolute right-2 top-2 rounded-full bg-red-500 p-2 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
-                  title="Sil"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polyline points="3 6 5 6 21 6" />
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                  </svg>
-                </button>
-              )}
-            </div>
-          ))}
+      {images.length > 0 ? (
+        <div className="flex-1">
+          <div className="grid grid-cols-6 gap-4">
+            {images.map((image) => (
+              <div
+                key={image.id}
+                className="group relative aspect-square overflow-hidden rounded-lg border border-stroke bg-gray-2 dark:border-stroke-dark dark:bg-dark-2"
+              >
+                <Image
+                  src={image.url}
+                  alt={image.name}
+                  fill
+                  className="object-cover transition-transform group-hover:scale-110"
+                />
+                {/* Silme Butonu - Sadece Admin için */}
+                {showActions && userRole === 'admin' && (
+                  <button
+                    onClick={() => handleDelete(image.id)}
+                    className="absolute right-2 top-2 rounded-full bg-red-500 p-2 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
+                    title="Sil"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-
-      {images.length === 0 && (
-        <div className="py-12 text-center">
+      ) : (
+        <div className="flex-1 flex items-center justify-center text-center">
           <p className="text-dark-4 dark:text-dark-6">
-            Henüz galeri resmi bulunmamaktadır.
+            Henüz galeri fotoğrafı bulunmamaktadır.
           </p>
         </div>
       )}

@@ -57,23 +57,22 @@ export default function DesignTemplatePage() {
   }
 
   return (
-    <div className="container mx-auto p-6">
-     
+    <div className="container w-full mx-auto p-6">
+
 
       {templates.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-dark-4 dark:text-dark-6">
-            Henüz şablonunuz bulunmamaktadır. Şablon almak için /dashboard/designs sayfasına gidin.
+            Henüz şablonunuz bulunmamaktadır. Şablon eklemek için şablonlar sayfasına gidin.
           </p>
         </div>
       ) : (
-        <div className="relative bg-white p-6 rounded-lg shadow-md max-h-[80vh] overflow-x-auto">
-            {/* Üst gradient overlay */}
-            <div className="absolute top-0 left-0 right-0 h-13 bg-gradient-to-b from-white to-transparent pointer-events-none z-10 rounded-t-lg"></div>
-            
-            <h1 className="mb-6 text-3xl font-bold text-dark dark:text-white">
+        <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card h-[75vh] overflow-y-auto">
+          <div className="mb-6">
+            <h2 className="text-body-2xlg font-bold text-dark dark:text-white mb-2">
               Şablonlar
-            </h1>
+            </h2>
+          </div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {templates.map((template) => (
               <div
@@ -87,7 +86,7 @@ export default function DesignTemplatePage() {
                     src={`${template.path}${template.path.includes('?') ? '&' : '?'}configId=${template.configId}`}
                     className="absolute inset-0 border-0"
                     style={{
-                      transform: `scale(${Math.min(400 / 1920, 225 / 1080)})`,
+                      transform: `scale(${Math.min(450 / 1920, 275 / 1080)})`,
                       transformOrigin: "top left",
                       width: "1920px",
                       height: "1080px",

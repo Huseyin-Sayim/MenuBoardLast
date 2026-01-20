@@ -6,12 +6,16 @@ import InputGroup from "@/components/FormElements/InputGroup";
 import Link from "next/link";
 
 interface NewPasswordStepProps {
+  email: string;
+  code: string;
   onSubmit: (password: string) => void;
   onBack: () => void;
   onSuccess?: () => void; // Landing page için callback
 }
 
 export default function NewPasswordStep({
+  email,
+  code,
   onSubmit,
   onBack,
   onSuccess,
@@ -28,7 +32,7 @@ export default function NewPasswordStep({
     confirmPassword: "",
   });
   const onSuccessRef = useRef(onSuccess);
-  
+
   // onSuccess callback'ini ref'te sakla
   useEffect(() => {
     onSuccessRef.current = onSuccess;
@@ -76,7 +80,7 @@ export default function NewPasswordStep({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const passwordError = validatePassword(data.password);
@@ -92,12 +96,25 @@ export default function NewPasswordStep({
     }
 
     setLoading(true);
-    // Simüle edilmiş API çağrısı
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code, password: data.password }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Şifre sıfırlama başarısız");
+      }
+
       setSuccess(true);
       onSubmit(data.password);
-    }, 1000);
+    } catch (error: any) {
+      alert(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -129,13 +146,13 @@ export default function NewPasswordStep({
     <>
       {/* Başarı Mesajı */}
       {success && (
-        <div 
+        <div
           className="mb-6 flex flex-col items-center justify-center"
           style={{
             animation: "fadeIn 0.5s ease-in-out, slideDown 0.5s ease-in-out"
           }}
         >
-          <div 
+          <div
             className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-light-7 dark:bg-green-light-7"
             style={{
               animation: "scaleIn 0.5s ease-out"
@@ -149,7 +166,7 @@ export default function NewPasswordStep({
           <p className="mb-4 text-sm text-dark-4 dark:text-dark-6">
             {countdown} saniye içinde giriş sayfasına yönlendirileceksiniz
           </p>
-        
+
         </div>
       )}
 
@@ -247,7 +264,7 @@ export default function NewPasswordStep({
             </div>
           </form>
 
-      
+
         </>
       )}
     </>

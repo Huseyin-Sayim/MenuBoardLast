@@ -26,18 +26,29 @@ export function DesignsPageContent({ templates }: DesignsPageContentProps) {
 
   useEffect(() => {
     const fetchUserRole = async () => {
+      console.log("[DesignsPageContent] Role kontrolü başlatılıyor...");
       try {
+        console.log("[DesignsPageContent] /api/userTemplate/role endpoint'ine istek gönderiliyor...");
         const response = await fetch("/api/userTemplate/role");
+        console.log("[DesignsPageContent] API yanıtı alındı. Status:", response.status);
+
         if (response.ok) {
           const result = await response.json();
+          console.log("[DesignsPageContent] API yanıt verisi:", result);
+          console.log("[DesignsPageContent] Kullanıcı role:", result.data?.role);
+
           if (result.data?.role === "admin") {
+            console.log("[DesignsPageContent] Admin yetkisi tespit edildi. isAdmin true yapılıyor.");
             setIsAdmin(true);
+          } else {
+            console.log("[DesignsPageContent] Admin yetkisi yok. isAdmin false kalıyor.");
           }
         } else {
-          console.error("Kullanıcı bilgisi getirilemedi");
+          const errorData = await response.json().catch(() => ({}));
+          console.error("[DesignsPageContent] Kullanıcı bilgisi getirilemedi. Status:", response.status, "Error:", errorData);
         }
       } catch (error) {
-        console.error("Kullanıcı bilgisi getirilirken hata:", error);
+        console.error("[DesignsPageContent] Kullanıcı bilgisi getirilirken hata:", error);
       }
     };
 
@@ -50,18 +61,15 @@ export function DesignsPageContent({ templates }: DesignsPageContentProps) {
 
   return (
     <>
-      <Breadcrumb pageName="" />
+      <div className="mt-4 md:mt-6 2xl:mt-9 flex flex-col">
 
-      <div className="mt-4 md:mt-6 2xl:mt-9">
-        {isAdmin && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-blue-500 p-3 border rounded-xl float-end m-5 text-amber-50 hover:bg-blue-600 transition-colors"
-          >
-            Şablon Ekle
-          </button>
-        )}
-        <DesignStore templates={templates} />
+        <div className="w-full">
+          <DesignStore
+            templates={templates}
+            isAdmin={isAdmin}
+            onAddTemplate={() => setIsModalOpen(true)}
+          />
+        </div>
       </div>
 
       {isModalOpen && (

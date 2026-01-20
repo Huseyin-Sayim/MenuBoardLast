@@ -1,16 +1,16 @@
 import zod from 'zod';
 import api from '../api/axios';
-const turkeyPhoneRegex =  /^(\+90|0)?\s?5\d{2}\s?\d{3}\s?\d{2}\s?\d{2}$/;
+const turkeyPhoneRegex = /^(\+90|0)?\s?5\d{2}\s?\d{3}\s?\d{2}\s?\d{2}$/;
 const mailValidate = zod.string().email('Geçersiz email formatı.').trim().toLowerCase()
-const nameValidate = zod.string().min(1,'İsim alanı boş olamaz').trim()
-const phoneValidate = zod.string().regex(turkeyPhoneRegex,'Geçersiz telefon numarası formatı.')
-const passwordValidate = zod.string().min(8,'Şifrede en az sekiz karakter, bir büyük harf, bir küçük harf olmalı.')  .regex(/[A-Z]/,'Şifrede en az bir büyük harf olmalı.').regex(/[a-z]/,'Şifrede en az bir küçük harf olmalı.').regex(/[0-9]/,'Şifrede en az bir rakam olmalı.')
+const nameValidate = zod.string().min(1, 'İsim alanı boş olamaz').trim()
+const phoneValidate = zod.string().regex(turkeyPhoneRegex, 'Geçersiz telefon numarası formatı.')
+const passwordValidate = zod.string().min(8, 'Şifrede en az sekiz karakter, bir büyük harf, bir küçük harf olmalı.').regex(/[A-Z]/, 'Şifrede en az bir büyük harf olmalı.').regex(/[a-z]/, 'Şifrede en az bir küçük harf olmalı.').regex(/[0-9]/, 'Şifrede en az bir rakam olmalı.')
 
 
 
 const checkEmailExists = async (email: string): Promise<boolean> => {
   try {
-    const response = await api.post('/api/check-db',{
+    const response = await api.post('/api/check-db', {
       email: email
     })
 
@@ -21,7 +21,7 @@ const checkEmailExists = async (email: string): Promise<boolean> => {
     return !response.data.emailAvailable
 
   } catch (err: any) {
-    console.error('Mail kontrol hatası.'+err)
+    console.error('Mail kontrol hatası.' + err)
     return false;
   }
 }
@@ -38,7 +38,7 @@ const checkPhoneNumberExists = async (phoneNumber: string): Promise<boolean> => 
     return !response.data.phoneAvailable;
 
   } catch (err: any) {
-    console.error('Telefon kontrol hatası.'+err)
+    console.error('Telefon kontrol hatası.' + err)
     return false;
   }
 }
@@ -49,6 +49,10 @@ export const registerSchema = zod
     phoneNumber: phoneValidate,
     email: mailValidate,
     password: passwordValidate,
+    address: zod.string().min(1, 'Adres giriniz'),
+    businessName: zod.string().min(1, 'İşletme adı giriniz'),
+    branchCount: zod.number().min(1, 'En az 1 şube olmalıdır'),
+    estimatedScreen: zod.number().min(1, 'En az 1 tahmini ekran olmalıdır.')
   })
   .refine(
     async (data) => {
@@ -75,13 +79,17 @@ export const registerBackendSchema = zod.object({
   name: nameValidate,
   phoneNumber: phoneValidate,
   email: mailValidate,
-  password: passwordValidate
+  password: passwordValidate,
+  address: zod.string().min(1, 'Adres giriniz'),
+  businessName: zod.string().min(1, 'İşletme adı giriniz'),
+  branchCount: zod.number().min(1, 'En az 1 şube olmalıdır'),
+  estimatedScreen: zod.number().min(1, 'En az 1 tahmini ekran olmalıdır.')
 });
 
 export const loginSchema = zod.object({
-  email:mailValidate,
-  password:passwordValidate,
-  remember:zod.boolean().optional()
+  email: mailValidate,
+  password: passwordValidate,
+  remember: zod.boolean().optional()
 })
 
 export const loginBackendSchema = zod.object({

@@ -11,7 +11,7 @@ export default async function middleware(req: NextRequest) {
   let token = headerToken || cookieToken;
   let newTokenCreated = false;
 
-  const publicPaths = ['/api/login', '/api/register', '/api/check-db', '/api/refresh', '/auth/sign-in', '/auth/sign-up', '/auth/forgot-password']
+  const publicPaths = ['/api/login', '/api/register', '/api/check-db', '/api/refresh', '/auth/sign-in', '/auth/sign-up', '/auth/forgot-password', '/api/auth/verify', '/api/auth/forgot-password', '/api/auth/verify-code', '/api/auth/reset-password']
 
   // ConfigId veya preview ile erişilen design/configs route'unu public yap
   const isPublicConfigsRoute = pathname === '/design/configs' &&
@@ -44,7 +44,7 @@ export default async function middleware(req: NextRequest) {
       const refreshSecret = new TextEncoder().encode(process.env.REFRESH_TOKEN_SECRET);
       const { payload: refreshPayload } = await jose.jwtVerify(refreshToken, refreshSecret);
 
-      const accessSecret = new TextEncoder().encode(process.env.ACCESS_TOKEN_SECRET);
+      const accessSecret = new TextEncoder().encode(process.env.ACCES_TOKEN_SECRET);
       const newAccessToken = await new jose.SignJWT({
         userId: (refreshPayload as any).userId,
         email: (refreshPayload as any).email,

@@ -45,7 +45,7 @@ async function getUserRole(): Promise<'admin' | 'user'> {
           return 'admin';
         }
       } catch (tokenError) {
-        console.error('Token verify hatası:', tokenError);
+        console.error('Token verify-mail hatası:', tokenError);
       }
     }
 
@@ -96,7 +96,6 @@ export default async function GalleryPage() {
 
   return (
     <>
-      <Breadcrumb pageName="Galeri" />
 
       <div className="mt-4 md:mt-6 2xl:mt-9">
         <Gallery initialData={formattedData} userRole={userRole} />

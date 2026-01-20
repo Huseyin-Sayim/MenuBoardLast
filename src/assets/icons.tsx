@@ -496,3 +496,41 @@ export function PaintIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function ScreenIcon(props: IconProps) {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      {...props}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M2.5 4.16667C2.5 3.24619 3.24619 2.5 4.16667 2.5H15.8333C16.7538 2.5 17.5 3.24619 17.5 4.16667V12.5C17.5 13.4205 16.7538 14.1667 15.8333 14.1667H4.16667C3.24619 14.1667 2.5 13.4205 2.5 12.5V4.16667ZM4.16667 4.16667H15.8333V12.5H4.16667V4.16667ZM9.16667 15.8333H7.5V17.5H12.5V15.8333H10.8333V15H9.16667V15.8333Z"
+        fill=""
+      />
+    </svg>
+  );
+}
+
+export function AddressIcon(props: IconProps) {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      {...props}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M10 1.25C6.55 1.25 3.75 4.05 3.75 7.5C3.75 12.1875 10 18.75 10 18.75C10 18.75 16.25 12.1875 16.25 7.5C16.25 4.05 13.45 1.25 10 1.25ZM10 10C8.62 10 7.5 8.88 7.5 7.5C7.5 6.12 8.62 5 10 5C11.38 5 12.5 6.12 12.5 7.5C12.5 8.88 11.38 10 10 10Z"
+        fill=""
+      />
+    </svg>
+  );
+}

@@ -18,7 +18,15 @@ model User {
   email            String             @unique
   phoneNumber      String             @unique
   password         String
+  address          String?
+  businessName     String?
+  branchCount      Int                @default(1)
+  isValidate       Boolean            @default(false)
   role             Role               @default(user)
+  verifyToken      String?
+  resetCode        String?
+  resetCodeExpires DateTime?
+  estimatedScreen  Int                @default(1)
   RefreshToken     RefreshToken[]
   Screen           Screen[]
   Media            Media[]

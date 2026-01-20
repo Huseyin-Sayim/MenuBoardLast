@@ -191,20 +191,25 @@ export function PaintIcon(props: PropsType) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width={24}
-      height={24}
-      viewBox="0 0 24 24"
+      width={32} // Border sığsın diye genişliği artırdık
+      height={32}
+      viewBox="0 0 32 32"
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
       {...props}
     >
-      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-      <path d="M5 3m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z" />
-      <path d="M19 6h1a2 2 0 0 1 2 2a5 5 0 0 1 -5 5l-5 0v2" />
-      <path d="M10 15m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z" />
+      {/* Dış Çerçeve (Border) */}
+      <rect x="2" y="2" width="28" height="28" rx="4" stroke="currentColor" />
+
+      <g transform="translate(4, 4)">
+        <rect x="3" y="2" width="18" height="6" rx="1.5" />
+        <rect x="12" y="12" width="9" height="10" rx="1.5" />
+        <line x1="3" y1="12" x2="9" y2="12" />
+        <line x1="6" y1="15" x2="9" y2="15" />
+        <line x1="5" y1="18" x2="9" y2="18" />
+        <line x1="3" y1="21" x2="9" y2="21" />
+      </g>
     </svg>
   );
 }
@@ -269,6 +274,32 @@ export function PaintBorderIcon(props: PropsType) {
         d="M16.5 3.5L15.5 4.5"
         stroke="currentColor"
         strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+export function GalleryIcon(props: PropsType) {
+  return (
+    <svg
+      width={20}
+      height={20}
+      viewBox="0 0 24 24" // Alanı biraz genişletmek en sağlıklısıdır
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M3 5.25C3 4.00736 4.00736 3 5.25 3H18.75C19.9926 3 21 4.00736 21 5.25V14.75C21 15.9926 19.9926 17 18.75 17H5.25C4.00736 17 3 15.9926 3 14.75V5.25ZM5.25 4.5H18.75C19.1642 4.5 19.5 4.83579 19.5 5.25V14.75C19.5 15.1642 19.1642 15.5 18.75 15.5H5.25C4.83579 15.5 4.5 15.1642 4.5 14.75V5.25C4.5 4.83579 4.83579 4.5 5.25 4.5ZM14.5 7.5C14.5 8.32843 13.8284 9 13 9C12.1716 9 11.5 8.32843 11.5 7.5C11.5 6.67157 12.1716 6 13 6C13.8284 6 14.5 6.67157 14.5 7.5ZM6 14L9 11L11 13L14 9L18 14H6Z"
+        fill="currentColor"
+      />
+      {/* Sol taraftaki o 'katman' efektini veren çizgi */}
+      <path
+        d="M1 7.5V17.5C1 18.6046 1.89543 19.5 3 19.5H16"
+        stroke="currentColor"
+        strokeWidth="1.5"
         strokeLinecap="round"
       />
     </svg>
