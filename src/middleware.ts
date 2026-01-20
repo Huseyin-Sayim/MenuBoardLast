@@ -34,7 +34,7 @@ export default async function middleware(req: NextRequest) {
 
   if (!token && refreshToken) {
     try {
-      if (!process.env.REFRESH_TOKEN_SECRET || !process.env.ACCES_TOKEN_SECRET) {
+      if (!process.env.REFRESH_TOKEN_SECRET || !process.env.ACCESS_TOKEN_SECRET) {
         return NextResponse.json(
           { message: 'Sunucu yapılandırma hatası' },
           { status: 500 }
@@ -75,14 +75,14 @@ export default async function middleware(req: NextRequest) {
   }
 
   try {
-    if (!process.env.ACCES_TOKEN_SECRET) {
+    if (!process.env.ACCESS_TOKEN_SECRET) {
       return NextResponse.json(
         { message: 'Sunucu yapılandırma hatası' },
         { status: 500 }
       );
     }
 
-    const secret = new TextEncoder().encode(process.env.ACCES_TOKEN_SECRET);
+    const secret = new TextEncoder().encode(process.env.ACCESS_TOKEN_SECRET);
     const { payload } = await jose.jwtVerify(token, secret);
 
     const userAllowedPaths = ['/api/users/', '/media', '/screen'];
