@@ -14,9 +14,11 @@ type Template = {
 
 interface DesignStoreProps {
   templates: Template[];
+  onAddTemplate?: () => void;
+  isAdmin?: boolean;
 }
 
-export function DesignStore({ templates }: DesignStoreProps) {
+export function DesignStore({ templates, onAddTemplate, isAdmin }: DesignStoreProps) {
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [userTemplateIds, setUserTemplateIds] = useState<string[]>([]);
   const [loadingUserTemplates, setLoadingUserTemplates] = useState(true);
@@ -46,11 +48,11 @@ export function DesignStore({ templates }: DesignStoreProps) {
 
   const handleAcquireTemplate = async (template: Template, e: React.MouseEvent) => {
     e.stopPropagation();
-    
+
     if (acquiringTemplateId) return;
-    
+
     setAcquiringTemplateId(template.id);
-    
+
     try {
       const response = await fetch(`/api/templates/${template.id}/acquire`, {
         method: "POST",
@@ -64,7 +66,7 @@ export function DesignStore({ templates }: DesignStoreProps) {
       if (response.ok) {
         const configId = result.data?.id;
         const component = result.data?.component || template.component;
-        
+
         if (configId) {
           router.push(`/dashboard/designTemplate/${component}?configId=${configId}`);
         } else {
@@ -129,7 +131,7 @@ export function DesignStore({ templates }: DesignStoreProps) {
   // Eğer template seçildiyse, tam görünümü göster
   if (selectedTemplate) {
     const templateStyle = getTemplateHeight(selectedTemplate.component);
-    
+
     return (
       <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
         <div className="mb-6 flex items-center justify-between">
@@ -160,7 +162,7 @@ export function DesignStore({ templates }: DesignStoreProps) {
         </div>
 
         {/* Template Tam Görünümü */}
-        <div 
+        <div
           className="relative w-full rounded-lg border border-stroke bg-gray-2 dark:border-stroke-dark dark:bg-dark-2"
           style={templateStyle}
         >
@@ -177,11 +179,29 @@ export function DesignStore({ templates }: DesignStoreProps) {
 
   // Liste görünümü
   return (
-    <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
-      <div className="mb-6">
-        <h2 className="text-body-2xlg font-bold text-dark dark:text-white mb-4">
+    <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card h-[75vh] overflow-y-auto flex flex-col">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-body-2xlg font-bold text-dark dark:text-white">
           Şablonlar
         </h2>
+        {isAdmin && onAddTemplate && (
+          <button
+            onClick={onAddTemplate}
+            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-1.5 text-sm font-medium text-white transition-all hover:opacity-90"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Şablon Ekle
+          </button>
+        )}
       </div>
 
       {/* Template Grid */}
@@ -196,7 +216,7 @@ export function DesignStore({ templates }: DesignStoreProps) {
               className="group relative rounded-lg border border-stroke bg-white overflow-hidden shadow-card hover:shadow-card-2 transition-all dark:border-stroke-dark dark:bg-dark-2"
             >
               {/* Iframe Önizleme - preview=true ile */}
-              <div 
+              <div
                 className="relative aspect-video w-full overflow-hidden bg-gray-2 dark:bg-dark-3 cursor-pointer"
                 onClick={() => openPreview(template)}
               >
@@ -224,7 +244,7 @@ export function DesignStore({ templates }: DesignStoreProps) {
                 <h3 className="text-lg font-semibold text-dark dark:text-white mb-3">
                   {template.name}
                 </h3>
-                
+
                 {/* Butonlar - Her zaman göster */}
                 {!loadingUserTemplates && (
                   <div className="flex gap-2">
@@ -237,7 +257,7 @@ export function DesignStore({ templates }: DesignStoreProps) {
                     </button>
                   </div>
                 )}
-                
+
                 {loadingUserTemplates && (
                   <div className="h-10 flex items-center justify-center">
                     <div className="text-sm text-dark-4 dark:text-dark-6">Yükleniyor...</div>
@@ -249,7 +269,7 @@ export function DesignStore({ templates }: DesignStoreProps) {
         })}
       </div>
       {templates.length === 0 && (
-        <div className="text-center py-12">
+        <div className="flex-1 flex items-center justify-center text-center">
           <p className="text-dark-4 dark:text-dark-6">
             Henüz şablon bulunmamaktadır.
           </p>

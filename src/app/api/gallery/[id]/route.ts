@@ -40,7 +40,7 @@ export async function DELETE( req: Request, { params }: { params: Promise<{ id: 
       const userId = (payload as any).userId;
       const tokenRole = (payload as any).role;
 
-      console.log('DELETE /api/gallery/[id] - Token verify başarılı');
+      console.log('DELETE /api/gallery/[id] - Token verify-mail başarılı');
       console.log('DELETE /api/gallery/[id] - userId:', userId);
       console.log('DELETE /api/gallery/[id] - tokenRole:', tokenRole);
 
@@ -77,7 +77,7 @@ export async function DELETE( req: Request, { params }: { params: Promise<{ id: 
 
       console.log('DELETE /api/gallery/[id] - Admin yetkisi doğrulandı, devam ediliyor');
     } catch (tokenError: any) {
-      console.error('DELETE /api/gallery/[id] - Token verify hatası:', tokenError.message);
+      console.error('DELETE /api/gallery/[id] - Token verify-mail hatası:', tokenError.message);
       return NextResponse.json({
         error: 'Geçersiz token: ' + tokenError.message
       }, { status: 401 });

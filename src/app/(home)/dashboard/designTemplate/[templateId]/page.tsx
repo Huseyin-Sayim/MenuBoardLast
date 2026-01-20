@@ -579,9 +579,9 @@ export default function TemplatePage () {
   }
 
   return (
-    <div className="relative h-screen w-full">
+    <div className="relative h-screen w-full ">
       {/* Header */}
-      <div className="absolute left-4 top-4 z-10 flex items-center gap-4">
+      <div className="absolute right-3 top-4 z-10 flex items-center gap-4 justify-end w-full">
         <button
           onClick={() => router.push("/dashboard/designTemplate")}
           className="rounded-lg bg-white/90 px-4 py-2 shadow-lg backdrop-blur-sm transition-all hover:bg-white dark:bg-gray-dark/90 dark:hover:bg-gray-dark"

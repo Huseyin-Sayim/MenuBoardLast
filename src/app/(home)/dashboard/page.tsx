@@ -89,7 +89,7 @@ async function getUserRole(): Promise<'admin' | 'user'> {
           return 'admin';
         }
       } catch (tokenError) {
-        console.error('Token verify hatası:', tokenError);
+        console.error('Token verify-mail hatası:', tokenError);
       }
     }
 

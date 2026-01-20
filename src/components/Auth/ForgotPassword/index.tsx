@@ -48,6 +48,8 @@ export default function ForgotPasswordForm({ onSuccess }: ForgotPasswordFormProp
       )}
       {step === "newPassword" && (
         <NewPasswordStep
+          email={email}
+          code={verificationCode}
           onSubmit={handlePasswordReset}
           onBack={() => setStep("verification")}
           onSuccess={onSuccess}

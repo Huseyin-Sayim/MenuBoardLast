@@ -2,7 +2,7 @@ import * as Icons from "../icons";
 
 export const NAV_DATA = [
   {
-  
+
     items: [
       {
         title: "Kontrol Paneli",
@@ -10,7 +10,7 @@ export const NAV_DATA = [
         url: "/dashboard",
         items: [],
       },
-   
+
       {
         title: "Ekranlarım",
         url: "/dashboard/screens",
@@ -24,6 +24,12 @@ export const NAV_DATA = [
         items: [],
       },
       {
+        title: "Fotoğraf Galerisi",
+        url: "/dashboard/gallery",
+        icon: Icons.GalleryIcon,
+        items: [],
+      },
+      {
         title: "Şablonlar",
         url: "/dashboard/designs",
         icon: Icons.PaintIcon,
@@ -34,6 +40,14 @@ export const NAV_DATA = [
         url: "/dashboard/designTemplate",
         icon: Icons.PaintBorderIcon,
         items: [],
+      },
+
+      {
+        title: "Tüm Kullanıcılar",
+        url: "/dashboard/users",
+        icon: Icons.User,
+        items: [],
+        allowedRoles: ["admin"],
       },
     ],
     label: undefined

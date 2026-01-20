@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { MediaEditView } from "./media-edit-view";
 import { MediaUploadView } from "./media-upload-view";
-import {updateMediaName} from "@/services/mediaServices";
+import { updateMediaName } from "@/services/mediaServices";
 
 export type MediaItem = {
   id: string;
@@ -66,9 +66,9 @@ function VideoDuration({ url, itemId }: { url: string; itemId: string }) {
 }
 
 interface MediaGalleryProps {
-  initialData : MediaItem[];
+  initialData: MediaItem[];
   showActions?: boolean;
-  className?:string
+  className?: string
   gridCols?: string;
   maxHeight?: string;
   disableClick?: boolean;
@@ -77,7 +77,7 @@ interface MediaGalleryProps {
 }
 
 
-export function MediaGallery({showActions=true,className,initialData,gridCols = "grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10", maxHeight, disableClick = false, selectionMode = false, onImageSelect} : MediaGalleryProps) {
+export function MediaGallery({ showActions = true, className, initialData, gridCols = "grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10", maxHeight, disableClick = false, selectionMode = false, onImageSelect }: MediaGalleryProps) {
   const [mediaItems, setMediaItems] = useState<MediaItem[]>(initialData);
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<"all" | "image" | "video">(selectionMode ? "image" : "all");
@@ -177,47 +177,44 @@ export function MediaGallery({showActions=true,className,initialData,gridCols = 
   const filteredItems = selectionMode
     ? mediaItems.filter((item) => item.type === "image") // Seçim modunda sadece image'ları göster
     : selectedCategory === "all"
-    ? mediaItems
-    : mediaItems.filter((item) => item.type === selectedCategory);
+      ? mediaItems
+      : mediaItems.filter((item) => item.type === selectedCategory);
 
   console.log('MediaGallery - filteredItems:', filteredItems.length, 'item (selectionMode:', selectionMode, ', category:', selectedCategory, ')');
 
   // Normal modda galeri görünümünü göster
-  return  (
-    <div className="rounded-[10px] bg-white shadow-1 dark:bg-gray-dark dark:shadow-card">
+  return (
+    <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card h-[75vh] overflow-y-auto flex flex-col">
       {/* Başlık bölümü - seçim modunda gizle */}
       {!selectionMode && (
-        <div className="flex justify-between border-b border-stroke px-7.5 py-4 dark:border-stroke-dark">
-          <span className="font-bold text-black text-2xl">
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-body-2xlg font-bold text-dark dark:text-white">
             Medya
-          </span>
-            {showActions && (
-              <button
-                onClick={handleUploadClick}
-                className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-all hover:bg-primary/90 active:scale-95"
+          </h2>
+          {showActions && (
+            <button
+              onClick={handleUploadClick}
+              className="flex items-center gap-2 rounded-lg bg-primary px-4 py-1.5 text-sm font-medium text-white transition-all hover:bg-primary/90 active:scale-95"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
               >
-                <svg
-                  className="size-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-                Yeni Medya Ekle
-              </button>
-            )}
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+              </svg>
+              Medya Ekle
+            </button>
+          )}
         </div>
       )}
 
       {/* Kategori Filtreleri - Seçim modunda gizle */}
       {!selectionMode && (
-        <div className="border-b border-stroke px-7.5 py-4 dark:border-stroke-dark">
+        <div className="mb-6">
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setSelectedCategory("all")}
@@ -256,15 +253,15 @@ export function MediaGallery({showActions=true,className,initialData,gridCols = 
         </div>
       )}
 
-      <div className={cn("p-7.5", maxHeight && "overflow-y-auto media-gallery-scrollbar")} style={maxHeight ? { maxHeight } : undefined}>
+      <div className={cn("flex-1 flex flex-col", maxHeight && "overflow-y-auto media-gallery-scrollbar")} style={maxHeight ? { maxHeight } : undefined}>
         {filteredItems.length === 0 ? (
-          <div className="py-12 text-center">
+          <div className="flex-1 flex items-center justify-center text-center">
             <p className="text-dark-4 dark:text-dark-6">
               {selectedCategory === "all"
-                ? "Henüz tasarım yüklenmemiş"
+                ? "Henüz tasarım yüklenmemiş."
                 : selectedCategory === "image"
-                  ? "Henüz fotoğraf yüklenmemiş"
-                  : "Henüz video yüklenmemiş"}
+                  ? "Henüz fotoğraf yüklenmemiş."
+                  : "Henüz video yüklenmemiş."}
             </p>
           </div>
         ) : (

@@ -57,15 +57,29 @@ export default function VerificationStep({
     }
   };
 
-  const handleSubmit = (codeValue?: string) => {
+  const handleSubmit = async (codeValue?: string) => {
     const codeToSubmit = codeValue || code.join("");
     if (codeToSubmit.length !== 6) return;
 
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const res = await fetch("/api/auth/verify-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code: codeToSubmit }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Geçersiz kod");
+      }
+
       onSubmit(codeToSubmit);
-    }, 1000);
+    } catch (error: any) {
+      alert(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

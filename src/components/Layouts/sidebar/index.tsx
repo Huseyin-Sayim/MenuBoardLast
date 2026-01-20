@@ -10,10 +10,51 @@ import { ArrowLeftIcon, ChevronUp } from "./icons";
 import { MenuItem } from "./menu-item";
 import { useSidebarContext } from "./sidebar-context";
 
-export function Sidebar() {
+interface SidebarProps {
+  role?: string;
+}
+
+export function Sidebar({ role }: SidebarProps) {
   const pathname = usePathname();
   const { setIsOpen, isOpen, isMobile, toggleSidebar } = useSidebarContext();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const [userRole, setUserRole] = useState<string | null>(role || null);
+
+  useEffect(() => {
+    if (role) {
+      setUserRole(role);
+      return;
+    }
+
+    // Cookie'yi client-side'da okuyoruz
+    // Dinamik import veya require kullanarak js-cookie'yi alabiliriz veya var olan import'u kullanabiliriz
+    // Ancak burada basitçe document.cookie parse edelim ya da js-cookie kullanalım.
+    // Proje js-cookie kullanıyor.
+    import("js-cookie").then((Cookies) => {
+      const userCookie = Cookies.default.get("user");
+      if (userCookie) {
+        try {
+          const user = JSON.parse(userCookie);
+          setUserRole(user.role);
+        } catch (e) {
+          console.error("User cookie parse error", e);
+        }
+      }
+    });
+  }, [role]);
+
+  const filteredNavData = NAV_DATA.map(section => ({
+    ...section,
+    items: section.items.filter((item: any) => {
+      if (item.allowedRoles && userRole) {
+        return item.allowedRoles.includes(userRole);
+      }
+      // Eğer allowedRoles tanımlıysa ama userRole yoksa (veya eşleşmiyorsa) gizle
+      if (item.allowedRoles && !userRole) return false;
+
+      return true;
+    })
+  }));
 
   const toggleExpanded = (title: string) => {
     setExpandedItems((prev) => (prev.includes(title) ? [] : [title]));
@@ -93,9 +134,9 @@ export function Sidebar() {
 
           {/* Navigation */}
           <div className="custom-scrollbar mt-6 flex-1 overflow-y-auto pr-3 min-[850px]:mt-10">
-            {NAV_DATA.map((section, sectionIndex) => (
+            {filteredNavData.map((section, sectionIndex) => (
               <div key={section.label ?? `section-${sectionIndex}`} className="mb-6">
-                <h2 className="mb-5 text-sm font-medium text-dark-4 dark:text-dark-6">
+                <h2 className="mb-5 text-sm font-semibold text-dark-4 dark:text-dark-6 px-3.5">
                   {section.label}
                 </h2>
 
@@ -122,7 +163,7 @@ export function Sidebar() {
                                 className={cn(
                                   "ml-auto rotate-180 transition-transform duration-200",
                                   expandedItems.includes(item.title) &&
-                                    "rotate-0",
+                                  "rotate-0",
                                 )}
                                 aria-hidden="true"
                               />
@@ -133,7 +174,7 @@ export function Sidebar() {
                                 className="ml-9 mr-0 space-y-1.5 pb-[15px] pr-0 pt-2"
                                 role="menu"
                               >
-                                {item.items.map((subItem : any, subItemIndex) => (
+                                {item.items.map((subItem: any, subItemIndex) => (
                                   <li key={subItem.url ?? subItem.title ?? `subitem-${subItemIndex}`} role="none">
                                     <MenuItem
                                       as="link"
@@ -153,7 +194,7 @@ export function Sidebar() {
                               "url" in item
                                 ? item.url + ""
                                 : "/" +
-                                  (item as any).title.toLowerCase().split(" ").join("-");
+                                (item as any).title.toLowerCase().split(" ").join("-");
 
                             return (
                               <MenuItem

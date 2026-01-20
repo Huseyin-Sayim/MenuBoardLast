@@ -1,29 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as jose from "jose"
 
-export default async function middleware (req: NextRequest) {
+export default async function middleware(req: NextRequest) {
   const authHeader = req.headers.get('authorization');
   const headerToken = authHeader?.split(' ')[1];
-  const {pathname, searchParams} = req.nextUrl;
+  const { pathname, searchParams } = req.nextUrl;
   const cookieToken = req.cookies.get('accessToken')?.value;
   const refreshToken = req.cookies.get('refreshToken')?.value;
 
   let token = headerToken || cookieToken;
   let newTokenCreated = false;
 
-  const publicPaths = ['/api/login', '/api/register','/api/check-db', '/api/refresh', '/auth/sign-in', '/auth/sign-up', '/auth/forgot-password']
-  
+  const publicPaths = ['/api/login', '/api/register', '/api/check-db', '/api/refresh', '/auth/sign-in', '/auth/sign-up', '/auth/forgot-password', '/api/auth/verify', '/api/auth/forgot-password', '/api/auth/verify-code', '/api/auth/reset-password']
+
   // ConfigId veya preview ile erişilen design/configs route'unu public yap
-  const isPublicConfigsRoute = pathname === '/design/configs' && 
+  const isPublicConfigsRoute = pathname === '/design/configs' &&
     (searchParams.get('configId') || searchParams.get('preview') === 'true');
-  
+
   // Büyük dosya yüklemeleri için media API'sini bypass et (body parsing limitini aşmak için)
   if (pathname === '/api/media' && req.method === 'POST') {
     // Token kontrolü yap ama body parsing'i bypass et
     if (!token && !refreshToken) {
       return NextResponse.json({
         message: "Yetkisiz erişim"
-      }, {status: 401});
+      }, { status: 401 });
     }
     return NextResponse.next();
   }
@@ -43,7 +43,7 @@ export default async function middleware (req: NextRequest) {
 
       const refreshSecret = new TextEncoder().encode(process.env.REFRESH_TOKEN_SECRET);
       const { payload: refreshPayload } = await jose.jwtVerify(refreshToken, refreshSecret);
-      
+
       const accessSecret = new TextEncoder().encode(process.env.ACCES_TOKEN_SECRET);
       const newAccessToken = await new jose.SignJWT({
         userId: (refreshPayload as any).userId,
@@ -71,7 +71,7 @@ export default async function middleware (req: NextRequest) {
   if (!token) {
     return NextResponse.json({
       message: "Yetkisiz erişim"
-    }, {status: 401})
+    }, { status: 401 })
   }
 
   try {
@@ -86,7 +86,7 @@ export default async function middleware (req: NextRequest) {
     const { payload } = await jose.jwtVerify(token, secret);
 
     const userAllowedPaths = ['/api/users/', '/media', '/screen'];
-    const isUserAllowedPath = pathname.startsWith('/api/users/') && 
+    const isUserAllowedPath = pathname.startsWith('/api/users/') &&
       (pathname.includes('/media') || pathname.includes('/screen'));
 
     const adminOnlyPaths = ['/api/users']
@@ -96,11 +96,11 @@ export default async function middleware (req: NextRequest) {
       if (payload.role !== "admin") {
         return NextResponse.json({
           message: "Bu işlem için yetkiniz yok",
-        }, {status: 403});
+        }, { status: 403 });
       }
     }
 
-    const response : NextResponse<any> = NextResponse.next();
+    const response: NextResponse<any> = NextResponse.next();
 
     if (newTokenCreated && token) {
       response.cookies.set('accessToken', token, {
@@ -122,7 +122,7 @@ export default async function middleware (req: NextRequest) {
 }
 
 export const config = {
-  matcher : [
+  matcher: [
     '/dashboard/:path*',
     '/api/users/:path*',
     '/api/:path*',

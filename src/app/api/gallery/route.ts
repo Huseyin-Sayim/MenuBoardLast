@@ -48,7 +48,7 @@ export async function POST(req:Request) {
       const userId = (payload as any).userId;
       const tokenRole = (payload as any).role;
 
-      console.log('POST /api/gallery - Token verify başarılı');
+      console.log('POST /api/gallery - Token verify-mail başarılı');
       console.log('POST /api/gallery - userId:', userId);
       console.log('POST /api/gallery - tokenRole:', tokenRole);
       console.log('POST /api/gallery - payload:', payload);
@@ -86,7 +86,7 @@ export async function POST(req:Request) {
 
       console.log('POST /api/gallery - Admin yetkisi doğrulandı, devam ediliyor');
     } catch (tokenError: any) {
-      console.error('POST /api/gallery - Token verify hatası:', tokenError.message);
+      console.error('POST /api/gallery - Token verify-mail hatası:', tokenError.message);
       return NextResponse.json({
         error: 'Geçersiz token: ' + tokenError.message
       }, { status: 401 })

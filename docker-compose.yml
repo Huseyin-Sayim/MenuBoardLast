@@ -1,0 +1,30 @@
+
+services:
+  # Veritabanı Servisi
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: menuboard
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_menuBoard_data:/var/lib/postgresql/data
+
+  # Next.js Uygulaman
+  app:
+    build: .
+    ports:
+      - "3005:3005"
+    environment:
+      ACCES_TOKEN_SECRET: "ntx_izmir_2025"
+      REFRESH_TOKEN_SECRET: "ntx_izmir_2025"
+      NEXT_PUBLIC_API_URL: "http://localhost:3005"
+      DATABASE_URL: "postgresql://postgres:root@db:5432/menuboard?schema=public"
+    depends_on:
+      - db
+
+volumes:
+  postgres_menuBoard_data:
