@@ -59,7 +59,7 @@ export function UserInfo() {
         return;
       }
 
-      await api.post('/api/logout',{
+      await api.post('/api/logout', {
         token: refreshToken
       });
 
@@ -69,7 +69,7 @@ export function UserInfo() {
       setIsOpen(false)
       router.push('/');
 
-    } catch (err : any) {
+    } catch (err: any) {
       console.error('Logout hatası:', err.response?.data?.message || err.message);
       Cookies.remove('accessToken');
       Cookies.remove('refreshToken');
@@ -106,7 +106,7 @@ export function UserInfo() {
         align="end"
       >
         <h2 className="sr-only">Kullanıcı bilgileri</h2>
-        
+
         {/* Kullanıcı bilgileri - Dropdown açıkken */}
         {isOpen && USER.name && (
           <div className="px-4 py-3 border-b border-[#E8E8E8] dark:border-dark-3">
@@ -120,11 +120,11 @@ export function UserInfo() {
             )}
           </div>
         )}
-        
+
         <hr className="border-[#E8E8E8] dark:border-dark-3" />
 
         <div className="p-2 text-base text-[#4B5563] dark:text-dark-6 [&>*]:cursor-pointer">
-         
+
 
           <Link
             href={"/dashboard/settings"}
@@ -135,6 +135,18 @@ export function UserInfo() {
 
             <span className="mr-auto text-base font-medium">
               Hesap Ayarları
+            </span>
+          </Link>
+
+          <Link
+            href={"/dashboard/ip-settings"}
+            onClick={() => setIsOpen(false)}
+            className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-[9px] hover:bg-gray-2 hover:text-dark dark:hover:bg-dark-3 dark:hover:text-white"
+          >
+            <SettingsIcon />
+
+            <span className="mr-auto text-base font-medium">
+              IP Ayarları
             </span>
           </Link>
         </div>
