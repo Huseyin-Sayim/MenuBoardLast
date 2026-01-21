@@ -13,7 +13,7 @@ async function getUserRole() {
   if (!token) return undefined;
 
   try {
-    const secret = new TextEncoder().encode(process.env.ACCES_TOKEN_SECRET);
+    const secret = new TextEncoder().encode(process.env.ACCESS_TOKEN_SECRET);
     const { payload } = await jose.jwtVerify(token, secret);
     const userId = payload.userId as string;
 

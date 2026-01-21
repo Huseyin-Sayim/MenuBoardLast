@@ -44,7 +44,7 @@ export default async function middleware(req: NextRequest) {
       const refreshSecret = new TextEncoder().encode(process.env.REFRESH_TOKEN_SECRET);
       const { payload: refreshPayload } = await jose.jwtVerify(refreshToken, refreshSecret);
 
-      const accessSecret = new TextEncoder().encode(process.env.ACCES_TOKEN_SECRET);
+      const accessSecret = new TextEncoder().encode(process.env.ACCESS_TOKEN_SECRET);
       const newAccessToken = await new jose.SignJWT({
         userId: (refreshPayload as any).userId,
         email: (refreshPayload as any).email,

@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { sendVerificationMail } from "@/lib/mail";
 
 
-const ACCES_TOKEN_SECRET: string | null = process.env.ACCES_TOKEN_SECRET || null;
+const ACCESS_TOKEN_SECRET: string | null = process.env.ACCESS_TOKEN_SECRET || null;
 const REFRESH_TOKEN_SECRET: string | null = process.env.REFRESH_TOKEN_SECRET || null;
 
 export const register = async (data: { name: string; email: string; password: string; phoneNumber: string; address: string; businessName: string; branchCount: number; estimatedScreen: number }) => {
@@ -124,9 +124,9 @@ export const login = async (data: { userData: { email: string; password: string 
       throw new Error('Girdiğiniz şifre yanlış. Lütfen tekrar deneyin.');
     }
 
-    if (!ACCES_TOKEN_SECRET) {
-      console.error('❌ ACCES_TOKEN_SECRET tanımlı değil!');
-      throw new Error("Sunucu yapılandırma hatası: ACCES_TOKEN_SECRET tanımlanmamış. Lütfen sistem yöneticisine başvurun.");
+    if (!ACCESS_TOKEN_SECRET) {
+      console.error('❌ ACCESS_TOKEN_SECRET tanımlı değil!');
+      throw new Error("Sunucu yapılandırma hatası: ACCESS_TOKEN_SECRET tanımlanmamış. Lütfen sistem yöneticisine başvurun.");
     }
 
     if (!REFRESH_TOKEN_SECRET) {
@@ -136,7 +136,7 @@ export const login = async (data: { userData: { email: string; password: string 
 
     const accessToken = jwt.sign(
       { userId: user.id, email: user.email, role: user.role },
-      ACCES_TOKEN_SECRET,
+      ACCESS_TOKEN_SECRET,
       { expiresIn: '15m' }
     );
 
