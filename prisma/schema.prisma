@@ -27,6 +27,7 @@ model User {
   resetCode        String?
   resetCodeExpires DateTime?
   estimatedScreen  Int                @default(1)
+  ip               String?
   RefreshToken     RefreshToken[]
   Screen           Screen[]
   Media            Media[]

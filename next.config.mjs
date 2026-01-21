@@ -30,7 +30,8 @@ const nextConfig = {
         port: ""
       }
     ]
-  }
+  },
+  devIndicators: false
 };
 
 export default nextConfig;
