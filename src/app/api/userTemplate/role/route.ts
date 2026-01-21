@@ -26,8 +26,8 @@ export async function GET(req: Request) {
     }
 
     try {
-      if (!process.env.ACCES_TOKEN_SECRET) {
-        console.error("[API /userTemplate/role] ACCES_TOKEN_SECRET environment variable bulunamadı");
+      if (!process.env.ACCESS_TOKEN_SECRET) {
+        console.error("[API /userTemplate/role] ACCESS_TOKEN_SECRET environment variable bulunamadı");
         return NextResponse.json(
           { message: 'Sunucu yapılandırma hatası' },
           { status: 500 }
@@ -35,7 +35,7 @@ export async function GET(req: Request) {
       }
 
       console.log("[API /userTemplate/role] Token doğrulanıyor...");
-      const secret = new TextEncoder().encode(process.env.ACCES_TOKEN_SECRET);
+      const secret = new TextEncoder().encode(process.env.ACCESS_TOKEN_SECRET);
       const { payload } = await jose.jwtVerify(token, secret);
       const userId = (payload as any).userId;
       const tokenRole = (payload as any).role;
