@@ -3,10 +3,9 @@ import { prisma } from "@/generated/prisma";
 import Template1Content from "../template-1/component/template-1";
 import Template2Content from "../template-2/component/template-2";
 import Template3Content from "../template-3/component/template-3";
-import Template4Content from "../template-4/component/template-4";
-import Template5Content from "../template-5/component/template-5";
-import Template6Content from "../template-6/component/template-6";
-import { defaultBurgers } from "../template-data";
+import Template4BurgerMenu from "../template-4/component/template-4";
+
+import { defaultBurgers, winterFavorites } from "../template-data";
 import { menuItems } from "../template-data";
 import { notFound } from "next/navigation";
 
@@ -159,110 +158,83 @@ export default async function ConfigsPage({ searchParams }: Props) {
       }
 
       case 'template-3': {
+        // Template 3 data logic (similar to template 1 or custom)
+        let items = winterFavorites;
+        if (configData && configData.data && Array.isArray(configData.data) && configData.data.length > 0) {
+          // Map config data if available
+          items = configData.data.map((item: any, index: number) => ({
+            id: index + 1,
+            name: item.name || '',
+            price: item.price || '0',
+            img: item.image || "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop",
+            heroIMG: item.image || "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=1000&auto=format&fit=crop",
+            heroTitle: item.name || 'Menü',
+            category: 'Genel'
+          }));
+        }
+
         return (
           <div className="w-full h-auto rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
-            <Template3Content />
+            <Template3Content items={items} />
           </div>
         );
       }
 
       case 'template-4': {
-        return (
-          <Template4Content />
-        );
-      }
+        let items: Array<{ name: string; price: string; description?: string; image?: string; badge?: string | null }> = [];
+        let promoProduct: { name?: string; price?: string; currency?: string; cents?: string; image?: string } | undefined = undefined;
+        let promoImage: string | undefined = undefined;
 
-      case 'template-5': {
-        let burgerItems = defaultBurgers;
-
-        if (configData) {
-          const template5Data = configData as {
-            category?: string;
-            data?: Array<{ name: string; price: string; image?: string }>;
-          };
-
-          if (template5Data.data && Array.isArray(template5Data.data) && template5Data.data.length > 0) {
-            burgerItems = template5Data.data.map((item, index) => ({
-              id: index + 1,
+        if (configData && configData.data && Array.isArray(configData.data)) {
+          items = configData.data
+            .filter((item: any) => item && item.name && item.name.trim() !== '')
+            .map((item: any) => ({
               name: item.name || '',
               price: item.price ? item.price.replace(/[^\d]/g, '') : '0',
-              img: item.image || "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop",
-              heroIMG: item.image || "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=1000&auto=format&fit=crop",
-              heroTitle: item.name || 'Menü',
-              category: template5Data.category || '',
+              description: item.description || '',
+              image: item.image || "/images/burger_menu.svg",
+              badge: null,
             }));
 
-            // En az 4 item olmalı (template-5 için max 4)
-            while (burgerItems.length < 4) {
-              const defaultItem = defaultBurgers[burgerItems.length];
-              burgerItems.push(defaultItem || {
-                id: burgerItems.length + 1,
-                name: '',
-                price: '0',
-                img: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop",
-                heroIMG: "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=1000&auto=format&fit=crop",
-                heroTitle: 'Menü',
-                category: '',
-              });
-            }
+          // En az 8 item olmalı (template-4'te 8 slot var)
+          while (items.length < 8) {
+            items.push({
+              name: '',
+              price: '0',
+              description: '',
+              image: "/images/burger_menu.svg",
+              badge: null,
+            });
           }
         }
 
-        // Template-5 için maksimum 4 ürün
-        if (Array.isArray(burgerItems) && burgerItems.length > 4) {
-          burgerItems = burgerItems.slice(0, 4);
-        }
-
-        return (
-          <Template5Content burgerItems={burgerItems} />
-        );
-      }
-
-      case 'template-6': {
-        let burgerItems = defaultBurgers;
-
-        if (configData) {
-          const template6Data = configData as {
-            category?: string;
-            data?: Array<{ name: string; price: string; image?: string }>;
+        // Promo product'ı çek
+        if (configData && configData.promoProduct) {
+          const promo = configData.promoProduct;
+          promoProduct = {
+            name: promo.name,
+            price: promo.price,
+            currency: promo.currency || '₺',
+            cents: promo.cents || '.00',
+            image: promo.image,
           };
-
-          if (template6Data.data && Array.isArray(template6Data.data) && template6Data.data.length > 0) {
-            burgerItems = template6Data.data.map((item, index) => ({
-              id: index + 1,
-              name: item.name || '',
-              price: item.price ? item.price.replace(/[^\d]/g, '') : '0',
-              img: item.image || "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop",
-              heroIMG: item.image || "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=1000&auto=format&fit=crop",
-              heroTitle: item.name || 'Menü',
-              category: template6Data.category || '',
-            }));
-
-            // En az 4 item olmalı (template-6 için max 4)
-            while (burgerItems.length < 4) {
-              const defaultItem = defaultBurgers[burgerItems.length];
-              burgerItems.push(defaultItem || {
-                id: burgerItems.length + 1,
-                name: '',
-                price: '0',
-                img: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop",
-                heroIMG: "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=1000&auto=format&fit=crop",
-                heroTitle: 'Menü',
-                category: '',
-              });
-            }
-          }
-        }
-
-        // Template-6 için maksimum 4 ürün
-        if (Array.isArray(burgerItems) && burgerItems.length > 4) {
-          burgerItems = burgerItems.slice(0, 4);
+          promoImage = promo.image;
         }
 
         return (
-          <Template6Content burgerItems={burgerItems} />
+          <div className="w-full h-auto rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
+            <div className="relative w-full" style={{ aspectRatio: "16 / 9", overflow: "hidden" }}>
+              <Template4BurgerMenu 
+                variant="preview" 
+                items={items.length > 0 ? items : undefined}
+                promoProduct={promoProduct}
+                promoImage={promoImage}
+              />
+            </div>
+          </div>
         );
       }
+
 
       default:
         return (

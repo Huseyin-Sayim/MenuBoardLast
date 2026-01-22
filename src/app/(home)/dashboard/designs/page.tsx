@@ -40,6 +40,20 @@ const getDefaultConfig = (component: string) => {
     };
   }
 
+  if (component === 'template-3') {
+    return {
+      category: "Kışlık Favoriler",
+      data: []
+    };
+  }
+
+  if (component === 'template-4') {
+    return {
+      category: "Burger Menü",
+      data: []
+    };
+  }
+
   return { category: "", data: [] };
 };
 

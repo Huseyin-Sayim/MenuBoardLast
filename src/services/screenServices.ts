@@ -42,7 +42,7 @@ export const createScreen = async (code: string) => {
         name: deviceCode.deviceId,
         deviceId: deviceCode.deviceId,
         user: {
-          connect: {id: deviceCode.userId}
+          connect: { id: deviceCode.userId }
         },
         width: deviceCode.width,
         height: deviceCode.height
@@ -53,7 +53,7 @@ export const createScreen = async (code: string) => {
       where: {
         code: code,
         OR: [
-          {deviceId: deviceCode.deviceId}
+          { deviceId: deviceCode.deviceId }
         ]
       },
     });
@@ -68,13 +68,13 @@ export const createScreen = async (code: string) => {
   }
 }
 
-export const createScreenCode = async (data: {userId: string, width: number, height: number, deviceId: string}) => {
+export const createScreenCode = async (data: { userId: string, width: number, height: number, deviceId: string }) => {
   try {
-    const {userId, width, height, deviceId} = data;
+    const { userId, width, height, deviceId } = data;
     let attempts = 0;
     const maxAttempts = 5;
 
-    if (!deviceId || deviceId === "" ) {
+    if (!deviceId || deviceId === "") {
       throw new Error('Cihaz id eksik');
     }
 
@@ -101,7 +101,7 @@ export const createScreenCode = async (data: {userId: string, width: number, hei
           data: {
             deviceId: deviceId,
             user: {
-              connect: {id: userId}
+              connect: { id: userId }
             },
             width: width,
             height: height,
@@ -119,7 +119,7 @@ export const createScreenCode = async (data: {userId: string, width: number, hei
       }
     }
   } catch (error: any) {
-    throw new Error('Doğrulama kodu oluşturulamadı',error.message);
+    throw new Error('Doğrulama kodu oluşturulamadı', error.message);
   }
 }
 
@@ -135,7 +135,7 @@ export const getScreenByDeviceId = async (deviceId: string) => {
   }
 }
 
-export const updateScreenConfig = async (screenId: string, configs: {mediaId?: string, templateId?: string, templateConfigId?: string, mediaIndex: number, duration:number}[]) => {
+export const updateScreenConfig = async (screenId: string, configs: { mediaId?: string, templateId?: string, templateConfigId?: string, mediaIndex: number, duration: number }[]) => {
   try {
     await prisma.screenConfig.deleteMany({
       where: {
@@ -155,21 +155,18 @@ export const updateScreenConfig = async (screenId: string, configs: {mediaId?: s
         if (!templateComponentMap.has(component)) {
           const path = `/design/${component}`;
           console.log(`Looking for template with path: ${path}`);
-          
+
           let template = await prisma.template.findFirst({
             where: { path: path }
           });
-          
+
           if (!template) {
-            const name = component === 'template-1' ? 'Şablon 1' : 
-                         component === 'template-2' ? 'Şablon 2' : 
-                         component === 'template-3' ? 'Şablon 3' : 
-                         component === 'template-4' ? 'Şablon 4' :
-                         component === 'template-5' ? 'Şablon 5' :
-                         component === 'template-6' ? 'Şablon 6' : 'Şablon';
-            
+            const name = component === 'template-1' ? 'Şablon 1' :
+              component === 'template-2' ? 'Şablon 2' :
+                component === 'template-3' ? 'Şablon 3' : 'Şablon';
+
             console.log(`Template not found, creating new template: ${name}, path: ${path}, component: ${component}`);
-            
+
             template = await prisma.template.create({
               data: {
                 name,
@@ -177,22 +174,22 @@ export const updateScreenConfig = async (screenId: string, configs: {mediaId?: s
                 component,
               },
             });
-            
+
             console.log(`Template created with ID: ${template.id}`);
           } else {
             console.log(`Template found with ID: ${template.id}`);
           }
-          
+
           templateComponentMap.set(component, template.id);
         }
       }
     }
-    
+
     console.log('Template component map:', Array.from(templateComponentMap.entries()));
 
     const createPromises = configs.map((config, index) => {
       console.log(`Processing config ${index + 1}:`, JSON.stringify(config, null, 2));
-      
+
       const data: any = {
         screen: {
           connect: { id: screenId }
@@ -216,7 +213,7 @@ export const updateScreenConfig = async (screenId: string, configs: {mediaId?: s
         };
       } else if (config.templateId) {
         let templateDbId = config.templateId;
-        
+
         if (config.templateId.startsWith('template-')) {
           const component = config.templateId; // template-1
           const foundId = templateComponentMap.get(component);
@@ -228,7 +225,7 @@ export const updateScreenConfig = async (screenId: string, configs: {mediaId?: s
             throw new Error(`Template ID bulunamadı: ${component}`);
           }
         }
-        
+
         console.log(`Adding Template connection for templateId: ${templateDbId}`);
         data.Template = {
           connect: { id: templateDbId }
@@ -241,7 +238,7 @@ export const updateScreenConfig = async (screenId: string, configs: {mediaId?: s
       }
 
       console.log(`Creating ScreenConfig with data:`, JSON.stringify(data, null, 2));
-      
+
       return prisma.screenConfig.create({
         data: data
       });
@@ -259,10 +256,10 @@ export const updateScreenConfig = async (screenId: string, configs: {mediaId?: s
   }
 }
 
-export const getScreenConfig = async (screenId:string) => {
+export const getScreenConfig = async (screenId: string) => {
   try {
     console.log('getScreenConfig called with screenId:', screenId);
-    
+
     const configs = await prisma.screenConfig.findMany({
       where: {
         screenId: screenId
@@ -271,16 +268,16 @@ export const getScreenConfig = async (screenId:string) => {
         mediaIndex: 'asc'
       }
     });
-    
+
     const result = await Promise.all(configs.map(async (config: any) => {
       const media = config.mediaId ? await prisma.media.findUnique({
         where: { id: config.mediaId }
       }) : null;
-      
+
       const template = config.templateId ? await prisma.template.findUnique({
         where: { id: config.templateId }
       }) : null;
-      
+
       // TemplateConfig varsa, Template bilgisini de al
       let templateConfig = null;
       if (config.templateConfigId) {
@@ -302,11 +299,11 @@ export const getScreenConfig = async (screenId:string) => {
           };
         }
       }
-      
+
       const screen = await prisma.screen.findUnique({
         where: { id: config.screenId }
       });
-      
+
       return {
         ...config,
         Media: media,
@@ -315,7 +312,7 @@ export const getScreenConfig = async (screenId:string) => {
         screen: screen
       };
     }));
-    
+
     console.log('getScreenConfig result:', JSON.stringify(result, null, 2));
     return result;
   } catch (err: any) {
@@ -327,17 +324,17 @@ export const getScreenConfig = async (screenId:string) => {
   }
 }
 
-export const getScreenName = async (id:string) => {
+export const getScreenName = async (id: string) => {
   try {
     return await prisma.screen.findUnique({
       where: {
-        id:id
+        id: id
       },
       select: {
-        name:true
+        name: true
       }
     })
-  } catch (err : any) {
+  } catch (err: any) {
     throw new Error(`Screen name getirilemedi: ${err.message}`)
   }
 }

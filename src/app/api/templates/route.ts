@@ -34,6 +34,31 @@ const getDefaultConfig = (component: string) => {
       }
     };
   }
+  if (component === 'template-7') {
+    return {
+      category: "Mix Burger",
+      data: [
+        {name: '3 Adet Bol Mix Burger', price: "1200", image: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=1920&auto=format&fit=crop"},
+      ]
+    }
+  }
+  if (component === 'template-8') {
+    return {
+      category: "Combo Menü",
+      data: [
+        {name: 'Ice Cream Souffle + Coffe', price: "12", image: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop"},
+        {name: 'Doner + cola + fries', price: "9", image: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop"},
+        {name: 'Hamburger + Cola', price: "8", image: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop"},
+        {name: 'Fries + Hot Dog + Doner', price: "15", image: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop"},
+      ]
+    }
+  }
+  if (component === 'template-4') {
+    return {
+      category: "Burger Menü",
+      data: []
+    };
+  }
   return {
     category: '',
     data:[]
