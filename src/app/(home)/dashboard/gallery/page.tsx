@@ -8,7 +8,7 @@ import prisma from "@/generated/prisma";
 async function getUserRole(): Promise<'admin' | 'user'> {
   try {
     const cookieStore = await cookies();
-    
+
     // Önce user cookie'den userId'yi al
     const userCookie = cookieStore.get('user')?.value;
     let userId: string | null = null;
@@ -29,9 +29,9 @@ async function getUserRole(): Promise<'admin' | 'user'> {
     // Token'dan userId ve role al
     const cookieToken = cookieStore.get('accessToken')?.value;
 
-    if (cookieToken && process.env.ACCES_TOKEN_SECRET) {
+    if (cookieToken && process.env.ACCESS_TOKEN_SECRET) {
       try {
-        const secret = new TextEncoder().encode(process.env.ACCES_TOKEN_SECRET);
+        const secret = new TextEncoder().encode(process.env.ACCESS_TOKEN_SECRET);
         const { payload } = await jose.jwtVerify(cookieToken, secret);
         const tokenUserId = (payload as any).userId;
         const tokenRole = (payload as any).role;
@@ -75,7 +75,7 @@ async function getUserRole(): Promise<'admin' | 'user'> {
 export default async function GalleryPage() {
   const userRole = await getUserRole();
   console.log('GalleryPage - userRole:', userRole);
-  
+
   let galleryImages = [];
   try {
     galleryImages = await getAllGalleryImages();

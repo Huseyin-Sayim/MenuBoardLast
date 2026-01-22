@@ -5,7 +5,7 @@ import { deleteGalleryImage } from "@/services/galleryServices";
 import prisma from "@/generated/prisma";
 
 
-export async function DELETE( req: Request, { params }: { params: Promise<{ id: string }>}) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
 
@@ -28,14 +28,14 @@ export async function DELETE( req: Request, { params }: { params: Promise<{ id: 
     }
 
     try {
-      if (!process.env.ACCES_TOKEN_SECRET) {
-        console.error('ACCES_TOKEN_SECRET bulunamadı');
+      if (!process.env.ACCESS_TOKEN_SECRET) {
+        console.error('ACCESS_TOKEN_SECRET bulunamadı');
         return NextResponse.json({
           error: 'Sunucu yapılandırma hatası'
         }, { status: 500 })
       }
 
-      const secret = new TextEncoder().encode(process.env.ACCES_TOKEN_SECRET);
+      const secret = new TextEncoder().encode(process.env.ACCESS_TOKEN_SECRET);
       const { payload } = await jose.jwtVerify(token, secret);
       const userId = (payload as any).userId;
       const tokenRole = (payload as any).role;
@@ -67,7 +67,7 @@ export async function DELETE( req: Request, { params }: { params: Promise<{ id: 
 
       // Role kontrolü (case-insensitive)
       const isAdmin = userRole?.toLowerCase() === 'admin' || userRole === 'admin';
-      
+
       if (!isAdmin) {
         console.log('DELETE /api/gallery/[id] - Admin değil, erişim reddedildi. userRole:', userRole);
         return NextResponse.json({
@@ -83,12 +83,12 @@ export async function DELETE( req: Request, { params }: { params: Promise<{ id: 
       }, { status: 401 });
     }
 
-      const deletedImage = await deleteGalleryImage(id);
+    const deletedImage = await deleteGalleryImage(id);
 
-      return NextResponse.json({
-        message: 'Galeri resmi başarıyla silindi.',
-        data:deletedImage
-      }, { status: 200 })
+    return NextResponse.json({
+      message: 'Galeri resmi başarıyla silindi.',
+      data: deletedImage
+    }, { status: 200 })
 
   } catch (err: any) {
     console.error("Galeri resmi silinirken hata:", err);

@@ -12,16 +12,16 @@ export async function GET(req: Request) {
     return NextResponse.json({
       message: 'Galeri resimleri başarıyla getirildi.',
       data: galleryImages
-    }, {status: 200})
-  } catch (err : any) {
+    }, { status: 200 })
+  } catch (err: any) {
     console.error('Galeri resimleri çekilirken hata oluştu: ' + err.message);
     return NextResponse.json({
       error: err.message || 'Galeri resimleri çekilemedi.'
-    }, {status: 500})
+    }, { status: 500 })
   }
 }
 
-export async function POST(req:Request) {
+export async function POST(req: Request) {
   try {
     const cookieStore = await cookies()
     const cookieToken = cookieStore.get('accessToken')?.value;
@@ -36,14 +36,14 @@ export async function POST(req:Request) {
     }
 
     try {
-      if (!process.env.ACCES_TOKEN_SECRET) {
-        console.error('ACCES_TOKEN_SECRET bulunamadı');
+      if (!process.env.ACCESS_TOKEN_SECRET) {
+        console.error('ACCESS_TOKEN_SECRET bulunamadı');
         return NextResponse.json({
           error: 'Sunucu yapılandırma hatası'
         }, { status: 500 })
       }
 
-      const secret = new TextEncoder().encode(process.env.ACCES_TOKEN_SECRET);
+      const secret = new TextEncoder().encode(process.env.ACCESS_TOKEN_SECRET);
       const { payload } = await jose.jwtVerify(token, secret);
       const userId = (payload as any).userId;
       const tokenRole = (payload as any).role;
@@ -76,7 +76,7 @@ export async function POST(req:Request) {
 
       // Role kontrolü (case-insensitive)
       const isAdmin = userRole?.toLowerCase() === 'admin' || userRole === 'admin';
-      
+
       if (!isAdmin) {
         console.log('POST /api/gallery - Admin değil, erişim reddedildi. userRole:', userRole);
         return NextResponse.json({
@@ -108,7 +108,7 @@ export async function POST(req:Request) {
       data: savedImage
     }, { status: 201 })
 
-  } catch (err : any) {
+  } catch (err: any) {
     console.error('Galeri resmi yüklenirken hata oluştu: ' + err.message);
     return NextResponse.json({
       error: 'Yükleme başarısız',

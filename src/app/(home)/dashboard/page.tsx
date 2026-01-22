@@ -52,7 +52,7 @@ const getDefaultConfig = (component: string) => {
 async function getUserRole(): Promise<'admin' | 'user'> {
   try {
     const cookieStore = await cookies();
-    
+
     // Önce user cookie'den userId'yi al
     const userCookie = cookieStore.get('user')?.value;
     let userId: string | null = null;
@@ -73,9 +73,9 @@ async function getUserRole(): Promise<'admin' | 'user'> {
     // Token'dan userId ve role al
     const cookieToken = cookieStore.get('accessToken')?.value;
 
-    if (cookieToken && process.env.ACCES_TOKEN_SECRET) {
+    if (cookieToken && process.env.ACCESS_TOKEN_SECRET) {
       try {
-        const secret = new TextEncoder().encode(process.env.ACCES_TOKEN_SECRET);
+        const secret = new TextEncoder().encode(process.env.ACCESS_TOKEN_SECRET);
         const { payload } = await jose.jwtVerify(cookieToken, secret);
         const tokenUserId = (payload as any).userId;
         const tokenRole = (payload as any).role;
@@ -147,7 +147,7 @@ export default async function Dashboard({ searchParams }: PropsType) {
     return <div>Kullanıcı oturumu bulunamadı.</div>
   }
 
-  const user = JSON.parse(userCookies) as {id: string};
+  const user = JSON.parse(userCookies) as { id: string };
 
   const userRole = await getUserRole();
   let galleryImages = [];
