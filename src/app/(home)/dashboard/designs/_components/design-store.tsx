@@ -120,8 +120,8 @@ export function DesignStore({ templates, onAddTemplate, isAdmin }: DesignStorePr
 
   // Template tipine göre yükseklik belirle
   const getTemplateHeight = (component: string) => {
-    // Template-2 için özel yükseklik (içerik yüksekliğine göre)
-    if (component === 'template-2') {
+    // Template-2 ve Template-3 için özel yükseklik (içerik yüksekliğine göre)
+    if (component === 'template-2' || component === 'template-3') {
       return { height: '100vh', overflow: 'hidden' };
     }
     // Diğer template'ler için

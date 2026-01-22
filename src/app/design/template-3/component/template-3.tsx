@@ -1,380 +1,360 @@
-"use client"
-import React from "react";
+"use client";
 
-type Template3ContentProps = {
-  prices?: Record<string, string>;
-  onPriceClickAction?: (itemName: string, currentPrice: string) => void;
-  isEditable?: boolean;
-};
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
 
-export default function Template3Content({ prices, onPriceClickAction, isEditable = false }: Template3ContentProps = {}) {
-  const menuItems = [
-    { name: "Serpme Kahvaltı", price: "₺120" },
-    { name: "Menemen", price: "₺45" },
-    { name: "Omlet", price: "₺40" },
-    { name: "Mercimek Çorbası", price: "₺35" },
-    { name: "Izgara Köfte", price: "₺85" },
-    { name: "Salata Tabağı", price: "₺55" },
-    { name: "Balık Tava", price: "₺130" },
-    { name: "Kuzu Tandır", price: "₺150" },
-    { name: "Mantı", price: "₺65" },
-  ].map(item => ({
-    ...item,
-    price: prices?.[item.name] || item.price,
-  }));
-  return (
-    <>
-      <div className="template-3-container">
-        {/* HTML/CSS şablon içeriği buraya */}
-        <header className="minimal-header">
-          <h1 className="minimal-title">Menü</h1>
-        </header>
-
-        <main className="minimal-content">
-          <section className="minimal-section">
-            <h2 className="minimal-section-title">Kahvaltı</h2>
-            <ul className="minimal-list">
-              <li className="minimal-list-item">
-                <span className="item-text">Serpme Kahvaltı</span>
-                <span className="item-dot"></span>
-                {isEditable && onPriceClickAction ? (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onPriceClickAction("Serpme Kahvaltı", menuItems.find(m => m.name === "Serpme Kahvaltı")?.price || "₺120");
-                    }}
-                    className="item-price"
-                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
-                  >
-                    {menuItems.find(m => m.name === "Serpme Kahvaltı")?.price || "₺120"}
-                  </button>
-                ) : (
-                  <span className="item-price">{menuItems.find(m => m.name === "Serpme Kahvaltı")?.price || "₺120"}</span>
-                )}
-              </li>
-              <li className="minimal-list-item">
-                <span className="item-text">Menemen</span>
-                <span className="item-dot"></span>
-                {isEditable && onPriceClickAction ? (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onPriceClickAction("Menemen", menuItems.find(m => m.name === "Menemen")?.price || "₺45");
-                    }}
-                    className="item-price"
-                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
-                  >
-                    {menuItems.find(m => m.name === "Menemen")?.price || "₺45"}
-                  </button>
-                ) : (
-                  <span className="item-price">{menuItems.find(m => m.name === "Menemen")?.price || "₺45"}</span>
-                )}
-              </li>
-              <li className="minimal-list-item">
-                <span className="item-text">Omlet</span>
-                <span className="item-dot"></span>
-                {isEditable && onPriceClickAction ? (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onPriceClickAction("Omlet", menuItems.find(m => m.name === "Omlet")?.price || "₺40");
-                    }}
-                    className="item-price"
-                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
-                  >
-                    {menuItems.find(m => m.name === "Omlet")?.price || "₺40"}
-                  </button>
-                ) : (
-                  <span className="item-price">{menuItems.find(m => m.name === "Omlet")?.price || "₺40"}</span>
-                )}
-              </li>
-            </ul>
-          </section>
-
-          <section className="minimal-section">
-            <h2 className="minimal-section-title">Öğle Yemeği</h2>
-            <ul className="minimal-list">
-              <li className="minimal-list-item">
-                <span className="item-text">Mercimek Çorbası</span>
-                <span className="item-dot"></span>
-                {isEditable && onPriceClickAction ? (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onPriceClickAction("Mercimek Çorbası", menuItems.find(m => m.name === "Mercimek Çorbası")?.price || "₺35");
-                    }}
-                    className="item-price"
-                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
-                  >
-                    {menuItems.find(m => m.name === "Mercimek Çorbası")?.price || "₺35"}
-                  </button>
-                ) : (
-                  <span className="item-price">{menuItems.find(m => m.name === "Mercimek Çorbası")?.price || "₺35"}</span>
-                )}
-              </li>
-              <li className="minimal-list-item">
-                <span className="item-text">Izgara Köfte</span>
-                <span className="item-dot"></span>
-                {isEditable && onPriceClickAction ? (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onPriceClickAction("Izgara Köfte", menuItems.find(m => m.name === "Izgara Köfte")?.price || "₺85");
-                    }}
-                    className="item-price"
-                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
-                  >
-                    {menuItems.find(m => m.name === "Izgara Köfte")?.price || "₺85"}
-                  </button>
-                ) : (
-                  <span className="item-price">{menuItems.find(m => m.name === "Izgara Köfte")?.price || "₺85"}</span>
-                )}
-              </li>
-              <li className="minimal-list-item">
-                <span className="item-text">Salata Tabağı</span>
-                <span className="item-dot"></span>
-                {isEditable && onPriceClickAction ? (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onPriceClickAction("Salata Tabağı", menuItems.find(m => m.name === "Salata Tabağı")?.price || "₺55");
-                    }}
-                    className="item-price"
-                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
-                  >
-                    {menuItems.find(m => m.name === "Salata Tabağı")?.price || "₺55"}
-                  </button>
-                ) : (
-                  <span className="item-price">{menuItems.find(m => m.name === "Salata Tabağı")?.price || "₺55"}</span>
-                )}
-              </li>
-            </ul>
-          </section>
-
-          <section className="minimal-sections">
-            <h2 className="minimal-section-title">Akşam Yemeği</h2>
-            <ul className="minimal-list">
-              <li className="minimal-list-item">
-                <span className="item-text">Balık Tava</span>
-                <span className="item-dot"></span>
-                {isEditable && onPriceClickAction ? (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onPriceClickAction("Balık Tava", menuItems.find(m => m.name === "Balık Tava")?.price || "₺130");
-                    }}
-                    className="item-price"
-                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
-                  >
-                    {menuItems.find(m => m.name === "Balık Tava")?.price || "₺130"}
-                  </button>
-                ) : (
-                  <span className="item-price">{menuItems.find(m => m.name === "Balık Tava")?.price || "₺130"}</span>
-                )}
-              </li>
-              <li className="minimal-list-item">
-                <span className="item-text">Kuzu Tandır</span>
-                <span className="item-dot"></span>
-                {isEditable && onPriceClickAction ? (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onPriceClickAction("Kuzu Tandır", menuItems.find(m => m.name === "Kuzu Tandır")?.price || "₺150");
-                    }}
-                    className="item-price"
-                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
-                  >
-                    {menuItems.find(m => m.name === "Kuzu Tandır")?.price || "₺150"}
-                  </button>
-                ) : (
-                  <span className="item-price">{menuItems.find(m => m.name === "Kuzu Tandır")?.price || "₺150"}</span>
-                )}
-              </li>
-              <li className="minimal-list-item">
-                <span className="item-text">Mantı</span>
-                <span className="item-dot"></span>
-                {isEditable && onPriceClickAction ? (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onPriceClickAction("Mantı", menuItems.find(m => m.name === "Mantı")?.price || "₺65");
-                    }}
-                    className="item-price"
-                    style={{ cursor: 'pointer', border: 'none', background: 'inherit', font: 'inherit', padding: 0, minWidth: '60px', textAlign: 'right' }}
-                  >
-                    {menuItems.find(m => m.name === "Mantı")?.price || "₺65"}
-                  </button>
-                ) : (
-                  <span className="item-price">{menuItems.find(m => m.name === "Mantı")?.price || "₺65"}</span>
-                )}
-              </li>
-            </ul>
-          </section>
-        </main>
-      </div>
-
-      <script>
-
-      </script>
-
-      <style jsx>{`
-      .menu-name {
-        font-size: 1.3rem;
-        font-weight: 400;
-        color: #1a1a1a;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        margin-bottom: 1.5rem;
-      }
-        .template-3-container {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          width: 100%;
-          height: 100%;
-          margin: 0;
-          padding: 3rem 2rem;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-          overflow: auto;
-        }
-
-        .minimal-header {
-          text-align: center;
-          margin-bottom: 4rem;
-        }
-
-        .minimal-title {
-          font-size: 2.5rem;
-          font-weight: 300;
-          color: #1a1a1a;
-          letter-spacing: 8px;
-          text-transform: uppercase;
-        }
-
-        .minimal-content {
-          display: flex;
-          flex-direction: row;
-          justify-content: center;
-          align-items: center;
-          gap: 15rem;
-        }
-
-        .minimal-section {
-          border-right: 1px solid #e5e5e5;
-          padding-right: 30%;
-        }
-
-        .minimal-section:last-child {
-          border-bottom: none;
-        }
-
-        .minimal-section-title {
-          font-size: 1.1rem;
-          font-weight: 400;
-          color: #999;
-          text-transform: uppercase;
-          letter-spacing: 2px;
-          margin-bottom: 1.5rem;
-        }
-
-        .minimal-list {
-          list-style: none;
-          padding: 0;
-          margin: 0;
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-        }
-
-        .minimal-list-item {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0.5rem 0;
-        }
-
-        .item-text {
-          font-size: 1.3rem;
-          font-weight: 400;
-          color: #1a1a1a;
-          flex: 1;
-        }
-
-        .item-dot {
-          flex: 1;
-          height: 1px;
-          background: repeating-linear-gradient(
-            to right,
-            #1a1a1a 0,
-            #1a1a1a 4px,
-            transparent 4px,
-            transparent 8px
-          );
-          margin: 0 1rem;
-          opacity: 0.3;
-        }
-
-        .item-price {
-          font-size: 1.1rem;
-          font-weight: 400;
-          color: #1a1a1a;
-          min-width: 60px;
-          text-align: right;
-        }
-
-        @media (max-width: 768px) {
-          .template-3-container {
-            padding: 2rem 1rem;
-          }
-
-          .minimal-title {
-            font-size: 2rem;
-            letter-spacing: 4px;
-          }
-
-          .item-dot {
-            margin: 0 0.5rem;
-          }
-        }
-
-      `}</style>
-      <style jsx global>{`
-        .dark .template-3-container .minimal-title,
-        .dark .template-3-container .item-text,
-        .dark .template-3-container .item-price {
-          color: #ffffff;
-        }
-
-        .dark .template-3-container .minimal-section {
-          border-color: #374151;
-        }
-
-        .dark .template-3-container .minimal-section-title {
-          color: #6b7280;
-        }
-
-        .dark .template-3-container .item-dot {
-          background: repeating-linear-gradient(
-            to right,
-            #ffffff 0,
-            #ffffff 4px,
-            transparent 4px,
-            transparent 8px
-          );
-        }
-      `}</style>
-    </>
-  );
+interface ProductOption {
+    key: string;
+    name: string;
+    price: number;
+    packageSalePrice?: number;
 }
 
+interface GalleryItem {
+    id: string;
+    name: string;
+    url: string;
+}
 
+interface Template3Props {
+    items: any[];
+    isEditable?: boolean;
+    availableCategories?: Array<{ _id: string; name: string }>;
+    availableProductsBySlot?: Record<number, Array<{ _id: string; name: string; pricing: any; options?: ProductOption[]; category: string; image?: string; img?: string; imageUrl?: string }>>;
+    selectedCategoriesBySlot?: Record<number, string>;
+    onCategoryChangeBySlot?: (slotIndex: number, categoryId: string) => void;
+    onProductSelect?: (gridIndex: number, productId: string) => void;
+    onSmallPriceSelect?: (gridIndex: number, optionKey: string, price: number) => void;
+    onLargePriceSelect?: (gridIndex: number, optionKey: string, price: number) => void;
+    onImageClick?: (gridIndex: number) => void;
+    galleryImages?: GalleryItem[];
+    isGalleryOpen?: boolean;
+    selectedImageSlot?: number | null;
+    onGalleryClose?: () => void;
+    onImageSelect?: (gridIndex: number, imageUrl: string) => void;
+    selectedProducts?: Array<{
+        name: string;
+        price: string;
+        productId?: string;
+        smallOptionKey?: string;
+        largeOptionKey?: string;
+        smallPrice?: string;
+        largePrice?: string;
+        image?: string;
+        categoryId?: string
+    }>;
+}
+
+export default function Template3Content({
+    items,
+    isEditable = false,
+    availableCategories = [],
+    availableProductsBySlot = {},
+    selectedCategoriesBySlot = {},
+    onCategoryChangeBySlot,
+    onProductSelect,
+    onSmallPriceSelect,
+    onLargePriceSelect,
+    onImageClick,
+    galleryImages = [],
+    isGalleryOpen = false,
+    selectedImageSlot = null,
+    onGalleryClose,
+    onImageSelect,
+    selectedProducts = []
+}: Template3Props) {
+    const [displayItems, setDisplayItems] = useState<any[]>([]);
+
+    useEffect(() => {
+        let processedItems = [...items];
+        while (processedItems.length < 6) {
+            processedItems = [...processedItems, ...items];
+        }
+        processedItems = processedItems.slice(0, 6);
+        setDisplayItems(processedItems);
+    }, [items]);
+
+    // Helper: Get all available price options from product
+    const getPriceOptions = (product: any): Array<{ key: string; name: string; price: number }> => {
+        const priceOptions: Array<{ key: string; name: string; price: number }> = [];
+
+        if (product?.options && product.options.length > 0) {
+            product.options.forEach((opt: ProductOption) => {
+                if (opt.price > 0) {
+                    priceOptions.push({
+                        key: `option_${opt.key}`,
+                        name: opt.name,
+                        price: opt.price
+                    });
+                }
+            });
+        }
+
+        if (product?.pricing) {
+            const pricingLabels: Record<string, string> = {
+                'basePrice': 'Ana Fiyat',
+                'fastSalePrice': 'Hızlı Satış',
+                'secondFastSalePrice': 'İkinci Satış',
+                'thirdFastSalePrice': 'Üçüncü Satış',
+                'packageSalePrice': 'Paket Satış',
+                'purchasePrice': 'Alış Fiyatı'
+            };
+
+            Object.entries(product.pricing).forEach(([key, value]: [string, any]) => {
+                if (value && typeof value.price === 'number' && value.price > 0) {
+                    priceOptions.push({
+                        key: `pricing_${key}`,
+                        name: pricingLabels[key] || key,
+                        price: value.price
+                    });
+                }
+            });
+        }
+
+        return priceOptions;
+    };
+
+    return (
+        <>
+            <div className="w-full h-screen flex flex-col items-center justify-between p-8 font-sans overflow-hidden relative"
+                style={{
+                    background: "linear-gradient(to bottom, #E0F7FA 0%, #E0F2F1 100%)",
+                    color: "#004D40",
+                }}>
+
+                {/* Header */}
+                <h1 className="text-6xl font-black uppercase tracking-wide text-[#00695C] mt-4 mb-2 drop-shadow-sm"
+                    style={{ fontFamily: "'Arial Black', Gadget, sans-serif" }}>
+                    Kışlık Favoriler
+                </h1>
+
+                {/* Grid Container */}
+                <div className="flex-1 w-full max-w-[1600px] grid grid-cols-2 grid-rows-3 gap-x-16 gap-y-4 my-4">
+                    {displayItems.map((item, index) => {
+                        const selectedProduct = selectedProducts[index];
+                        const slotCategory = selectedCategoriesBySlot[index] || '';
+                        const slotProducts = availableProductsBySlot[index] || [];
+                        const hasSelectedCategory = slotCategory && slotCategory !== '';
+                        const hasSelectedProduct = selectedProduct?.name && selectedProduct.name !== '';
+
+                        const apiProduct = slotProducts.find(p => p.name === item.name);
+                        const priceOptions = apiProduct ? getPriceOptions(apiProduct) : [];
+                        const hasPriceOptions = priceOptions.length > 0;
+
+                        const basePrice = parseInt(item.price) || 200;
+                        const displaySmallPrice = selectedProduct?.smallPrice || `₺${basePrice}`;
+                        const displayLargePrice = selectedProduct?.largePrice || `₺${Math.floor(basePrice * 1.15)}`;
+
+                        // Image source: selected image > product image > default
+                        const imageSource = selectedProduct?.image || item.img || item.image || "/images/toffeeNut.png";
+
+                        return (
+                            <div key={index} className="flex items-center justify-between border-b-2 border-[#00695C]/20 pb-2 relative">
+                                {/* Text Content */}
+                                <div className="flex flex-col justify-center flex-1 pr-4">
+
+                                    {/* Edit Mode: Category -> Product Flow */}
+                                    {isEditable ? (
+                                        <>
+                                            {!hasSelectedCategory && availableCategories.length > 0 && (
+                                                <select
+                                                    value=""
+                                                    onChange={(e) => onCategoryChangeBySlot?.(index, e.target.value)}
+                                                    className="text-xl font-bold text-[#004D40] mb-2 p-2 rounded-lg border-2 border-[#00695C] bg-white cursor-pointer"
+                                                    style={{ outline: 'none', maxWidth: '100%' }}
+                                                >
+                                                    <option value="">Kategori Seçin</option>
+                                                    {availableCategories.map((cat) => (
+                                                        <option key={cat._id} value={cat._id}>
+                                                            {cat.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            )}
+
+                                            {hasSelectedCategory && (
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className="text-xs text-[#00695C] opacity-70">
+                                                            {availableCategories.find(c => c._id === slotCategory)?.name || 'Kategori'}
+                                                        </span>
+                                                        <button
+                                                            onClick={() => onCategoryChangeBySlot?.(index, '')}
+                                                            className="text-xs text-red-500 hover:text-red-700 underline"
+                                                        >
+                                                            Değiştir
+                                                        </button>
+                                                    </div>
+
+                                                    <select
+                                                        value={item.name || ""}
+                                                        onChange={(e) => {
+                                                            const product = slotProducts.find(p => p.name === e.target.value);
+                                                            if (product && onProductSelect) {
+                                                                onProductSelect(index, product._id);
+                                                            }
+                                                        }}
+                                                        className="text-xl font-bold uppercase text-[#004D40] leading-tight mb-2 p-2 rounded-lg border-2 border-[#00695C] bg-white cursor-pointer"
+                                                        style={{ outline: 'none', maxWidth: '100%' }}
+                                                    >
+                                                        <option value="">Ürün Seçin</option>
+                                                        {slotProducts.map((product) => (
+                                                            <option key={product._id} value={product.name}>
+                                                                {product.name}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <h3 className="text-3xl font-bold uppercase text-[#004D40] leading-tight mb-2">
+                                            {item.name}
+                                        </h3>
+                                    )}
+
+                                    {/* Price Section */}
+                                    <div className="flex flex-col gap-1 text-[#004D40] font-bold text-xl ml-1">
+                                        <div className="flex items-center gap-4">
+                                            <span className="text-lg font-medium opacity-80 w-14">Küçük</span>
+                                            {isEditable && hasSelectedProduct && hasPriceOptions ? (
+                                                <select
+                                                    value={selectedProduct?.smallOptionKey || ''}
+                                                    onChange={(e) => {
+                                                        const option = priceOptions.find(opt => opt.key === e.target.value);
+                                                        if (option && onSmallPriceSelect) {
+                                                            onSmallPriceSelect(index, option.key, option.price);
+                                                        }
+                                                    }}
+                                                    className="p-1 rounded-lg border-2 border-[#00695C] bg-[#00695C] text-white font-bold cursor-pointer text-sm"
+                                                    style={{ outline: 'none', minWidth: '140px' }}
+                                                >
+                                                    <option value="">Fiyat Seçin</option>
+                                                    {priceOptions.map((opt) => (
+                                                        <option key={opt.key} value={opt.key}>
+                                                            {opt.name} - ₺{opt.price}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <span>{displaySmallPrice}</span>
+                                            )}
+                                        </div>
+
+                                        <div className="flex items-center gap-4">
+                                            <span className="text-lg font-medium opacity-80 w-14">Büyük</span>
+                                            {isEditable && hasSelectedProduct && hasPriceOptions ? (
+                                                <select
+                                                    value={selectedProduct?.largeOptionKey || ''}
+                                                    onChange={(e) => {
+                                                        const option = priceOptions.find(opt => opt.key === e.target.value);
+                                                        if (option && onLargePriceSelect) {
+                                                            onLargePriceSelect(index, option.key, option.price);
+                                                        }
+                                                    }}
+                                                    className="p-1 rounded-lg border-2 border-[#00695C] bg-[#00695C] text-white font-bold cursor-pointer text-sm"
+                                                    style={{ outline: 'none', minWidth: '140px' }}
+                                                >
+                                                    <option value="">Fiyat Seçin</option>
+                                                    {priceOptions.map((opt) => (
+                                                        <option key={opt.key} value={opt.key}>
+                                                            {opt.name} - ₺{opt.price}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <span>{displayLargePrice}</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Image - Clickable in Edit Mode */}
+                                <div
+                                    className={`relative w-40 h-40 flex-shrink-0 ${isEditable ? 'cursor-pointer group' : ''}`}
+                                    onClick={() => isEditable && onImageClick?.(index)}
+                                >
+                                    <Image
+                                        src={imageSource}
+                                        alt={item.name || "Ürün"}
+                                        fill
+                                        className="object-cover"
+                                    />
+                                    {/* Edit Overlay */}
+                                    {isEditable && (
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <div className="text-white text-center">
+                                                <svg className="w-8 h-8 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                </svg>
+                                                <span className="text-xs">Değiştir</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Footer */}
+                <div className="w-full flex justify-end items-end text-[#00695C] opacity-80 mt-4 px-8 pb-4">
+                    <div className="text-right text-xs max-w-md leading-relaxed">
+                        <p>Fiyatlarımız KDV dahildir.</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Gallery Modal */}
+            {isGalleryOpen && selectedImageSlot !== null && (
+                <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
+                        {/* Modal Header */}
+                        <div className="flex items-center justify-between p-4 border-b">
+                            <h3 className="text-xl font-bold text-gray-800">Fotoğraf Seç</h3>
+                            <button
+                                onClick={onGalleryClose}
+                                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                            >
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        {/* Gallery Grid */}
+                        <div className="p-4 overflow-y-auto max-h-[60vh]">
+                            {galleryImages.length > 0 ? (
+                                <div className="grid grid-cols-4 gap-4">
+                                    {galleryImages.map((img) => (
+                                        <div
+                                            key={img.id}
+                                            className="relative aspect-square cursor-pointer rounded-lg overflow-hidden border-2 border-transparent hover:border-[#00695C] transition-colors"
+                                            onClick={() => {
+                                                onImageSelect?.(selectedImageSlot, img.url);
+                                                onGalleryClose?.();
+                                            }}
+                                        >
+                                            <Image
+                                                src={img.url}
+                                                alt={img.name}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-12 text-gray-500">
+                                    <p>Fotoğraf bulunamadı.</p>
+                                    <p className="text-sm mt-2">Önce Galeri sayfasından fotoğraf yükleyin.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
+    );
+}

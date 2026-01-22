@@ -24,7 +24,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { getScreenName } from "@/services/screenServices";
 import Template1Content from "@/app/design/template-1/component/template-1";
 import Template2Content from "@/app/design/template-2/component/template-2";
-import Template3Content from "@/app/design/template-3/component/template-3";
+
 import { defaultBurgers, menuItems } from "@/app/design/template-data";
 
 // Template1 için tip
@@ -128,11 +128,11 @@ type SortableItemProps = {
   item: MediaItem | MenuBoardDesign;
   isDesign?: boolean;
   duration: number;
-  onDurationChange: (id:string,val:number) => void;
+  onDurationChange: (id: string, val: number) => void;
   onRemove: (id: string) => void;
 };
 
-function SortableItem({ id, item, isDesign,duration,onDurationChange, onRemove }: SortableItemProps) {
+function SortableItem({ id, item, isDesign, duration, onDurationChange, onRemove }: SortableItemProps) {
   const {
     attributes,
     listeners,
@@ -150,7 +150,7 @@ function SortableItem({ id, item, isDesign,duration,onDurationChange, onRemove }
 
   const isTemplate = id.startsWith('template-') || id.startsWith('config-');
   const templateItem = isTemplate ? (item as MenuBoardDesign) : null;
-  
+
   const thumbnail = isDesign
     ? (item as MenuBoardDesign).preview
     : (item as MediaItem).thumbnail || (item as MediaItem).url;
@@ -194,8 +194,8 @@ function SortableItem({ id, item, isDesign,duration,onDurationChange, onRemove }
       <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded bg-gray-2 dark:bg-dark-2">
         {isTemplate && templateItem?.path ? (
           <iframe
-            src={templateItem.configId 
-              ? `${templateItem.path}?configId=${templateItem.configId}` 
+            src={templateItem.configId
+              ? `${templateItem.path}?configId=${templateItem.configId}`
               : templateItem.path}
             className="absolute inset-0 border-0"
             style={{
@@ -282,7 +282,7 @@ export interface ScreenConfig {
   templateId?: string;
   templateConfigId?: string; // TemplateConfig ID'si (her config ayrı)
   mediaIndex: number
-  duration:number
+  duration: number
 }
 
 export function EditView({
@@ -367,8 +367,8 @@ export function EditView({
         };
       } else {
         // Media için
-        const mediaId = item.id.startsWith('media-') 
-          ? item.id.replace('media-', '') 
+        const mediaId = item.id.startsWith('media-')
+          ? item.id.replace('media-', '')
           : item.item.id;
         return {
           screenId: screenName,
@@ -435,7 +435,7 @@ export function EditView({
   const maxHeight = isPortrait ? "400px" : "none";
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const [previewScale, setPreviewScale] = useState<number>(1);
-  
+
 
   // DnD Kit sensors
   const sensors = useSensors(
@@ -464,38 +464,38 @@ export function EditView({
       const updateScale = () => {
         const container = previewContainerRef.current;
         if (!container) return;
-        
+
         // Container'ın gerçek iç boyutlarını al (clientWidth/clientHeight padding'i otomatik çıkarır)
         const containerWidth = container.clientWidth;
         const containerHeight = container.clientHeight;
-        
+
         // Ölçeklendirmeyi hesapla - şablonun önizleme alanına tam sığması için
         // Math.min kullanarak en küçük oranı al, böylece hem genişlik hem yükseklik sığar
         if (containerWidth <= 0 || containerHeight <= 0) {
           setPreviewScale(1);
           return;
         }
-        
+
         // Container'a tam sığması için scale hesapla
         const scaleX = containerWidth / screenWidth;
         const scaleY = containerHeight / screenHeight;
         const scale = Math.min(scaleX, scaleY);
-        
+
         // Scale'in geçerli olduğundan emin ol ve ayarla
         setPreviewScale(Math.max(0.01, scale));
-        
+
         setPreviewScale(scale);
       };
-      
+
       // İlk hesaplama için kısa bir gecikme ekle (DOM'un render olması için)
       const timeoutId = setTimeout(updateScale, 100);
-      
+
       // Resize event listener ekle
       const resizeObserver = new ResizeObserver(() => {
         setTimeout(updateScale, 50);
       });
       resizeObserver.observe(previewContainerRef.current);
-      
+
       return () => {
         clearTimeout(timeoutId);
         resizeObserver.disconnect();
@@ -538,13 +538,13 @@ export function EditView({
     // Medya seçimini temizle
     setSelectedMediaId(null);
     setSelectedDesign(`template-${templateId}`);
-    
+
     const template = templates.find((t) => t.id === templateId);
-    
+
     if (template && !playlist.find((p) => p.id === `config-${template.configId}`)) {
       // Her config ayrı bir şablon olarak gösterilecek - config-{configId} formatında ID
       const playlistId = `config-${template.configId}`;
-      
+
       // Şablonu MenuBoardDesign formatına çevir
       const templateAsDesign: MenuBoardDesign = {
         id: template.configId || template.id, // Config ID'sini kullan
@@ -555,7 +555,7 @@ export function EditView({
         path: template.path, // Path bilgisini de ekle
         configId: template.configId, // Config ID'sini ekle (iframe için)
       };
-      
+
       setPlaylist((prev) => [
         ...prev,
         {
@@ -660,15 +660,15 @@ export function EditView({
                   maxHeight: maxHeight,
                   width: isPortrait ? "auto" : "100%",
                   margin: isPortrait ? "0 auto" : "0",
-                  backgroundColor: activeTemplate?.id === "template-1" ? "#000" : activeTemplate?.id === "template-2" ? "#faf8f5" : activeTemplate?.id === "template-3" ? "#ffffff" : "#e5e5fb",
+                  backgroundColor: activeTemplate?.id === "template-1" ? "#000" : activeTemplate?.id === "template-2" ? "#faf8f5" : "#e5e5fb",
                   overflow: 'hidden',
                 }}
               >
                 {activeTemplate ? (
                   <div className="absolute inset-0 flex items-center justify-center" style={{ overflow: 'hidden' }}>
                     <iframe
-                      src={activeTemplate.configId 
-                        ? `${activeTemplate.path}?configId=${activeTemplate.configId}` 
+                      src={activeTemplate.configId
+                        ? `${activeTemplate.path}?configId=${activeTemplate.configId}`
                         : activeTemplate.path}
                       className="border-0"
                       style={{
@@ -867,8 +867,8 @@ export function EditView({
                     >
                       <div className="relative aspect-video w-full overflow-hidden bg-gray-2 dark:bg-dark-2">
                         <iframe
-                          src={template.configId 
-                            ? `${template.path}?configId=${template.configId}` 
+                          src={template.configId
+                            ? `${template.path}?configId=${template.configId}`
                             : template.path}
                           className="absolute inset-0 border-0"
                           style={{

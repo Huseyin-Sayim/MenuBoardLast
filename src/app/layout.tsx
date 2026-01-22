@@ -11,11 +11,11 @@ import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | Menü Tahtası Yönetim Paneli",
-    default: "Menü Tahtası Yönetim Paneli",
+    template: "%s | NTX Menü Board Yönetim Paneli",
+    default: "NTX Menü Board Yönetim Paneli",
   },
   description:
-    "Menü tahtası yönetim paneli - Ekranlarınızı ve tasarımlarınızı yönetin.",
+    "Menü Board yönetim paneli - Ekranlarınızı ve tasarımlarınızı yönetin.",
 };
 
 export default function RootLayout({ children }: PropsWithChildren) {
