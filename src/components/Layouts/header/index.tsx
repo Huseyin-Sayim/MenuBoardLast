@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSidebarContext } from "../sidebar/sidebar-context";
 import { MenuIcon } from "./icons";
-import { ThemeToggleSwitch } from "./theme-toggle";
+// import { ThemeToggleSwitch } from "./theme-toggle";
 import { UserInfo } from "./user-info";
 
 export function Header() {
@@ -51,7 +51,7 @@ export function Header() {
 
       <div className="flex flex-1 items-center justify-end gap-2 min-[375px]:gap-4">
 
-        <ThemeToggleSwitch />
+        {/*<ThemeToggleSwitch />*/}
 
 
         <div className="shrink-0">

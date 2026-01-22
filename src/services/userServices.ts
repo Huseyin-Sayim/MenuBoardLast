@@ -19,12 +19,16 @@ export const getUsers = async () => {
 
 export const getUserById = async (id: string) => {
   try {
-    return await prisma.user.findFirst({
+    return await prisma.user.findUnique({
+      where: {
+        id
+      },
       select: {
         email: true,
         name: true,
         phoneNumber: true,
-        Screen: true
+        Screen: true,
+        ip: true
       }
     })
   } catch (error: any) {

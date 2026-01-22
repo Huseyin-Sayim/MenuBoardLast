@@ -89,6 +89,24 @@ export default function TemplatePage() {
     image?: string;
   }>({});
   const [template4PromoImage, setTemplate4PromoImage] = useState<string | undefined>(undefined);
+  const [apiBaseUrl, setApiBaseUrl] = useState<string>("http://localhost:5000");
+
+  useEffect(() => {
+    const fetchUserIp = async () => {
+      try {
+        const response = await fetch('/api/settings/ip');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.ip) {
+            setApiBaseUrl(`http://${data.ip}:5000`);
+          }
+        }
+      } catch (error) {
+        console.error('IP adresi çekilirken hata:', error);
+      }
+    };
+    fetchUserIp();
+  }, []);
 
   const formatPrice = (currency?: string, price?: number): string => {
     if (typeof price !== 'number') return '';
@@ -126,7 +144,7 @@ export default function TemplatePage() {
     const fetchCategories = async () => {
       try {
         console.log('Kategoriler çekiliyor...');
-        const response = await fetch('http://localhost:5000/api/categories');
+        const response = await fetch(`${apiBaseUrl}/api/categories`);
         if (response.ok) {
           const data = await response.json();
           console.log('Kategoriler geldi:', data);
@@ -139,7 +157,7 @@ export default function TemplatePage() {
       }
     };
     fetchCategories();
-  }, []);
+  }, [apiBaseUrl]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -149,7 +167,7 @@ export default function TemplatePage() {
       }
       try {
         console.log('Ürünler çekiliyor, kategori:', selectedCategory);
-        const response = await fetch('http://localhost:5000/api/products');
+        const response = await fetch(`${apiBaseUrl}/api/products`);
         if (response.ok) {
           const data = await response.json();
           const products = data.data || [];
@@ -167,7 +185,7 @@ export default function TemplatePage() {
     if (templateId === "template-1" || templateId === "template-3" || templateId === "template-5" || templateId === "template-6" || templateId === "template-7") {
       fetchProducts();
     }
-  }, [selectedCategory, templateId]);
+  }, [selectedCategory, templateId, apiBaseUrl]);
 
   useEffect(() => {
     const fetchProductsForCategories = async () => {
@@ -181,7 +199,7 @@ export default function TemplatePage() {
 
       try {
         console.log('Template-2 için ürünler çekiliyor, kategoriler:', categoryIds);
-        const response = await fetch('http://localhost:5000/api/products');
+        const response = await fetch(`${apiBaseUrl}/api/products`);
         if (response.ok) {
           const data = await response.json();
           const products = data.data || [];
@@ -201,7 +219,7 @@ export default function TemplatePage() {
     };
 
     fetchProductsForCategories();
-  }, [selectedCategories, templateId]);
+  }, [selectedCategories, templateId, apiBaseUrl]);
 
   useEffect(() => {
     console.log('Config useEffect triggered:', { configData, templateId, configId });
@@ -230,7 +248,7 @@ export default function TemplatePage() {
 
             try {
               // Fetch all products once to optimize performance and enable lookup
-              const response = await fetch('http://localhost:5000/api/products');
+              const response = await fetch(`${apiBaseUrl}/api/products`);
               if (response.ok) {
                 const data = await response.json();
                 const allProducts = data.data || [];
@@ -290,7 +308,7 @@ export default function TemplatePage() {
 
             try {
               // Fetch all products once to optimize performance and enable lookup
-              const response = await fetch('http://localhost:5000/api/products');
+              const response = await fetch(`${apiBaseUrl}/api/products`);
               if (response.ok) {
                 const data = await response.json();
                 const allProducts = data.data || [];
@@ -346,7 +364,7 @@ export default function TemplatePage() {
 
             // Fetch products for promo category
             if (promo.categoryId) {
-              fetch('http://localhost:5000/api/products')
+              fetch(`${apiBaseUrl}/api/products`)
                 .then(response => response.json())
                 .then(data => {
                   const products = data.data || [];
@@ -388,7 +406,7 @@ export default function TemplatePage() {
         setSelectedProducts((configData as any)?.data || []);
       }
     }
-  }, [configData, templateId, configId]);
+  }, [configData, templateId, configId, apiBaseUrl]);
 
   useEffect(() => {
     const loadGallery = async () => {
@@ -644,7 +662,7 @@ export default function TemplatePage() {
 
           // Fetch products for this category
           try {
-            const response = await fetch('http://localhost:5000/api/products');
+            const response = await fetch(`${apiBaseUrl}/api/products`);
             if (response.ok) {
               const data = await response.json();
               const products = data.data || [];
@@ -787,7 +805,7 @@ export default function TemplatePage() {
 
               // Fetch products for this category
               try {
-                const response = await fetch('http://localhost:5000/api/products');
+                const response = await fetch(`${apiBaseUrl}/api/products`);
                 if (response.ok) {
                   const data = await response.json();
                   const products = data.data || [];
@@ -813,10 +831,10 @@ export default function TemplatePage() {
                 const productImage = product.image || product.img || product.imageUrl || undefined;
                 // Include categoryId for config restoration
                 setTemplate4SelectedProducts(prev => {
-                  const newProducts = [...prev];
-                  while (newProducts.length <= slotIndex) {
-                    newProducts.push({ name: '', price: '', image: undefined });
-                  }
+                  console.log('onProductSelect - prev state:', JSON.stringify(prev));
+                  console.log('onProductSelect - slotIndex:', slotIndex);
+                  // Her zaman 8 elemanlı array olmalı
+                  const newProducts = prev.length === 8 ? [...prev] : Array(8).fill(null).map((_, i) => prev[i] || { name: '', price: '', image: undefined });
                   newProducts[slotIndex] = {
                     name: product.name,
                     price: formattedPrice,
@@ -826,6 +844,7 @@ export default function TemplatePage() {
                     description: product.description || '',
                     categoryId: categoryId
                   };
+                  console.log('onProductSelect - new state:', JSON.stringify(newProducts));
                   return newProducts;
                 });
 
@@ -967,7 +986,7 @@ export default function TemplatePage() {
               }
 
               try {
-                const response = await fetch('http://localhost:5000/api/products');
+                const response = await fetch(`${apiBaseUrl}/api/products`);
                 if (response.ok) {
                   const data = await response.json();
                   const products = data.data || [];

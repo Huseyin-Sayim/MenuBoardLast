@@ -15,14 +15,14 @@ const queryClient = new QueryClient({
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider
-        defaultTheme="system"
-        attribute="class"
-        enableSystem={true}>
+    // <QueryClientProvider client={queryClient}>
+    //   <ThemeProvider
+    //     defaultTheme="system"
+    //     attribute="class"
+    //     enableSystem={true}>
         <SidebarProvider>{children}</SidebarProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+      // </ThemeProvider>
+    // </QueryClientProvider>
   );
 }
 
