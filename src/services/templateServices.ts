@@ -7,7 +7,27 @@ export async function saveTemplateConfig(
   configId?: string,
 ) {
   try {
-    console.log('saveTemplateConfig çağrıldı:', { userId, templateId, configData, configId });
+    // 📝 Detaylı Loglama - TemplateConfig Kaydetme
+    console.log('\n');
+    console.log('╔══════════════════════════════════════════════════════════════╗');
+    console.log('║           📝 TEMPLATE CONFIG KAYDEDİLİYOR                    ║');
+    console.log('╠══════════════════════════════════════════════════════════════╣');
+    console.log(`║ 👤 User ID: ${userId}`);
+    console.log(`║ 📄 Template ID: ${templateId}`);
+    console.log(`║ 🔑 Config ID: ${configId || 'YENİ OLUŞTURULACAK'}`);
+    console.log('╠══════════════════════════════════════════════════════════════╣');
+    console.log('║ 📦 Kaydedilen Veri:');
+    console.log('╟──────────────────────────────────────────────────────────────╢');
+    console.log(`║ Kategori: ${configData.category || 'Belirtilmemiş'}`);
+    console.log(`║ Ürün Sayısı: ${configData.data?.length || 0}`);
+    if (configData.data && configData.data.length > 0) {
+      console.log('║ Ürünler:');
+      configData.data.forEach((item: any, index: number) => {
+        console.log(`║   ${index + 1}. ${item.name || item.title || 'İsimsiz'} - ${item.price || 'Fiyat yok'}`);
+      });
+    }
+    console.log('╚══════════════════════════════════════════════════════════════╝');
+    console.log('\n');
 
     let dbTemplateId = templateId;
 

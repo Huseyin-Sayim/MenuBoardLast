@@ -1,8 +1,12 @@
 "use client";
 
 import type { JSX } from "react";
+import type { IMenuData, IMenuItem } from "@/types/menu-data";
 
 type Template4Variant = "full" | "preview";
+
+// 🎯 Template-4 Kapasite
+const CAPACITY = 8;
 
 export interface Template4MenuItem {
   name: string;
@@ -12,10 +16,16 @@ export interface Template4MenuItem {
   badge?: string | null;
   productId?: string;
   priceType?: string;
+  // 🆕 IMenuData fields
+  layout?: { x: number; y: number; w: number; h: number; z: number };
+  style?: { fontSize: string; color: string; fontWeight: string; textAlign: any; opacity: number };
 }
 
 interface Template4Props {
   variant?: Template4Variant;
+  // 🆕 IMenuData desteği - yeni sistemle uyumluluk
+  menuData?: IMenuData;
+  // Legacy props
   items?: Template4MenuItem[];
   isEditable?: boolean;
   availableCategories?: Array<{ _id: string; name: string }>;
@@ -116,13 +126,17 @@ const menuItems = [
     image: "/images/burger_menu.svg",
     badge: null as string | null,
   },
-];
+] as Template4MenuItem[];
 
 const promoImage = "/images/burger_menu.svg";
 const logoImage = "/images/burger_logo.svg";
 
+// 🎯 Kapasite export
+Template4BurgerMenu.capacity = CAPACITY;
+
 export default function Template4BurgerMenu({
   variant = "full",
+  menuData,
   items = menuItems,
   isEditable = false,
   availableCategories = [],
@@ -142,25 +156,69 @@ export default function Template4BurgerMenu({
   onPromoPriceTypeSelect,
   onPromoImageClick,
 }: Template4Props): JSX.Element {
-  // Debug: Client-side'da props'ları log'la
+  // 📝 Detaylı Debug Loglama
   if (typeof window !== 'undefined') {
-    console.log('Template4BurgerMenu props:', {
-      hasPromoProduct: !!promoProduct,
-      promoProduct,
-      promoImage,
-      promoProductImage: promoProduct?.image,
-      displayPromoImage: promoImage || promoProduct?.image || "/images/burger_menu.svg",
-      itemsCount: items?.length
-    });
+    console.log('\n');
+    console.log('╔══════════════════════════════════════════════════════════════╗');
+    console.log('║                 🍔 TEMPLATE-4 RENDER                         ║');
+    console.log('╠══════════════════════════════════════════════════════════════╣');
+    console.log(`║ 📊 Kapasite: ${CAPACITY}`);
+    console.log(`║ 📦 Gelen Item Sayısı: ${items?.length || 0}`);
+    console.log(`║ 🆕 IMenuData Kullanılıyor: ${!!menuData}`);
+    console.log(`║ ✏️ Düzenleme Modu: ${isEditable}`);
+    if (menuData) {
+      console.log(`║ 🎨 Tema: ${menuData.settings?.theme}`);
+      console.log(`║ 💰 Para Birimi: ${menuData.settings?.currency}`);
+      console.log(`║ 📌 Başlık: ${menuData.settings?.globalTitle}`);
+      console.log(`║ 📦 IMenuData Item Sayısı: ${menuData.items?.length || 0}`);
+    }
+    if (promoProduct) {
+      console.log(`║ 🎁 Promo Ürün: ${promoProduct.name || 'Belirtilmemiş'}`);
+    }
+    console.log('╚══════════════════════════════════════════════════════════════╝');
+    console.log('\n');
   }
 
-  const displayTitle = promoProduct?.name || titleConfig.mainTitle;
-  const titleLines = displayTitle.split("\n");
+  // 🆕 VERİ TEMİZ GELİYOR - Doğrudan kullan
+  // Normalization Layer sayesinde artık item.title, item.price (number), item.image garantili
+
+  // IMenuData varsa doğrudan Template4MenuItem formatına çevir
+  // Legacy items varsa olduğu gibi kullan
+  const processedItems: Template4MenuItem[] = menuData?.items?.map((item: IMenuItem) => ({
+    name: item.title,  // IMenuData'da title olarak geliyor, template name bekliyor
+    price: `${menuData.settings?.currency || "₺"}${item.price}`,  // number → formatted string
+    description: item.subtitle || "",
+    image: item.image || "/images/placeholder-food.svg",
+    badge: null,
+    productId: item.id,
+    layout: item.layout, // 🆕 Layout aktar
+    style: item.style,   // 🆕 Style aktar
+  })) || items.map((item: any, index: number) => ({
+    name: item.title || item.name || "",
+    price: typeof item.price === "number" ? `₺${item.price}` : item.price || "",
+    description: item.description || item.subtitle || "",
+    image: item.image || "/images/placeholder-food.svg",
+    badge: item.badge || null,
+    productId: item.productId || `item-${index}`,
+    layout: item.layout,
+    style: item.style
+  }));
+
+  // Slice logic - kapasite aşımını kontrol et
+  let finalItems = processedItems;
+  if (processedItems.length > CAPACITY) {
+    finalItems = processedItems.slice(0, CAPACITY);
+    console.log(`[Template-4] ⚠️ ${processedItems.length - CAPACITY} ürün kesildi (kapasite: ${CAPACITY})`);
+  }
+
+  const displayTitle = promoProduct?.name || (menuData?.settings?.globalTitle) || titleConfig.mainTitle;
+  const displayTitleString = typeof displayTitle === 'string' ? displayTitle : String(displayTitle);
+  const titleLines = displayTitleString.split("\n");
   const displayPrice = promoProduct?.price || titleConfig.price;
-  const displayCurrency = promoProduct?.currency || titleConfig.currency;
+  const displayCurrency = promoProduct?.currency || (menuData?.settings?.currency) || titleConfig.currency;
   const displayCents = promoProduct?.cents || titleConfig.cents;
   const displayPromoImage = promoImage || promoProduct?.image || "/images/burger_menu.svg";
-  const displayItems = items.length > 0 ? items : menuItems;
+  const displayItems = finalItems.length > 0 ? finalItems : menuItems;
 
   return (
     <>
@@ -214,8 +272,23 @@ export default function Template4BurgerMenu({
               const hasCategory = !!selectedCategoryId;
               const hasProduct = !!selectedProduct;
 
+              // Layout defaults if missing
+              const layout = item.layout || { x: 0, y: 0, w: 23, h: 45, z: 1 };
+              const style = item.style || { fontSize: '1vw', color: '#FFFFFF', fontWeight: 'bold', textAlign: 'left', opacity: 1 };
+
               return (
-                <div className="menu-item" key={index}>
+                <div
+                  className="menu-item absolute"
+                  key={index}
+                  style={{
+                    left: `${layout.x}%`,
+                    top: `${layout.y}%`,
+                    width: `${layout.w}%`,
+                    height: `${layout.h}%`,
+                    zIndex: layout.z,
+                    opacity: style.opacity,
+                  }}
+                >
                   <div
                     className={`item-image${isEditable ? " item-image-editable" : ""}`}
                     onClick={() => {
@@ -223,12 +296,21 @@ export default function Template4BurgerMenu({
                         onImageClick(index);
                       }
                     }}
-                    style={isEditable ? { cursor: "pointer" } : {}}
+                    style={{
+                      ...(isEditable ? { cursor: "pointer" } : {}),
+                      height: '65%', // Image takes 65% of item height
+                      position: 'relative'
+                    }}
                   >
                     <img
-                      src={item.image || "/images/burger_menu.svg"}
+                      src={item.image || "/images/placeholder-food.svg"}
                       alt={item.name}
                       className="item-img"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain'
+                      }}
                     />
                     {item.badge && (
                       <span className={`badge ${item.badge.toLowerCase()}`}>
@@ -237,7 +319,7 @@ export default function Template4BurgerMenu({
                     )}
                   </div>
 
-                  <div className="item-info">
+                  <div className="item-info" style={{ height: '35%', overflow: 'hidden' }}>
                     <div className="item-header">
                       {isEditable ? (
                         <>
@@ -251,6 +333,7 @@ export default function Template4BurgerMenu({
                                 }
                               }}
                               className="template-4-select template-4-select-full"
+                              style={{ maxHeight: '100%' }}
                             >
                               <option value="">Kategori Seç</option>
                               {availableCategories.map((cat) => (
@@ -329,13 +412,13 @@ export default function Template4BurgerMenu({
                         </>
                       ) : (
                         <>
-                          <h3 className="item-name">{item.name}</h3>
-                          <span className="item-price">{item.price}₺</span>
+                          <h3 className="item-name" style={{ fontSize: '1.4em' }}>{item.name}</h3>
+                          <span className="item-price" style={{ fontSize: '0.9em' }}>{item.price}</span>
                         </>
                       )}
                     </div>
-                    {item.description && (
-                      <p className="item-desc">{item.description}</p>
+                    {item.description && !isEditable && (
+                      <p className="item-desc" style={{ fontSize: '0.7em', lineHeight: 1.2 }}>{item.description}</p>
                     )}
                   </div>
                 </div>
@@ -376,7 +459,7 @@ export default function Template4BurgerMenu({
         }
 
         .left-section {
-          width: calc(650 * var(--scale-x));
+          width: 34%; /* Fixed percentage width */
           padding: calc(50 * var(--scale-y)) calc(50 * var(--scale-x));
           display: flex;
           flex-direction: column;
@@ -453,6 +536,7 @@ export default function Template4BurgerMenu({
           position: absolute;
           top: calc(0 * var(--scale-y));
           right: calc(40 * var(--scale-x));
+          z-index: 10;
         }
 
         .logo-img {
@@ -461,23 +545,21 @@ export default function Template4BurgerMenu({
         }
 
         .menu-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          grid-template-rows: repeat(2, auto);
-          gap: calc(25 * var(--scale-y)) calc(20 * var(--scale-x));
+          position: relative;
+          display: block;
+          width: 100%;
           height: 100%;
-          align-content: center;
         }
 
         .menu-item {
           display: flex;
           flex-direction: column;
-          gap: calc(8 * var(--scale-y));
+          gap: 0; /* Reset gap, use height percentages */
+          overflow: visible; /* Allow dropdowns to overflow */
         }
 
         .item-image {
           position: relative;
-          height: calc(200 * var(--scale-y));
           display: flex;
           align-items: center;
           justify-content: center;
@@ -491,12 +573,12 @@ export default function Template4BurgerMenu({
         .item-image-editable::after {
           content: "📷";
           position: absolute;
-          top: calc(4 * var(--scale-y));
-          right: calc(4 * var(--scale-x));
+          top: 5px;
+          right: 5px;
           background-color: rgba(0, 0, 0, 0.6);
-          padding: calc(4 * var(--scale-y)) calc(6 * var(--scale-x));
-          border-radius: calc(4 * var(--scale-x));
-          font-size: calc(14 * var(--scale-x));
+          padding: 4px 6px;
+          border-radius: 4px;
+          font-size: 14px;
           pointer-events: none;
         }
 
@@ -516,6 +598,7 @@ export default function Template4BurgerMenu({
           font-family: "Open Sans", sans-serif;
           font-size: calc(12 * var(--scale-x));
           font-weight: 700;
+          z-index: 2;
         }
 
         .badge.new {
@@ -531,60 +614,43 @@ export default function Template4BurgerMenu({
         .item-info {
           display: flex;
           flex-direction: column;
-          gap: calc(4 * var(--scale-y));
+          gap: 2px;
+          width: 100%;
         }
 
         .item-header {
           display: flex;
           align-items: baseline;
-          gap: calc(8 * var(--scale-x));
+          gap: 5px;
+          width: 100%;
         }
 
         .item-name {
           font-family: "Bebas Neue", sans-serif;
-          font-size: calc(34 * var(--scale-x));
           color: #ffffff;
           letter-spacing: 1px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .item-price {
           font-family: "Open Sans", sans-serif;
-          font-size: calc(20 * var(--scale-x));
           font-weight: 700;
           color: #f5a623;
           background-color: rgba(0, 0, 0, 0.3);
-          padding: calc(4 * var(--scale-y)) calc(12 * var(--scale-x));
-          border-radius: calc(10 * var(--scale-x));
+          padding: 2px 8px;
+          border-radius: 8px;
         }
 
         .item-desc {
           font-family: "Open Sans", sans-serif;
-          font-size: calc(14 * var(--scale-x));
           color: rgba(255, 255, 255, 0.9);
-          line-height: 1.4;
         }
 
-        /* Sadece dashboard düzenleme ekranı için (preview modu) daha küçük tipografi ve biraz daha sıkışık grid */
+        /* Sadece dashboard düzenleme ekranı için (preview modu) */
         .burger-menu.burger-menu--preview .menu-grid {
-          gap: calc(20 * var(--scale-y)) calc(16 * var(--scale-x));
-        }
-
-        .burger-menu.burger-menu--preview .item-image {
-          height: calc(170 * var(--scale-y));
-        }
-
-        .burger-menu.burger-menu--preview .item-name {
-          font-size: calc(26 * var(--scale-x));
-        }
-
-        .burger-menu.burger-menu--preview .item-price {
-          font-size: calc(16 * var(--scale-x));
-          padding: calc(3 * var(--scale-y)) calc(10 * var(--scale-x));
-        }
-
-        .burger-menu.burger-menu--preview .item-desc {
-          font-size: calc(12 * var(--scale-x));
-          line-height: 1.3;
+          /* No specific grid adjustments needed for absolute */
         }
 
         .template-4-editor-controls {
@@ -598,12 +664,12 @@ export default function Template4BurgerMenu({
         }
 
         .template-4-select {
-          padding: calc(4 * var(--scale-y)) calc(8 * var(--scale-x));
-          border-radius: calc(4 * var(--scale-x));
+          padding: 2px 4px;
+          border-radius: 4px;
           border: 1px solid rgba(255, 255, 255, 0.3);
           background-color: rgba(255, 255, 255, 0.9);
           color: #000;
-          font-size: calc(12 * var(--scale-x));
+          font-size: 11px;
           font-family: "Open Sans", sans-serif;
           cursor: pointer;
         }
@@ -646,12 +712,12 @@ export default function Template4BurgerMenu({
         }
 
         .template-4-change-btn {
-          padding: calc(2 * var(--scale-y)) calc(8 * var(--scale-x));
-          border-radius: calc(4 * var(--scale-x));
+          padding: 2px 6px;
+          border-radius: 4px;
           border: 1px solid #f5a623;
           background-color: transparent;
           color: #f5a623;
-          font-size: calc(10 * var(--scale-x));
+          font-size: 9px;
           font-family: "Open Sans", sans-serif;
           cursor: pointer;
           transition: all 0.2s;
@@ -665,20 +731,20 @@ export default function Template4BurgerMenu({
         .template-4-category-header {
           display: flex;
           align-items: center;
-          gap: calc(8 * var(--scale-x));
-          margin-bottom: calc(4 * var(--scale-y));
+          gap: 6px;
+          margin-bottom: 2px;
         }
 
         .template-4-category-name {
           font-family: "Bebas Neue", sans-serif;
-          font-size: calc(14 * var(--scale-x));
+          font-size: 12px;
           color: rgba(255, 255, 255, 0.7);
           text-transform: uppercase;
         }
 
         .template-4-select-full {
           width: 100%;
-          margin-bottom: calc(4 * var(--scale-y));
+          margin-bottom: 2px;
         }
 
         .template-4-price-dropdown {
@@ -695,16 +761,16 @@ export default function Template4BurgerMenu({
         .item-price-container {
           display: flex;
           align-items: center;
-          gap: calc(6 * var(--scale-x));
+          gap: 4px;
         }
 
         .template-4-price-select {
-          padding: calc(2 * var(--scale-y)) calc(4 * var(--scale-x));
-          border-radius: calc(4 * var(--scale-x));
+          padding: 2px 4px;
+          border-radius: 4px;
           border: 1px solid rgba(255, 255, 255, 0.3);
           background-color: rgba(0, 0, 0, 0.4);
           color: #f5a623;
-          font-size: calc(10 * var(--scale-x));
+          font-size: 10px;
           font-family: "Open Sans", sans-serif;
           cursor: pointer;
         }
@@ -721,5 +787,3 @@ export default function Template4BurgerMenu({
     </>
   );
 }
-
-

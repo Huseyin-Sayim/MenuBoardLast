@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <rect width="200" height="200" fill="#2a2a2a"/>
+  <circle cx="100" cy="80" r="40" fill="#3d3d3d"/>
+  <ellipse cx="100" cy="150" rx="60" ry="25" fill="#3d3d3d"/>
+  <text x="100" y="85" text-anchor="middle" fill="#666" font-family="Arial" font-size="14">🍽️</text>
+  <text x="100" y="155" text-anchor="middle" fill="#555" font-family="Arial" font-size="10">Görsel Yok</text>
+</svg>

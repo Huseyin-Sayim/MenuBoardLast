@@ -2,6 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import type { IMenuData, IMenuItem } from "@/types/menu-data";
+
+// 🎯 Template-3 Kapasite
+const CAPACITY = 6;
 
 interface ProductOption {
     key: string;
@@ -17,6 +21,9 @@ interface GalleryItem {
 }
 
 interface Template3Props {
+    // 🆕 IMenuData desteği - yeni sistemle uyumluluk
+    menuData?: IMenuData;
+    // Legacy props - geriye uyumluluk için
     items: any[];
     isEditable?: boolean;
     availableCategories?: Array<{ _id: string; name: string }>;
@@ -45,7 +52,11 @@ interface Template3Props {
     }>;
 }
 
+// 🎯 Kapasite export
+Template3Content.capacity = CAPACITY;
+
 export default function Template3Content({
+    menuData,
     items,
     isEditable = false,
     availableCategories = [],
@@ -65,14 +76,79 @@ export default function Template3Content({
 }: Template3Props) {
     const [displayItems, setDisplayItems] = useState<any[]>([]);
 
+    // 🔍 IMenuData formatını algıla
+    // menuData prop'u varsa VEYA items array içinde settings/items yapısı varsa
+    const isMenuDataFormat = !!(menuData?.settings && menuData?.items) ||
+        !!(items && (items as any).settings && (items as any).items);
+
+    // Eğer items aslında IMenuData ise, onu menuData olarak kullan
+    const effectiveMenuData = menuData || (isMenuDataFormat ? items as any : null);
+
+    // 📝 Debug Loglama
     useEffect(() => {
-        let processedItems = [...items];
-        while (processedItems.length < 6) {
-            processedItems = [...processedItems, ...items];
+        if (typeof window !== 'undefined') {
+            console.log('\n');
+            console.log('╔══════════════════════════════════════════════════════════════╗');
+            console.log('║                 🎨 TEMPLATE-3 RENDER                         ║');
+            console.log('╠══════════════════════════════════════════════════════════════╣');
+            console.log(`║ 📊 Kapasite: ${CAPACITY}`);
+            console.log(`║ 📦 Gelen Item Sayısı: ${Array.isArray(items) ? items.length : 'N/A'}`);
+            console.log(`║ 🆕 IMenuData Kullanılıyor: ${!!effectiveMenuData}`);
+            if (effectiveMenuData) {
+                console.log(`║ 🎨 Tema: ${effectiveMenuData.settings?.theme}`);
+                console.log(`║ 💰 Para Birimi: ${effectiveMenuData.settings?.currency}`);
+                console.log(`║ 📌 Başlık: ${effectiveMenuData.settings?.globalTitle}`);
+                console.log(`║ 📦 IMenuData Item Sayısı: ${effectiveMenuData.items?.length || 0}`);
+                if (effectiveMenuData.items?.length > 0) {
+                    const firstItem = effectiveMenuData.items[0];
+                    console.log(`║ 📍 İlk ürün layout: x:${firstItem.layout?.x}%, y:${firstItem.layout?.y}%`);
+                }
+            }
+            console.log('╚══════════════════════════════════════════════════════════════╝');
+            console.log('\n');
         }
-        processedItems = processedItems.slice(0, 6);
+    }, [items, effectiveMenuData]);
+
+    useEffect(() => {
+        // 🆕 IMenuData FORMATI ALGILANDI - Doğrudan kullan
+        let sourceItems: any[];
+
+        if (effectiveMenuData?.items && Array.isArray(effectiveMenuData.items)) {
+            // ✅ IMenuData formatı - temiz veri, doğrudan kullan
+            console.log('[Template-3] ✅ IMenuData formatı algılandı - temiz veri kullanılıyor');
+            sourceItems = effectiveMenuData.items;
+        } else if (Array.isArray(items)) {
+            // Legacy format - dönüştür
+            console.log('[Template-3] ⚠️ Legacy format - dönüştürülüyor');
+            sourceItems = items.map((item: any, index: number) => ({
+                id: item.productId || `item-${index}`,
+                title: item.name || item.title || "",
+                subtitle: item.description || "",
+                price: typeof item.price === "number" ? item.price : parseFloat(String(item.price).replace(/[^\d.-]/g, "")) || 0,
+                image: item.image || "/images/placeholder-food.svg",
+                isAvailable: true,
+                layout: item.layout || { x: 0, y: 0, w: 25, h: 20, z: 1 },
+                style: item.style || { fontSize: '1.2vw', color: '#FFFFFF', fontWeight: '600', textAlign: 'center', opacity: 1 },
+            }));
+        } else {
+            sourceItems = [];
+        }
+
+        let processedItems = [...sourceItems];
+
+        // Slice Logic - kapasite kontrolü
+        if (processedItems.length > CAPACITY) {
+            processedItems = processedItems.slice(0, CAPACITY);
+            console.log(`[Template-3] ⚠️ ${sourceItems.length - CAPACITY} ürün kesildi (kapasite: ${CAPACITY})`);
+        } else if (processedItems.length < CAPACITY && processedItems.length > 0) {
+            while (processedItems.length < CAPACITY) {
+                processedItems = [...processedItems, ...sourceItems];
+            }
+            processedItems = processedItems.slice(0, CAPACITY);
+        }
+
         setDisplayItems(processedItems);
-    }, [items]);
+    }, [items, effectiveMenuData]);
 
     // Helper: Get all available price options from product
     const getPriceOptions = (product: any): Array<{ key: string; name: string; price: number }> => {
@@ -128,8 +204,8 @@ export default function Template3Content({
                     Kışlık Favoriler
                 </h1>
 
-                {/* Grid Container */}
-                <div className="flex-1 w-full max-w-[1600px] grid grid-cols-2 grid-rows-3 gap-x-16 gap-y-4 my-4">
+                {/* Absolute Layout Container */}
+                <div className="flex-1 w-full h-full relative my-4">
                     {displayItems.map((item, index) => {
                         const selectedProduct = selectedProducts[index];
                         const slotCategory = selectedCategoriesBySlot[index] || '';
@@ -137,21 +213,36 @@ export default function Template3Content({
                         const hasSelectedCategory = slotCategory && slotCategory !== '';
                         const hasSelectedProduct = selectedProduct?.name && selectedProduct.name !== '';
 
-                        const apiProduct = slotProducts.find(p => p.name === item.name);
+                        const apiProduct = slotProducts.find(p => p.name === (item.title || item.name));
                         const priceOptions = apiProduct ? getPriceOptions(apiProduct) : [];
                         const hasPriceOptions = priceOptions.length > 0;
 
-                        const basePrice = parseInt(item.price) || 200;
+                        const basePrice = typeof item.price === "number" ? item.price : parseInt(String(item.price)) || 200;
                         const displaySmallPrice = selectedProduct?.smallPrice || `₺${basePrice}`;
                         const displayLargePrice = selectedProduct?.largePrice || `₺${Math.floor(basePrice * 1.15)}`;
 
                         // Image source: selected image > product image > default
-                        const imageSource = selectedProduct?.image || item.img || item.image || "/images/toffeeNut.png";
+                        const imageSource = selectedProduct?.image || item.image || item.img || "/images/placeholder-food.svg";
+
+                        // Layout değerleri (varsayılan değerler ile)
+                        const layout = item.layout || { x: 0, y: 0, w: 25, h: 20, z: 1 };
+                        const style = item.style || { fontSize: '1.2vw', color: '#004D40', fontWeight: 'bold', textAlign: 'center', opacity: 1 };
 
                         return (
-                            <div key={index} className="flex items-center justify-between border-b-2 border-[#00695C]/20 pb-2 relative">
+                            <div
+                                key={index}
+                                className="absolute flex items-center justify-between border-b-2 border-[#00695C]/20 pb-2 overflow-hidden transition-all duration-300"
+                                style={{
+                                    left: `${layout.x}%`,
+                                    top: `${layout.y}%`,
+                                    width: `${layout.w}%`,
+                                    height: `${layout.h}%`,
+                                    zIndex: layout.z,
+                                    opacity: style.opacity,
+                                }}
+                            >
                                 {/* Text Content */}
-                                <div className="flex flex-col justify-center flex-1 pr-4">
+                                <div className="flex flex-col justify-center flex-1 pr-4 h-full">
 
                                     {/* Edit Mode: Category -> Product Flow */}
                                     {isEditable ? (
@@ -173,7 +264,7 @@ export default function Template3Content({
                                             )}
 
                                             {hasSelectedCategory && (
-                                                <div className="flex flex-col gap-1">
+                                                <div className="flex flex-col gap-1 w-full">
                                                     <div className="flex items-center gap-2 mb-1">
                                                         <span className="text-xs text-[#00695C] opacity-70">
                                                             {availableCategories.find(c => c._id === slotCategory)?.name || 'Kategori'}
@@ -187,15 +278,15 @@ export default function Template3Content({
                                                     </div>
 
                                                     <select
-                                                        value={item.name || ""}
+                                                        value={item.title || item.name || ""}
                                                         onChange={(e) => {
                                                             const product = slotProducts.find(p => p.name === e.target.value);
                                                             if (product && onProductSelect) {
                                                                 onProductSelect(index, product._id);
                                                             }
                                                         }}
-                                                        className="text-xl font-bold uppercase text-[#004D40] leading-tight mb-2 p-2 rounded-lg border-2 border-[#00695C] bg-white cursor-pointer"
-                                                        style={{ outline: 'none', maxWidth: '100%' }}
+                                                        className="text-xl font-bold uppercase text-[#004D40] leading-tight mb-2 p-2 rounded-lg border-2 border-[#00695C] bg-white cursor-pointer w-full"
+                                                        style={{ outline: 'none' }}
                                                     >
                                                         <option value="">Ürün Seçin</option>
                                                         {slotProducts.map((product) => (
@@ -208,15 +299,23 @@ export default function Template3Content({
                                             )}
                                         </>
                                     ) : (
-                                        <h3 className="text-3xl font-bold uppercase text-[#004D40] leading-tight mb-2">
-                                            {item.name}
+                                        <h3
+                                            className="uppercase leading-tight mb-2 truncate w-full"
+                                            style={{
+                                                fontSize: '1.5vw', // style.fontSize yerine responsive scale için orantılı
+                                                color: style.color || '#004D40',
+                                                fontWeight: style.fontWeight || 'bold',
+                                                textAlign: style.textAlign || 'left' as any
+                                            }}
+                                        >
+                                            {item.title || item.name}
                                         </h3>
                                     )}
 
                                     {/* Price Section */}
-                                    <div className="flex flex-col gap-1 text-[#004D40] font-bold text-xl ml-1">
+                                    <div className="flex flex-col gap-1 text-[#004D40] font-bold ml-1" style={{ fontSize: '1vw' }}>
                                         <div className="flex items-center gap-4">
-                                            <span className="text-lg font-medium opacity-80 w-14">Küçük</span>
+                                            <span className="opacity-80 w-14">Küçük</span>
                                             {isEditable && hasSelectedProduct && hasPriceOptions ? (
                                                 <select
                                                     value={selectedProduct?.smallOptionKey || ''}
@@ -226,8 +325,8 @@ export default function Template3Content({
                                                             onSmallPriceSelect(index, option.key, option.price);
                                                         }
                                                     }}
-                                                    className="p-1 rounded-lg border-2 border-[#00695C] bg-[#00695C] text-white font-bold cursor-pointer text-sm"
-                                                    style={{ outline: 'none', minWidth: '140px' }}
+                                                    className="p-1 rounded-lg border-2 border-[#00695C] bg-[#00695C] text-white font-bold cursor-pointer text-xs"
+                                                    style={{ outline: 'none', minWidth: '100px' }}
                                                 >
                                                     <option value="">Fiyat Seçin</option>
                                                     {priceOptions.map((opt) => (
@@ -242,7 +341,7 @@ export default function Template3Content({
                                         </div>
 
                                         <div className="flex items-center gap-4">
-                                            <span className="text-lg font-medium opacity-80 w-14">Büyük</span>
+                                            <span className="opacity-80 w-14">Büyük</span>
                                             {isEditable && hasSelectedProduct && hasPriceOptions ? (
                                                 <select
                                                     value={selectedProduct?.largeOptionKey || ''}
@@ -252,8 +351,8 @@ export default function Template3Content({
                                                             onLargePriceSelect(index, option.key, option.price);
                                                         }
                                                     }}
-                                                    className="p-1 rounded-lg border-2 border-[#00695C] bg-[#00695C] text-white font-bold cursor-pointer text-sm"
-                                                    style={{ outline: 'none', minWidth: '140px' }}
+                                                    className="p-1 rounded-lg border-2 border-[#00695C] bg-[#00695C] text-white font-bold cursor-pointer text-xs"
+                                                    style={{ outline: 'none', minWidth: '100px' }}
                                                 >
                                                     <option value="">Fiyat Seçin</option>
                                                     {priceOptions.map((opt) => (
@@ -271,18 +370,19 @@ export default function Template3Content({
 
                                 {/* Image - Clickable in Edit Mode */}
                                 <div
-                                    className={`relative w-40 h-40 flex-shrink-0 ${isEditable ? 'cursor-pointer group' : ''}`}
+                                    className={`relative h-full aspect-square flex-shrink-0 ${isEditable ? 'cursor-pointer group' : ''}`}
                                     onClick={() => isEditable && onImageClick?.(index)}
                                 >
                                     <Image
                                         src={imageSource}
                                         alt={item.name || "Ürün"}
                                         fill
-                                        className="object-cover"
+                                        className="object-cover rounded-md"
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                     />
                                     {/* Edit Overlay */}
                                     {isEditable && (
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-md">
                                             <div className="text-white text-center">
                                                 <svg className="w-8 h-8 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -299,7 +399,7 @@ export default function Template3Content({
                 </div>
 
                 {/* Footer */}
-                <div className="w-full flex justify-end items-end text-[#00695C] opacity-80 mt-4 px-8 pb-4">
+                <div className="w-full flex justify-end items-end text-[#00695C] opacity-80 mt-2 px-8 pb-4">
                     <div className="text-right text-xs max-w-md leading-relaxed">
                         <p>Fiyatlarımız KDV dahildir.</p>
                     </div>
