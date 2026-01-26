@@ -4,6 +4,9 @@ import Template1Content from "../template-1/component/template-1";
 import Template2Content from "../template-2/component/template-2";
 import Template3Content from "../template-3/component/template-3";
 import Template4BurgerMenu from "../template-4/component/template-4";
+import Template5Content from "../template-5/component/template-5";
+import Template6Content from "../template-6/component/template-6";
+import Template7Content from "../template-7/component/template-7";
 
 import { defaultBurgers, winterFavorites } from "../template-data";
 import { menuItems } from "../template-data";
@@ -222,19 +225,168 @@ export default async function ConfigsPage({ searchParams }: Props) {
         }
 
         return (
+          <Template4BurgerMenu 
+            variant="preview" 
+            items={items.length > 0 ? items : undefined}
+            promoProduct={promoProduct}
+            promoImage={promoImage}
+          />
+        );
+      }
+
+      case 'template-5': {
+        let featuredProduct = {
+          logoImage: "/images/burger_logo.svg",
+          productImage: "/images/burger+patato.png",
+          label: "PREMIUM",
+          title: "CHEESE",
+          name: "WHOPPER",
+          pricing: [
+            { label: "Per 1", price: "$3.25", cal: "300" },
+            { label: "Per 2", price: "$8.89", cal: "280" }
+          ]
+        };
+
+        let menuItems: Array<any> = Array.from({ length: 8 }, (_, i) => ({
+          number: i + 1,
+          category: "",
+          name: "",
+          image: "/images/burger_menu.svg",
+          prices: [], // Options yoksa boş kalacak
+          isNew: false
+        }));
+
+        if (configData) {
+          if (configData.featuredProduct) {
+            featuredProduct = { ...featuredProduct, ...configData.featuredProduct };
+          }
+          if (configData.menuItems && Array.isArray(configData.menuItems)) {
+            menuItems = configData.menuItems;
+            while (menuItems.length < 8) {
+              menuItems.push({
+                number: menuItems.length + 1,
+                category: "",
+                name: "",
+                image: "/images/burger_menu.svg",
+                prices: [{ size: "Small", price: "$0" }],
+                isNew: false
+              });
+            }
+          }
+        }
+
+        return (
           <div className="w-full h-auto rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
-            <div className="relative w-full" style={{ aspectRatio: "16 / 9", overflow: "hidden" }}>
-              <Template4BurgerMenu 
-                variant="preview" 
-                items={items.length > 0 ? items : undefined}
-                promoProduct={promoProduct}
-                promoImage={promoImage}
-              />
-            </div>
+            <Template5Content
+              featuredProduct={featuredProduct}
+              menuItems={menuItems}
+            />
           </div>
         );
       }
 
+      case 'template-6': {
+        let brandName = "mamaspizza";
+        let menuItems: Array<any> = Array.from({ length: 9 }, (_, i) => ({
+          title: "",
+          desc: "",
+          price: "",
+          image: "/images/pizza1.svg",
+          isNew: false,
+          isRed: false,
+          hasTopPrice: false,
+          fullImage: false,
+          isLargeTitle: false
+        }));
+
+        if (configData) {
+          if (configData.brandName) {
+            brandName = configData.brandName;
+          }
+          if (configData.menuItems && Array.isArray(configData.menuItems)) {
+            menuItems = configData.menuItems;
+            while (menuItems.length < 9) {
+              menuItems.push({
+                title: "",
+                desc: "",
+                price: "",
+                image: "/images/pizza1.svg",
+                isNew: false,
+                isRed: false,
+                hasTopPrice: false,
+                fullImage: false,
+                isLargeTitle: false
+              });
+            }
+          }
+        }
+
+        return (
+          <div className="w-full h-auto rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
+            <Template6Content
+              brandName={brandName}
+              menuItems={menuItems}
+            />
+          </div>
+        );
+      }
+
+      case 'template-7': {
+        let brand = { shortName: "LA", fullName: "gyrogreek", phone: "(818)356-9676", logoImg: "" };
+        let hero = { 
+          logo: "/images/burger_logo.svg", 
+          titleTop: "GYRO", 
+          titleBottom: "FOOD", 
+          image: "/images/teavuk_dürüm.svg", 
+          promo: { title: "Only Today", value: "20%", label: "OFF" } 
+        };
+        let sidebarItems: Array<any> = [{ title: "", desc: "", price: "" }];
+        let gridItems: Array<any> = Array.from({ length: 6 }, (_, i) => ({
+          title: "",
+          desc: "",
+          price: "",
+          variant: "white",
+          image: "/images/teavuk_dürüm.svg"
+        }));
+
+        if (configData) {
+          if (configData.brand) {
+            brand = { ...brand, ...configData.brand };
+          }
+          if (configData.hero) {
+            hero = { ...hero, ...configData.hero };
+          }
+          if (configData.sidebarItems && Array.isArray(configData.sidebarItems)) {
+            sidebarItems = configData.sidebarItems;
+            if (sidebarItems.length === 0) {
+              sidebarItems = [{ title: "", desc: "", price: "" }];
+            }
+          }
+          if (configData.gridItems && Array.isArray(configData.gridItems)) {
+            gridItems = configData.gridItems;
+            while (gridItems.length < 6) {
+              gridItems.push({
+                title: "",
+                desc: "",
+                price: "",
+                variant: "white",
+                image: "/images/teavuk_dürüm.svg"
+              });
+            }
+          }
+        }
+
+        return (
+          <div className="w-full h-auto rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
+            <Template7Content
+              brand={brand}
+              hero={hero}
+              sidebarItems={sidebarItems}
+              gridItems={gridItems}
+            />
+          </div>
+        );
+      }
 
       default:
         return (

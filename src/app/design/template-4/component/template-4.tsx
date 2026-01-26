@@ -346,16 +346,29 @@ export default function Template4BurgerMenu({
       </div>
 
       <style jsx global>{`
+
+        body {
+          margin: 0 !important;
+          padding: 0 !important;
+          width: 100vw !important;
+          height: 100vh !important;
+          overflow: hidden !important;
+          background: #000;
+        }
         .burger-menu {
           --scale-x: calc(100vw / 1920);
           --scale-y: calc(100vh / 1080);
+          position: fixed;
 
           background-color: #cc2027;
           width: 100vw;
           height: 100vh;
-          position: relative;
           display: flex;
           overflow: hidden;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
         }
 
         /* Preview modunda orijinal boyut */

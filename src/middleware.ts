@@ -17,6 +17,10 @@ export default async function middleware(req: NextRequest) {
   const isPublicConfigsRoute = pathname === '/design/configs' &&
     (searchParams.get('configId') || searchParams.get('preview') === 'true');
 
+  // ConfigId ile erişilen design/template-X route'larını public yap (snapshot için gerekli)
+  const isPublicTemplateRoute = pathname.startsWith('/design/template-') &&
+    searchParams.get('configId') !== null;
+
   // Büyük dosya yüklemeleri için media API'sini bypass et (body parsing limitini aşmak için)
   if (pathname === '/api/media' && req.method === 'POST') {
     // Token kontrolü yap ama body parsing'i bypass et
@@ -28,7 +32,7 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  if (publicPaths.some(path => pathname.startsWith(path)) || isPublicConfigsRoute) {
+  if (publicPaths.some(path => pathname.startsWith(path)) || isPublicConfigsRoute || isPublicTemplateRoute) {
     return NextResponse.next();
   }
 

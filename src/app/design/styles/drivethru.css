@@ -1,0 +1,318 @@
+/* Drive Thru Menu - Clean Design */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.drive-thru-menu {
+    --scale-x: calc(100vw / 1920);
+    --scale-y: calc(100vh / 1080);
+
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    font-family: 'Poppins', sans-serif;
+    background-color: #ffffff;
+}
+
+/* Sidebar */
+.sidebar {
+    width: calc(320 * var(--scale-x));
+    background: linear-gradient(180deg, #c25a00 0%, #8b3a00 50%, #6b2d00 100%);
+    display: flex;
+    flex-direction: column;
+    padding: calc(20 * var(--scale-y)) calc(15 * var(--scale-x));
+    position: relative;
+}
+
+/* Decorative brush strokes */
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: calc(80 * var(--scale-y));
+    left: 0;
+    right: 0;
+    height: calc(15 * var(--scale-y));
+    background: #f5a623;
+    transform: skewY(-2deg);
+}
+
+.sidebar::after {
+    content: '';
+    position: absolute;
+    top: calc(100 * var(--scale-y));
+    left: 0;
+    right: 0;
+    height: calc(10 * var(--scale-y));
+    background: #d4890a;
+    transform: skewY(1deg);
+}
+
+/* Logo Area */
+.logo-area {
+    text-align: center;
+    margin-bottom: calc(20 * var(--scale-y));
+    z-index: 2;
+}
+
+.logo-img {
+    max-width: calc(200 * var(--scale-x));
+    height: auto;
+}
+
+/* Featured Image */
+.featured-image {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.featured-img {
+    max-width: 100%;
+    max-height: calc(450 * var(--scale-y));
+    object-fit: contain;
+    filter: drop-shadow(5px 10px 20px rgba(0, 0, 0, 0.4));
+}
+
+/* Featured Info */
+.featured-info {
+    text-align: center;
+    color: #ffffff;
+    z-index: 2;
+}
+
+.featured-label {
+    font-size: calc(18 * var(--scale-x));
+    font-weight: 600;
+    display: block;
+}
+
+.featured-title {
+    font-size: calc(32 * var(--scale-x));
+    font-weight: 700;
+    display: block;
+}
+
+.featured-name {
+    font-size: calc(50 * var(--scale-x));
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: calc(15 * var(--scale-y));
+}
+
+.featured-divider {
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #f5a623, transparent);
+    margin: calc(15 * var(--scale-y)) 0;
+}
+
+/* Pricing Table */
+.pricing-table {
+    display: flex;
+    flex-direction: column;
+    gap: calc(8 * var(--scale-y));
+}
+
+.pricing-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: calc(10 * var(--scale-x));
+    font-size: calc(16 * var(--scale-x));
+}
+
+.pricing-label {
+    font-weight: 600;
+}
+
+.pricing-price {
+    color: #f5a623;
+    font-weight: 700;
+}
+
+.pricing-cal {
+    font-size: calc(12 * var(--scale-x));
+    opacity: 0.8;
+}
+
+.pricing-calvalue {
+    font-weight: 600;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: calc(30 * var(--scale-y)) calc(40 * var(--scale-x));
+    gap: calc(5 * var(--scale-y));
+}
+
+/* Menu Row */
+.menu-row {
+    display: flex;
+    flex: 1;
+    gap: calc(25 * var(--scale-x));
+}
+
+/* Row Divider */
+.row-divider {
+    height: 4px;
+    background: linear-gradient(90deg, #e63946, #e63946 80%, transparent);
+    margin: 0;
+}
+
+/* Menu Item */
+.menu-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border-radius: calc(10 * var(--scale-x));
+    overflow: hidden;
+}
+
+.menu-item.new-item {
+    background: #e63946;
+    color: #ffffff;
+}
+
+/* Item Image Area */
+.item-image-area {
+    height: calc(220 * var(--scale-y));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.item-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(3px 5px 10px rgba(0, 0, 0, 0.2));
+}
+
+.combo-image {
+    position: absolute;
+    bottom: calc(10 * var(--scale-y));
+    right: calc(10 * var(--scale-x));
+    width: calc(80 * var(--scale-x));
+    height: auto;
+}
+
+/* Item Details */
+.item-details {
+    padding: calc(15 * var(--scale-y)) calc(15 * var(--scale-x));
+    display: flex;
+    flex-direction: column;
+    gap: calc(8 * var(--scale-y));
+}
+
+/* New Badge */
+.new-badge {
+    font-size: calc(18 * var(--scale-x));
+    font-weight: 800;
+    color: #ffffff;
+}
+
+/* Item Title */
+.item-title {
+    display: flex;
+    align-items: flex-start;
+    gap: calc(8 * var(--scale-x));
+}
+
+.item-number {
+    font-size: calc(50 * var(--scale-x));
+    font-weight: 900;
+    color: #e63946;
+    line-height: 1;
+}
+
+.new-item .item-number {
+    color: #ffffff;
+}
+
+.item-names {
+    display: flex;
+    flex-direction: column;
+}
+
+.item-category {
+    font-size: calc(14 * var(--scale-x));
+    color: #e63946;
+    font-weight: 600;
+}
+
+.new-item .item-category {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.item-name {
+    font-size: calc(32 * var(--scale-x));
+    font-weight: 800;
+    color: #1a1a1a;
+    line-height: 1.1;
+}
+
+.new-item .item-name {
+    color: #ffffff;
+}
+
+/* Item Prices */
+.item-prices {
+    display: flex;
+    flex-direction: column;
+    gap: calc(5 * var(--scale-y));
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: calc(5 * var(--scale-y));
+    margin-bottom: calc(5 * var(--scale-y));
+}
+
+.price-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+.size-label {
+    font-size: calc(20 * var(--scale-x));
+    font-weight: 600;
+    color: #e63946;
+}
+
+.new-item .size-label {
+    color: #ffffff;
+}
+
+.price-value {
+    font-size: calc(18 * var(--scale-x));
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.new-item .price-value {
+    color: #ffffff;
+}
+
+

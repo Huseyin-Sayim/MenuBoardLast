@@ -1,9 +1,10 @@
 import { prisma } from '@/generated/prisma'
+import { generateSnapshotForConfig } from './renderService'
 
 export async function saveTemplateConfig(
   userId: string,
   templateId: string,
-  configData: { category: any; data: any[] },
+  configData: any, // Farklı template'ler farklı formatlar kullanıyor: { category, data } | { categories, data } | { featuredProduct, menuItems }
   configId?: string,
 ) {
   try {
@@ -83,6 +84,52 @@ export async function saveTemplateConfig(
       console.error('saveConfig null veya undefined döndü');
       throw new Error("Tamplate verisi kaydedilemedi !!");
     }
+
+    // Snapshot oluştur (arka planda, hata olsa bile config kaydedilmiş olur)
+    // Async olarak çalıştır, response'u bekleme
+    (async () => {
+      try {
+        // Template bilgisini al
+        const template = await prisma.template.findUnique({
+          where: { id: dbTemplateId },
+        });
+
+        if (template) {
+          console.log('Generating snapshot for config:', saveConfig.id);
+          
+          // Template'e göre doğru path'i belirle
+          let templatePath = '/design/configs';
+          if (template.component === 'template-4') {
+            // Template-4 için kendi sayfasını kullan
+            templatePath = '/design/template-4';
+          } else {
+            // Diğer template'ler için configs endpoint'ini kullan
+            templatePath = '/design/configs';
+          }
+          
+          const { snapshotUrl, snapshotVersion } = await generateSnapshotForConfig(
+            saveConfig.id,
+            templatePath,
+            1920,
+            1080
+          );
+
+          // Snapshot bilgilerini güncelle
+          await prisma.templateConfig.update({
+            where: { id: saveConfig.id },
+            data: {
+              snapshotUrl,
+              snapshotVersion,
+            },
+          });
+
+          console.log('Snapshot generated and saved:', { snapshotUrl, snapshotVersion });
+        }
+      } catch (snapshotError: any) {
+        // Snapshot hatası config kaydını engellemez, sadece log'lanır
+        console.error('Snapshot oluşturulurken hata:', snapshotError);
+      }
+    })();
 
     return saveConfig;
   } catch (err: any) {
@@ -253,6 +300,75 @@ export async function acquireTemplate(userId: string, templateId: string) {
       defaultConfig = { category: "", data: [] };
     } else if (template.component === 'template-2') {
       defaultConfig = { categories: {}, data: {} };
+    } else if (template.component === 'template-5') {
+      defaultConfig = {
+        featuredProduct: {
+          logoImage: "/images/burger_logo.svg",
+          productImage: "/images/burger+patato.png",
+          label: "PREMIUM",
+          title: "CHEESE",
+          name: "WHOPPER",
+          pricing: [
+            { label: "Per 1", price: "₺0", cal: "300" },
+            { label: "Per 2", price: "₺0", cal: "280" }
+          ]
+        },
+        menuItems: Array.from({ length: 8 }, (_, i) => ({
+          number: i + 1,
+          category: "",
+          name: "",
+          image: "/images/burger_menu.svg",
+          prices: [{ size: "Small", price: "₺0" }],
+          isNew: false
+        }))
+      };
+    } else if (template.component === 'template-6') {
+      defaultConfig = {
+        brandName: "mamaspizza",
+        menuItems: Array.from({ length: 9 }, (_, i) => ({
+          title: "",
+          desc: "",
+          price: "",
+          image: "/images/pizza1.svg",
+          isNew: false,
+          isRed: false,
+          hasTopPrice: false,
+          fullImage: false,
+          isLargeTitle: false
+        }))
+      };
+    } else if (template.component === 'template-7') {
+      defaultConfig = {
+        brand: {
+          shortName: "LA",
+          fullName: "gyrogreek",
+          phone: "(818)356-9676",
+          logoImg: ""
+        },
+        hero: {
+          logo: "/images/burger_logo.svg",
+          titleTop: "GYRO",
+          titleBottom: "FOOD",
+          image: "/images/teavuk_dürüm.svg",
+          promo: {
+            title: "Only Today",
+            value: "20%",
+            label: "OFF"
+          }
+        },
+        sidebarItems: [{
+          title: "",
+          desc: "",
+          price: ""
+        }],
+        gridItems: Array.from({ length: 6 }, (_, i) => ({
+          title: "",
+          desc: "",
+          price: "",
+          variant: "white",
+          image: "/images/teavuk_dürüm.svg"
+        }))
+      };
     } else {
       defaultConfig = {};
     }

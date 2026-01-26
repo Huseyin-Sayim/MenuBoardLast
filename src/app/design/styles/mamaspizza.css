@@ -1,0 +1,324 @@
+@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Permanent+Marker&family=Dancing+Script:wght@400;700&family=Inter:wght@400;700;900&family=Playfair+Display:ital,wght@0,700;1,700&family=Roboto+Condensed:wght@700;900&display=swap');
+
+:root {
+    --bg-purple: #1b0a2e;
+    --accent-red: #d32f2f;
+    --accent-yellow: #fdd835;
+    --accent-green: #4caf50;
+    --text-white: #ffffff;
+    --card-bg: rgba(255, 255, 255, 0.05);
+}
+
+body,
+html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #000;
+}
+
+.mamas-pizza-container {
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--bg-purple);
+    background-image:
+        radial-gradient(circle at center, #2e124d 0%, #1b0a2e 100%);
+    color: var(--text-white);
+    font-family: 'Roboto Condensed', sans-serif;
+    display: flex;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* --- MAIN LAYOUT --- */
+.mamas-main-grid {
+    display: grid;
+    grid-template-columns: 32vw 68vw;
+    width: 100%;
+    height: 100%;
+}
+
+/* --- LEFT COLUMN --- */
+.mamas-left {
+    padding: 3vh 3vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    position: relative;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.mamas-logo-area {
+    margin-bottom: 2vh;
+}
+
+.mamas-logo-text {
+    border: 1px solid white;
+    padding: 1vh 1vw;
+    font-size: 1.2vw;
+    letter-spacing: 0.1vw;
+    display: inline-block;
+}
+
+.lets-eat-promo {
+    margin-top: 1vh;
+    z-index: 5;
+}
+
+.text-lets {
+    font-family: 'Dancing Script', cursive;
+    font-size: 3.5vw;
+    display: block;
+}
+
+.text-eat {
+    font-size: 7vw;
+    font-weight: 900;
+    line-height: 0.8;
+    display: block;
+    margin-top: -0.5vh;
+}
+
+.text-authentic {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8vw;
+    color: var(--accent-yellow);
+    margin-right: 0.5vw;
+}
+
+.text-italian {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8vw;
+    font-style: italic;
+}
+
+.text-pizza-big {
+    font-family: 'Luckiest Guy', cursive;
+    font-size: 9vw;
+    color: var(--accent-yellow);
+    line-height: 1;
+    display: block;
+}
+
+.best-ingredients-list {
+    margin-top: 1vh;
+}
+
+.best-item {
+    display: block;
+    font-weight: 700;
+    font-size: 1.5vw;
+    line-height: 1.2;
+}
+
+.best-delicious {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2.5vw;
+}
+
+.best-fresh {
+    font-family: 'Luckiest Guy', cursive;
+    font-size: 3.5vw;
+    color: var(--accent-green);
+}
+
+.best-tasty {
+    font-size: 2.5vw;
+    font-weight: 900;
+    letter-spacing: 0.2vw;
+}
+
+/* .half-pizza-display {
+    position: absolute;
+    right: -15vw;
+    top: 15vh;
+    width: 32vw;
+    height: 32vw;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    border: 0.4vw dashed rgba(255, 255, 255, 0.1);
+    z-index: 0;
+} */
+
+.half-pizza-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.mamas-footer-info {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+}
+
+.pickup-delivery-box {
+    border: 2px solid white;
+    border-radius: 5vh;
+    padding: 1vh 1.5vw;
+    font-size: 0.8vw;
+    text-align: center;
+}
+
+/* --- RIGHT COLUMN GRID --- */
+.mamas-right {
+    padding: 2vh 2vw;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 1.5vh 1.5vw;
+    height: 100vh;
+    box-sizing: border-box;
+}
+
+.menu-card {
+    border: 0.15vw solid rgba(255, 255, 255, 0.4);
+    border-radius: 0.8vw;
+    padding: 1.2vh 1vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: visible;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.menu-card.card-red {
+    background-color: var(--accent-red);
+    border: none;
+}
+
+.card-title {
+    font-size: 1.4vw;
+    font-weight: 900;
+    color: var(--accent-yellow);
+    margin: 0;
+    line-height: 1.1;
+}
+
+.card-red .card-title {
+    color: #1b0a2e;
+    font-size: 2.2vw;
+    line-height: 0.9;
+}
+
+.card-desc {
+    font-size: 0.75vw;
+    line-height: 1.2;
+    margin: 0.5vh 0;
+    color: var(--text-white);
+    max-height: 4.5vh;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.card-price-red {
+    background: var(--accent-red);
+    color: white;
+    padding: 0.2vh 0.5vw;
+    border-radius: 0.3vw;
+    font-weight: 900;
+    font-size: 1.1vw;
+    align-self: flex-start;
+}
+
+.card-content {
+    max-width: 70%;
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+.card-img-area {
+    position: absolute;
+    bottom: 0.5vh;
+    right: 0.5vw;
+    z-index: 1;
+}
+
+/* Editable modda card-content selectbox'ları için */
+.menu-card .card-content {
+    pointer-events: auto;
+}
+
+.menu-card .card-content select {
+    pointer-events: auto !important;
+}
+
+/* Image area sadece image üzerinde tıklanabilir olmalı */
+.card-img-area {
+    pointer-events: none;
+}
+
+.card-img-area img,
+.card-img-area .card-img-placeholder {
+    pointer-events: auto;
+}
+
+.card-item-img {
+    width: 12vw;
+    height: 11vw;
+    object-fit: contain;
+}
+
+.card-full-img {
+    width: 14vw;
+    height: auto;
+    object-fit: contain;
+}
+
+.card-img-placeholder {
+    width: 10vw;
+    height: 10vw;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+}
+
+.price-tag-bubble {
+    position: absolute;
+    top: 0.5vh;
+    right: 0.5vw;
+    background: var(--accent-red);
+    padding: 0.2vh 0.4vw;
+    border-radius: 0.2vw;
+    font-weight: 900;
+    font-size: 0.9vw;
+}
+
+.new-badge {
+    background: var(--accent-green);
+    color: white;
+    padding: 0.2vh 0.6vw;
+    border-radius: 0.2vw;
+    font-size: 0.8vw;
+    font-weight: 900;
+    align-self: flex-start;
+    margin-bottom: 0.3vh;
+}
+
+/* Template-6 Selectbox Styles */
+.template-6-select {
+    background: var(--bg-purple) !important;
+    color: var(--text-white) !important;
+    position: relative !important;
+    z-index: 10 !important;
+}
+
+.template-6-select option {
+    background: var(--bg-purple) !important;
+    color: var(--text-white) !important;
+}
+
+.template-6-select:focus {
+    outline: 2px solid var(--accent-yellow);
+    outline-offset: 2px;
+    z-index: 20 !important;
+}
+

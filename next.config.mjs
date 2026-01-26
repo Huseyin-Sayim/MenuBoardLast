@@ -5,8 +5,6 @@ const nextConfig = {
       bodySizeLimit: "500mb"
     }
   },
-  // API route'lar için body size limiti (500MB)
-  middlewareClientMaxBodySize: "500mb",
   images: {
     remotePatterns: [
       {
