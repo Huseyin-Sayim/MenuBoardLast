@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { prisma } from "@/generated/prisma";
 import Template5Content from "./component/template-5";
+import { template5Featured, template5Items } from "../template-data";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -15,7 +16,10 @@ export default async function Template5Page({ searchParams }: Props) {
     // Config yoksa default göster
     return (
       <div className="w-full h-auto">
-        <Template5Content />
+        <Template5Content
+          featuredProduct={template5Featured}
+          menuItems={template5Items}
+        />
       </div>
     );
   }

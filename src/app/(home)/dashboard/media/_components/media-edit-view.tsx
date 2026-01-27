@@ -240,6 +240,7 @@ export function MediaEditView({
                   alt={selectedItem.name}
                   fill
                   className="object-cover"
+                  unoptimized
                 />
               )}
             </div>
@@ -267,7 +268,7 @@ export function MediaEditView({
                   </button>
                 )}
               </div>
-              
+
               {/* Input Alanı - Sadece düzenleme modunda görünür */}
               {isEditingName && (
                 <div className="flex flex-col gap-2">
@@ -345,12 +346,17 @@ export function MediaEditView({
                   <div className="capitalize relative h-20 w-32 shrink-0 overflow-hidden rounded-lg">
                     {item.type === "video" ? (
                       <>
-                        <Image
-                          src={item.thumbnail || item.url}
-                          alt={item.name}
-                          fill
-                          className="object-cover"
-                        />
+                        {item.thumbnail ? (
+                          <Image
+                            src={item.thumbnail}
+                            alt={item.name}
+                            fill
+                            className="object-cover"
+                            unoptimized
+                          />
+                        ) : (
+                          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/30" />
+                        )}
                         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                           <svg
                             className="size-6 text-white"
@@ -367,6 +373,7 @@ export function MediaEditView({
                         alt={item.name}
                         fill
                         className="object-cover"
+                        unoptimized
                       />
                     )}
                   </div>

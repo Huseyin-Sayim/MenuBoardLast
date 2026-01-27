@@ -8,8 +8,9 @@ import Template4BurgerMenu from "@/app/design/template-4/component/template-4";
 import Template5Content from "@/app/design/template-5/component/template-5";
 import Template6Content from "@/app/design/template-6/component/template-6";
 import Template7Content from "@/app/design/template-7/component/template-7";
+import Template8 from "@/app/design/template-8/component/template-8";
 
-import { defaultBurgers, menuItems, winterFavorites } from "@/app/design/template-data";
+import { defaultBurgers, menuItems, winterFavorites, template8MenuItems as defaultT8Menu, template8HotItems as defaultT8Hot, template8ForYouItems as defaultT8ForYou, template8Aromas } from "@/app/design/template-data";
 import { useEffect, useState } from "react";
 import { useTemplateConfig, useUpdateTemplateConfig } from "@/hooks/use-template-config";
 import { MediaGallery, MediaItem } from "@/app/(home)/dashboard/media/_components/media-gallery";
@@ -46,7 +47,7 @@ export default function TemplatePage() {
     categoryId?: string;
   }>>([])
   const [availableCategories, setAvailableCategories] = useState<Array<{ _id: string; name: string }>>([]);
-  const [availableProducts, setAvailableProducts] = useState<Array<{ _id: string; name: string; pricing: any; category: string; description?: string; image?: string; img?: string; imageUrl?: string }>>([]);
+  const [availableProducts, setAvailableProducts] = useState<Array<{ _id: string; name: string; pricing: any; category: string; description?: string; image?: string; img?: string; imageUrl?: string; options?: Array<{ key: string; name: string; price: number }> }>>([]);
 
   const [selectedCategories, setSelectedCategories] = useState<Record<string, string>>({});
   const [selectedProductsByCategory, setSelectedProductsByCategory] = useState<Record<string, Array<{
@@ -96,7 +97,7 @@ export default function TemplatePage() {
     image?: string;
   }>({});
   const [template4PromoImage, setTemplate4PromoImage] = useState<string | undefined>(undefined);
-  
+
   // Template 5 - Drive Thru Menu
   const [template5FeaturedProduct, setTemplate5FeaturedProduct] = useState<{
     logoImage?: string;
@@ -106,7 +107,7 @@ export default function TemplatePage() {
     name?: string;
     categoryId?: string;
     productId?: string;
-    pricing: Array<{label: string; price: string; cal?: string; priceType?: string; optionKey?: string}>;
+    pricing: Array<{ label: string; price: string; cal?: string; priceType?: string; optionKey?: string }>;
   }>({
     logoImage: "/images/burger_logo.svg",
     productImage: "/images/burger+patato.png",
@@ -125,7 +126,7 @@ export default function TemplatePage() {
     name?: string;
     productId?: string;
     image?: string;
-    prices: Array<{size: string; price: string; priceType?: string; optionKey?: string}>;
+    prices: Array<{ size: string; price: string; priceType?: string; optionKey?: string }>;
     isNew?: boolean;
   }>>(Array.from({ length: 8 }, (_, i) => ({
     number: i + 1,
@@ -137,7 +138,7 @@ export default function TemplatePage() {
   })));
   const [template5ProductsBySlot, setTemplate5ProductsBySlot] = useState<Record<number, Array<{ _id: string; name: string; pricing: any; category: string; image?: string; img?: string; imageUrl?: string }>>>({});
   const [template5FeaturedProducts, setTemplate5FeaturedProducts] = useState<Array<{ _id: string; name: string; pricing: any; category: string; image?: string; img?: string; imageUrl?: string }>>([]);
-  
+
   // Template 6 - MamasPizza
   const [template6BrandName, setTemplate6BrandName] = useState<string>("mamaspizza");
   const [template6MenuItems, setTemplate6MenuItems] = useState<Array<{
@@ -163,27 +164,27 @@ export default function TemplatePage() {
     fullImage: false,
     isLargeTitle: false
   })));
-  const [template6ProductsBySlot, setTemplate6ProductsBySlot] = useState<Record<number, Array<{ _id: string; name: string; pricing: any; category: string; image?: string; img?: string; imageUrl?: string; options?: Array<{key: string; name: string; price: number}> }>>>({});
-  
+  const [template6ProductsBySlot, setTemplate6ProductsBySlot] = useState<Record<number, Array<{ _id: string; name: string; pricing: any; category: string; image?: string; img?: string; imageUrl?: string; options?: Array<{ key: string; name: string; price: number }> }>>>({});
+
   // Template 7 - GyroGreekMenu
-  const [template7Brand, setTemplate7Brand] = useState<{ shortName?: string; fullName?: string; phone?: string; logoImg?: string }>({ 
-    shortName: "LA", 
-    fullName: "gyrogreek", 
-    phone: "(818)356-9676", 
-    logoImg: "" 
+  const [template7Brand, setTemplate7Brand] = useState<{ shortName?: string; fullName?: string; phone?: string; logoImg?: string }>({
+    shortName: "LA",
+    fullName: "gyrogreek",
+    phone: "(818)356-9676",
+    logoImg: ""
   });
-  const [template7Hero, setTemplate7Hero] = useState<{ 
-    logo?: string; 
-    titleTop?: string; 
-    titleBottom?: string; 
-    image?: string; 
-    promo?: { title?: string; value?: string; label?: string } 
-  }>({ 
-    logo: "/images/burger_logo.svg", 
-    titleTop: "GYRO", 
-    titleBottom: "FOOD", 
-    image: "/images/teavuk_dürüm.svg", 
-    promo: { title: "Only Today", value: "20%", label: "OFF" } 
+  const [template7Hero, setTemplate7Hero] = useState<{
+    logo?: string;
+    titleTop?: string;
+    titleBottom?: string;
+    image?: string;
+    promo?: { title?: string; value?: string; label?: string }
+  }>({
+    logo: "/images/burger_logo.svg",
+    titleTop: "GYRO",
+    titleBottom: "FOOD",
+    image: "/images/teavuk_dürüm.svg",
+    promo: { title: "Only Today", value: "20%", label: "OFF" }
   });
   const [template7SidebarItems, setTemplate7SidebarItems] = useState<Array<{
     title?: string;
@@ -207,8 +208,42 @@ export default function TemplatePage() {
     variant: "white",
     image: "/images/teavuk_dürüm.svg"
   })));
-  const [template7ProductsBySlot, setTemplate7ProductsBySlot] = useState<Record<string, Array<{ _id: string; name: string; pricing: any; category: string; image?: string; img?: string; imageUrl?: string; options?: Array<{key: string; name: string; price: number}> }>>>({});
-  
+  const [template7ProductsBySlot, setTemplate7ProductsBySlot] = useState<Record<string, Array<{ _id: string; name: string; pricing: any; category: string; image?: string; img?: string; imageUrl?: string; options?: Array<{ key: string; name: string; price: number }> }>>>({});
+
+  // Template 8 - CoffeeShop
+  const [template8MenuItems, setTemplate8MenuItems] = useState<Array<{
+    name: string;
+    priceSmall: string;
+    priceLarge: string;
+    categoryId?: string;
+    productId?: string;
+    smallOptionKey?: string;
+    largeOptionKey?: string;
+  }>>(defaultT8Menu);
+
+  const [template8HotItems, setTemplate8HotItems] = useState<Array<{
+    name: string;
+    price1Label: string;
+    price1Value: string;
+    price2Label: string;
+    price2Value: string;
+    categoryId?: string;
+    productId?: string;
+    price1OptionKey?: string;
+    price2OptionKey?: string;
+  }>>(defaultT8Hot);
+
+  const [template8ForYouItems, setTemplate8ForYouItems] = useState<Array<{
+    name: string;
+    price: string;
+    categoryId?: string;
+    productId?: string;
+    optionKey?: string;
+  }>>(defaultT8ForYou);
+
+  // Ortak slot cache (Template 8 için)
+  const [template8ProductsBySlot, setTemplate8ProductsBySlot] = useState<Record<string, Array<{ _id: string; name: string; pricing: any; category: string; image?: string; img?: string; imageUrl?: string; options?: Array<{ key: string; name: string; price: number }> }>>>({});
+
   const [apiBaseUrl, setApiBaseUrl] = useState<string>("http://localhost:5000");
 
   useEffect(() => {
@@ -524,10 +559,10 @@ export default function TemplatePage() {
       } else if (templateId === "template-5") {
         const config = configData as any;
         console.log('Template-5 config loading:', config);
-        
+
         if (config?.featuredProduct) {
           setTemplate5FeaturedProduct(config.featuredProduct);
-          
+
           // Featured product için kategoriye göre ürünleri getir
           if (config.featuredProduct.categoryId) {
             fetch(`${apiBaseUrl}/api/products`)
@@ -542,10 +577,10 @@ export default function TemplatePage() {
               });
           }
         }
-        
+
         if (config?.menuItems && Array.isArray(config.menuItems)) {
           setTemplate5MenuItems(config.menuItems);
-          
+
           // Her menu item için kategoriye göre ürünleri getir
           const restoreMenuItems = async () => {
             try {
@@ -554,7 +589,7 @@ export default function TemplatePage() {
                 const data = await response.json();
                 const allProducts = data.data || [];
                 const newProductsBySlot: Record<number, any[]> = {};
-                
+
                 for (let i = 0; i < config.menuItems.length && i < 8; i++) {
                   const item = config.menuItems[i];
                   if (item.categoryId) {
@@ -562,27 +597,27 @@ export default function TemplatePage() {
                     newProductsBySlot[i + 1] = filteredProducts;
                   }
                 }
-                
+
                 setTemplate5ProductsBySlot(newProductsBySlot);
               }
             } catch (error) {
               console.error('Template-5 ürünler çekilirken hata:', error);
             }
           };
-          
+
           restoreMenuItems();
         }
       } else if (templateId === "template-6") {
         const config = configData as any;
         console.log('Template-6 config loading:', config);
-        
+
         if (config?.brandName) {
           setTemplate6BrandName(config.brandName);
         }
-        
+
         if (config?.menuItems && Array.isArray(config.menuItems)) {
           setTemplate6MenuItems(config.menuItems);
-          
+
           // Her menu item için kategoriye göre ürünleri getir
           const restoreMenuItems = async () => {
             try {
@@ -591,42 +626,42 @@ export default function TemplatePage() {
                 const data = await response.json();
                 const products = data.data || [];
                 const productsBySlot: Record<number, any[]> = {};
-                
+
                 config.menuItems.forEach((item: any, index: number) => {
                   if (item.categoryId) {
                     const filteredProducts = products.filter((p: any) => p.category === item.categoryId);
                     productsBySlot[index] = filteredProducts;
                   }
                 });
-                
+
                 setTemplate6ProductsBySlot(productsBySlot);
               }
             } catch (error) {
               console.error('Template-6 ürünler çekilirken hata:', error);
             }
           };
-          
+
           restoreMenuItems();
         }
       } else if (templateId === "template-7") {
         const config = configData as any;
         console.log('Template-7 config loading:', config);
-        
+
         if (config?.brand) {
           setTemplate7Brand(config.brand);
         }
-        
+
         if (config?.hero) {
           setTemplate7Hero(config.hero);
         }
-        
+
         if (config?.sidebarItems && Array.isArray(config.sidebarItems)) {
           setTemplate7SidebarItems(config.sidebarItems);
         }
-        
+
         if (config?.gridItems && Array.isArray(config.gridItems)) {
           setTemplate7GridItems(config.gridItems);
-          
+
           // Her item için kategoriye göre ürünleri getir
           const restoreItems = async () => {
             try {
@@ -635,7 +670,7 @@ export default function TemplatePage() {
                 const data = await response.json();
                 const products = data.data || [];
                 const productsBySlot: Record<string, any[]> = {};
-                
+
                 // Sidebar items
                 config.sidebarItems?.forEach((item: any, index: number) => {
                   if (item.categoryId) {
@@ -643,7 +678,7 @@ export default function TemplatePage() {
                     productsBySlot[`sidebar-${index}`] = filteredProducts;
                   }
                 });
-                
+
                 // Grid items
                 config.gridItems?.forEach((item: any, index: number) => {
                   if (item.categoryId) {
@@ -651,16 +686,61 @@ export default function TemplatePage() {
                     productsBySlot[`grid-${index}`] = filteredProducts;
                   }
                 });
-                
+
                 setTemplate7ProductsBySlot(productsBySlot);
               }
             } catch (error) {
               console.error('Template-7 ürünler çekilirken hata:', error);
             }
           };
-          
+
           restoreItems();
         }
+      } else if (templateId === "template-8") {
+        const config = configData as any;
+        console.log('Template-8 config loading:', config);
+
+        if (config?.menuItems) setTemplate8MenuItems(config.menuItems);
+        if (config?.hotItems) setTemplate8HotItems(config.hotItems);
+        if (config?.forYouItems) setTemplate8ForYouItems(config.forYouItems);
+
+        // Restore products for slots
+        const restoreItems = async () => {
+          try {
+            const response = await fetch(`${apiBaseUrl}/api/products`);
+            if (response.ok) {
+              const data = await response.json();
+              const products = data.data || [];
+              const productsBySlot: Record<string, any[]> = {};
+
+              // Menu items
+              config.menuItems?.forEach((item: any, index: number) => {
+                if (item.categoryId) {
+                  productsBySlot[`menu-${index}`] = products.filter((p: any) => p.category === item.categoryId);
+                }
+              });
+
+              // Hot items
+              config.hotItems?.forEach((item: any, index: number) => {
+                if (item.categoryId) {
+                  productsBySlot[`hot-${index}`] = products.filter((p: any) => p.category === item.categoryId);
+                }
+              });
+
+              // For You items
+              config.forYouItems?.forEach((item: any, index: number) => {
+                if (item.categoryId) {
+                  productsBySlot[`foryou-${index}`] = products.filter((p: any) => p.category === item.categoryId);
+                }
+              });
+
+              setTemplate8ProductsBySlot(productsBySlot);
+            }
+          } catch (error) {
+            console.error('Template-8 ürünler çekilirken hata:', error);
+          }
+        };
+        restoreItems();
       } else {
         setSelectedCategory((configData as any)?.category || "");
         setSelectedProducts((configData as any)?.data || []);
@@ -674,7 +754,7 @@ export default function TemplatePage() {
         // Kullanıcı ID'sini cookie'den al
         const userCookie = Cookies.get('user');
         let userId: string | null = null;
-        
+
         if (userCookie) {
           try {
             const user = JSON.parse(userCookie) as { id?: string };
@@ -1337,7 +1417,7 @@ export default function TemplatePage() {
                 productImage: undefined,
                 pricing: prev.pricing.map(p => ({ ...p, price: "₺0" }))
               }));
-              
+
               // Kategoriye göre ürünleri getir
               if (categoryId) {
                 try {
@@ -1359,13 +1439,13 @@ export default function TemplatePage() {
               const product = template5FeaturedProducts.find(p => p._id === productId);
               if (product && product.pricing?.basePrice) {
                 const productImage = product.image || product.img || product.imageUrl || undefined;
-                
+
                 // Options varsa options'tan, yoksa default pricing'den oluştur
-                let pricing: Array<{label: string; price: string; cal?: string; priceType?: string; optionKey?: string}> = [];
-                
-                if (product.options && Array.isArray(product.options) && product.options.length > 0) {
+                let pricing: Array<{ label: string; price: string; cal?: string; priceType?: string; optionKey?: string }> = [];
+
+                if ((product as any).options && Array.isArray((product as any).options) && (product as any).options.length > 0) {
                   // Options'tan dinamik olarak pricing oluştur (max 2 option)
-                  pricing = product.options.slice(0, 2).map((option: any, index: number) => {
+                  pricing = (product as any).options.slice(0, 2).map((option: any, index: number) => {
                     const formattedPrice = formatPrice(
                       product.pricing.basePrice.currency,
                       option.price || product.pricing.basePrice.price
@@ -1378,7 +1458,7 @@ export default function TemplatePage() {
                       optionKey: option.key
                     };
                   });
-                  
+
                   // Eğer 2'den az option varsa, ikinci satırı default olarak ekle
                   if (pricing.length === 1) {
                     const formattedPrice = formatPrice(
@@ -1403,7 +1483,7 @@ export default function TemplatePage() {
                     { label: "Per 2", price: formattedPrice, cal: "280", priceType: 'basePrice' }
                   ];
                 }
-                
+
                 setTemplate5FeaturedProduct(prev => ({
                   ...prev,
                   productId,
@@ -1419,10 +1499,10 @@ export default function TemplatePage() {
               if (product) {
                 const currentPricing = template5FeaturedProduct.pricing[index];
                 let formattedPrice = '';
-                
+
                 // Eğer optionKey varsa, options'tan fiyat al
-                if (currentPricing.optionKey && product.options) {
-                  const option = product.options.find((opt: any) => opt.key === currentPricing.optionKey);
+                if (currentPricing.optionKey && (product as any).options) {
+                  const option = (product as any).options.find((opt: any) => opt.key === currentPricing.optionKey);
                   if (option) {
                     formattedPrice = formatPrice(
                       product.pricing.basePrice.currency,
@@ -1436,11 +1516,11 @@ export default function TemplatePage() {
                     product.pricing[priceType].price
                   );
                 }
-                
+
                 if (formattedPrice) {
                   setTemplate5FeaturedProduct(prev => ({
                     ...prev,
-                    pricing: prev.pricing.map((p, i) => 
+                    pricing: prev.pricing.map((p, i) =>
                       i === index ? { ...p, price: formattedPrice, priceType } : p
                     )
                   }));
@@ -1448,12 +1528,12 @@ export default function TemplatePage() {
               }
             }}
             onMenuItemCategoryChange={async (itemNumber: number, categoryId: string) => {
-              setTemplate5MenuItems(prev => prev.map(item => 
-                item.number === itemNumber 
+              setTemplate5MenuItems(prev => prev.map(item =>
+                item.number === itemNumber
                   ? { ...item, categoryId, productId: undefined, name: "", prices: [] }
                   : item
               ));
-              
+
               // Kategoriye göre ürünleri getir - sadece bu slot için
               if (categoryId) {
                 try {
@@ -1470,26 +1550,17 @@ export default function TemplatePage() {
                 } catch (error) {
                   console.error('Ürünler çekilirken hata:', error);
                 }
-              } else {
-                setTemplate5ProductsBySlot(prev => {
-                  const newState = { ...prev };
-                  delete newState[itemNumber];
-                  return newState;
-                });
               }
             }}
             onMenuItemProductSelect={(itemNumber: number, productId: string) => {
-              const slotProducts = template5ProductsBySlot[itemNumber] || [];
-              const product = slotProducts.find(p => p._id === productId);
+              const product = template5ProductsBySlot[itemNumber]?.find(p => p._id === productId);
               if (product && product.pricing?.basePrice) {
                 const productImage = product.image || product.img || product.imageUrl || undefined;
-                
-                // Sadece options varsa prices oluştur, yoksa boş array
-                let prices: Array<{size: string; price: string; priceType?: string; optionKey?: string}> = [];
-                
-                if (product.options && Array.isArray(product.options) && product.options.length > 0) {
-                  // Options'tan dinamik olarak fiyatları oluştur
-                  prices = product.options.map((option: any) => {
+
+                let prices: Array<{ size: string; price: string; priceType?: string; optionKey?: string }> = [];
+
+                if ((product as any).options && Array.isArray((product as any).options) && (product as any).options.length > 0) {
+                  prices = (product as any).options.map((option: any) => {
                     const formattedPrice = formatPrice(
                       product.pricing.basePrice.currency,
                       option.price || product.pricing.basePrice.price
@@ -1501,19 +1572,28 @@ export default function TemplatePage() {
                       optionKey: option.key
                     };
                   });
+                } else {
+                  const formattedPrice = formatPrice(
+                    product.pricing.basePrice.currency,
+                    product.pricing.basePrice.price
+                  );
+                  prices.push({
+                    size: "Only",
+                    price: formattedPrice,
+                    priceType: 'basePrice'
+                  });
                 }
-                // Options yoksa prices boş kalacak (Small/Large gösterilmeyecek)
-                
-                setTemplate5MenuItems(prev => prev.map(item => 
-                  item.number === itemNumber 
+
+                setTemplate5MenuItems(prev => prev.map(item =>
+                  item.number === itemNumber
                     ? {
-                        ...item,
-                        productId,
-                        categoryId: product.category,
-                        name: product.name,
-                        image: productImage,
-                        prices: prices
-                      }
+                      ...item,
+                      productId,
+                      categoryId: product.category,
+                      name: product.name,
+                      image: productImage,
+                      prices: prices
+                    }
                     : item
                 ));
               }
@@ -1546,8 +1626,8 @@ export default function TemplatePage() {
                 }));
               } else {
                 // Menu item image
-                setTemplate5MenuItems(prev => prev.map(item => 
-                  item.number === itemNumber 
+                setTemplate5MenuItems(prev => prev.map(item =>
+                  item.number === itemNumber
                     ? { ...item, image: imageUrl }
                     : item
                 ));
@@ -1558,6 +1638,234 @@ export default function TemplatePage() {
           />
         </div>
       ),
+    },
+    "template-8": {
+      id: "template-8",
+      name: "Şablon 8 (Coffee Shop)",
+      component: (
+        <div className="relative h-screen w-full">
+          <Template8
+            menuItems={template8MenuItems}
+            hotItems={template8HotItems}
+            forYouItems={template8ForYouItems}
+            aromaItems={template8Aromas}
+            isEditable={true}
+            availableCategories={availableCategories}
+            availableProductsBySlot={template8ProductsBySlot}
+
+            // Menu Items Callbacks
+            onMenuItemCategoryChange={async (index, categoryId) => {
+              try {
+                const response = await fetch(`${apiBaseUrl}/api/products`);
+                if (response.ok) {
+                  const data = await response.json();
+                  const products = data.data || [];
+                  const filtered = products.filter((p: any) => p.category === categoryId);
+
+                  setTemplate8ProductsBySlot(prev => ({ ...prev, [`menu-${index}`]: filtered }));
+
+                  setTemplate8MenuItems(prev => {
+                    const newItems = [...prev];
+                    if (newItems[index]) {
+                      newItems[index] = { ...newItems[index], categoryId, productId: undefined };
+                    }
+                    return newItems;
+                  });
+                }
+              } catch (e) { console.error(e); }
+            }}
+
+            onMenuItemProductSelect={(index, productId) => {
+              const slotProducts = template8ProductsBySlot[`menu-${index}`] || [];
+              const product = slotProducts.find(p => p._id === productId);
+
+              if (product) {
+                setTemplate8MenuItems(prev => {
+                  const newItems = [...prev];
+                  if (newItems[index]) {
+                    newItems[index] = {
+                      ...newItems[index],
+                      productId,
+                      name: product.name,
+                      smallOptionKey: undefined,
+                      largeOptionKey: undefined
+                    };
+                  }
+                  return newItems;
+                });
+              }
+            }}
+
+            onMenuItemOptionSelect={(index, type, optionKey) => {
+              const currentItem = template8MenuItems[index];
+              const slotProducts = template8ProductsBySlot[`menu-${index}`] || [];
+              const product = slotProducts.find(p => p._id === currentItem.productId);
+
+              if (product && product.options) {
+                const selectedOpt = product.options.find(o => o.key === optionKey);
+                if (selectedOpt) {
+                  const priceStr = `₺${selectedOpt.price}`;
+                  setTemplate8MenuItems(prev => {
+                    const newItems = [...prev];
+                    if (newItems[index]) {
+                      const updated = { ...newItems[index] };
+                      if (type === 'small') {
+                        updated.priceSmall = priceStr;
+                        updated.smallOptionKey = optionKey;
+                      } else {
+                        updated.priceLarge = priceStr;
+                        updated.largeOptionKey = optionKey;
+                      }
+                      newItems[index] = updated;
+                    }
+                    return newItems;
+                  });
+                }
+              }
+            }}
+
+            // Hot Items Callbacks
+            onHotItemCategoryChange={async (index, categoryId) => {
+              try {
+                const response = await fetch(`${apiBaseUrl}/api/products`);
+                if (response.ok) {
+                  const data = await response.json();
+                  const products = data.data || [];
+                  const filtered = products.filter((p: any) => p.category === categoryId);
+
+                  setTemplate8ProductsBySlot(prev => ({ ...prev, [`hot-${index}`]: filtered }));
+
+                  setTemplate8HotItems(prev => {
+                    const newItems = [...prev];
+                    if (newItems[index]) {
+                      newItems[index] = { ...newItems[index], categoryId, productId: undefined };
+                    }
+                    return newItems;
+                  });
+                }
+              } catch (e) { console.error(e); }
+            }}
+
+            onHotItemProductSelect={(index, productId) => {
+              const slotProducts = template8ProductsBySlot[`hot-${index}`] || [];
+              const product = slotProducts.find(p => p._id === productId);
+              if (product) {
+                setTemplate8HotItems(prev => {
+                  const newItems = [...prev];
+                  if (newItems[index]) {
+                    newItems[index] = {
+                      ...newItems[index],
+                      productId,
+                      name: product.name,
+                      price1OptionKey: undefined,
+                      price2OptionKey: undefined
+                    };
+                  }
+                  return newItems;
+                });
+              }
+            }}
+
+            onHotItemOptionSelect={(index, type, optionKey) => {
+              const currentItem = template8HotItems[index];
+              const slotProducts = template8ProductsBySlot[`hot-${index}`] || [];
+              const product = slotProducts.find(p => p._id === currentItem.productId);
+
+              if (product && product.options) {
+                const selectedOpt = product.options.find(o => o.key === optionKey);
+                if (selectedOpt) {
+                  const priceStr = `₺${selectedOpt.price}`;
+                  const labelStr = selectedOpt.name.toUpperCase();
+
+                  setTemplate8HotItems(prev => {
+                    const newItems = [...prev];
+                    if (newItems[index]) {
+                      const updated = { ...newItems[index] };
+                      if (type === 'price1') {
+                        updated.price1Value = priceStr;
+                        updated.price1Label = labelStr;
+                        updated.price1OptionKey = optionKey;
+                      } else {
+                        updated.price2Value = priceStr;
+                        updated.price2Label = labelStr;
+                        updated.price2OptionKey = optionKey;
+                      }
+                      newItems[index] = updated;
+                    }
+                    return newItems;
+                  });
+                }
+              }
+            }}
+
+            // For You Items Callbacks
+            onForYouItemCategoryChange={async (index, categoryId) => {
+              try {
+                const response = await fetch(`${apiBaseUrl}/api/products`);
+                if (response.ok) {
+                  const data = await response.json();
+                  const products = data.data || [];
+                  const filtered = products.filter((p: any) => p.category === categoryId);
+
+                  setTemplate8ProductsBySlot(prev => ({ ...prev, [`foryou-${index}`]: filtered }));
+
+                  setTemplate8ForYouItems(prev => {
+                    const newItems = [...prev];
+                    if (newItems[index]) {
+                      newItems[index] = { ...newItems[index], categoryId, productId: undefined };
+                    }
+                    return newItems;
+                  });
+                }
+              } catch (e) { console.error(e); }
+            }}
+
+            onForYouItemProductSelect={(index, productId) => {
+              const slotProducts = template8ProductsBySlot[`foryou-${index}`] || [];
+              const product = slotProducts.find(p => p._id === productId);
+              if (product) {
+                setTemplate8ForYouItems(prev => {
+                  const newItems = [...prev];
+                  if (newItems[index]) {
+                    newItems[index] = {
+                      ...newItems[index],
+                      productId,
+                      name: product.name,
+                      optionKey: undefined
+                    };
+                  }
+                  return newItems;
+                });
+              }
+            }}
+
+            onForYouItemOptionSelect={(index, optionKey) => {
+              const currentItem = template8ForYouItems[index];
+              const slotProducts = template8ProductsBySlot[`foryou-${index}`] || [];
+              const product = slotProducts.find(p => p._id === currentItem.productId);
+
+              if (product && product.options) {
+                const selectedOpt = product.options.find(o => o.key === optionKey);
+                if (selectedOpt) {
+                  const priceStr = `₺${selectedOpt.price}`;
+                  setTemplate8ForYouItems(prev => {
+                    const newItems = [...prev];
+                    if (newItems[index]) {
+                      newItems[index] = {
+                        ...newItems[index],
+                        price: priceStr,
+                        optionKey
+                      };
+                    }
+                    return newItems;
+                  });
+                }
+              }
+            }}
+
+          />
+        </div>
+      )
     },
     "template-6": {
       id: "template-6",
@@ -1584,7 +1892,7 @@ export default function TemplatePage() {
                     ...prev,
                     [slotIndex]: filteredProducts
                   }));
-                  
+
                   // Menu item'ı güncelle
                   setTemplate6MenuItems(prev => {
                     const newItems = [...prev];
@@ -1619,18 +1927,18 @@ export default function TemplatePage() {
                     product.pricing.basePrice.price
                   );
                 }
-                
+
                 const productImage = product.image || product.img || product.imageUrl || "/images/pizza1.svg";
-                
+
                 setTemplate6MenuItems(prev => {
                   const newItems = [...prev];
                   newItems[slotIndex] = {
                     ...newItems[slotIndex],
-                      productId: productId,
-                      title: product.name,
-                      desc: (product as any).description || "",
-                      price: formattedPrice,
-                      image: productImage
+                    productId: productId,
+                    title: product.name,
+                    desc: (product as any).description || "",
+                    price: formattedPrice,
+                    image: productImage
                   };
                   return newItems;
                 });
@@ -1645,7 +1953,7 @@ export default function TemplatePage() {
                     product.pricing[priceType].currency,
                     product.pricing[priceType].price
                   );
-                  
+
                   setTemplate6MenuItems(prev => {
                     const newItems = [...prev];
                     newItems[slotIndex] = {
@@ -1692,7 +2000,7 @@ export default function TemplatePage() {
                     ...prev,
                     [`sidebar-${index}`]: filteredProducts
                   }));
-                  
+
                   setTemplate7SidebarItems(prev => {
                     const newItems = [...prev];
                     if (newItems[index]) {
@@ -1719,7 +2027,7 @@ export default function TemplatePage() {
                   product.pricing.basePrice.currency,
                   product.pricing.basePrice.price
                 );
-                
+
                 setTemplate7SidebarItems(prev => {
                   const newItems = [...prev];
                   if (newItems[index]) {
@@ -1745,7 +2053,7 @@ export default function TemplatePage() {
                     ...prev,
                     [`grid-${index}`]: filteredProducts
                   }));
-                  
+
                   setTemplate7GridItems(prev => {
                     const newItems = [...prev];
                     if (newItems[index]) {
@@ -1773,7 +2081,7 @@ export default function TemplatePage() {
                   product.pricing.basePrice.price
                 );
                 const productImage = product.image || product.img || product.imageUrl || "/images/teavuk_dürüm.svg";
-                
+
                 setTemplate7GridItems(prev => {
                   const newItems = [...prev];
                   if (newItems[index]) {
@@ -1793,6 +2101,56 @@ export default function TemplatePage() {
             onGridItemImageClick={(index: number) => {
               setSelectedImageIndex(index);
               setIsImageSelectorOpen(true);
+            }}
+            onSidebarItemOptionSelect={(index: number, optionKey: string) => {
+              const currentItem = template7SidebarItems[index];
+              if (currentItem && currentItem.productId) {
+                const product = template7ProductsBySlot[`sidebar-${index}`]?.find(p => p._id === currentItem.productId) as any;
+                if (product && product.options) {
+                  const selectedOption = product.options.find((opt: any) => opt.key === optionKey);
+                  if (selectedOption) {
+                    const formattedPrice = formatPrice(
+                      product.pricing.basePrice.currency,
+                      selectedOption.price
+                    );
+                    setTemplate7SidebarItems(prev => {
+                      const newItems = [...prev];
+                      if (newItems[index]) {
+                        newItems[index] = {
+                          ...newItems[index],
+                          price: formattedPrice
+                        };
+                      }
+                      return newItems;
+                    });
+                  }
+                }
+              }
+            }}
+            onGridItemOptionSelect={(index: number, optionKey: string) => {
+              const currentItem = template7GridItems[index];
+              if (currentItem && currentItem.productId) {
+                const product = template7ProductsBySlot[`grid-${index}`]?.find(p => p._id === currentItem.productId) as any;
+                if (product && product.options) {
+                  const selectedOption = product.options.find((opt: any) => opt.key === optionKey);
+                  if (selectedOption) {
+                    const formattedPrice = formatPrice(
+                      product.pricing.basePrice.currency,
+                      selectedOption.price
+                    );
+                    setTemplate7GridItems(prev => {
+                      const newItems = [...prev];
+                      if (newItems[index]) {
+                        newItems[index] = {
+                          ...newItems[index],
+                          price: formattedPrice
+                        };
+                      }
+                      return newItems;
+                    });
+                  }
+                }
+              }
             }}
           />
         </div>
@@ -1860,9 +2218,9 @@ export default function TemplatePage() {
 
               const configData = templateId === "template-2"
                 ? {
-                    categories: selectedCategories,
-                    data: selectedProductsByCategory
-                  }
+                  categories: selectedCategories,
+                  data: selectedProductsByCategory
+                }
                 : templateId === "template-4"
                   ? {
                     data: template4SelectedProducts,
@@ -1888,10 +2246,16 @@ export default function TemplatePage() {
                           sidebarItems: template7SidebarItems,
                           gridItems: template7GridItems
                         }
-                        : {
-                          category: selectedCategory || "",
-                          data: (selectedProducts.length > 0 ? selectedProducts : [])
-                        };
+                        : templateId === "template-8"
+                          ? {
+                            menuItems: template8MenuItems,
+                            hotItems: template8HotItems,
+                            forYouItems: template8ForYouItems
+                          }
+                          : {
+                            category: selectedCategory || "",
+                            data: (selectedProducts.length > 0 ? selectedProducts : [])
+                          };
 
               // Debug: Template-4 için configData'yı log'la
               if (templateId === "template-4") {
@@ -2013,21 +2377,19 @@ export default function TemplatePage() {
             <div className="flex border-b border-stroke dark:border-stroke-dark px-6">
               <button
                 onClick={() => setSelectedMediaCategory('gallery')}
-                className={`px-4 py-3 font-medium transition-colors border-b-2 ${
-                  selectedMediaCategory === 'gallery'
-                    ? 'border-primary text-primary dark:text-primary'
-                    : 'border-transparent text-dark-4 hover:text-dark dark:text-dark-6 dark:hover:text-white'
-                }`}
+                className={`px-4 py-3 font-medium transition-colors border-b-2 ${selectedMediaCategory === 'gallery'
+                  ? 'border-primary text-primary dark:text-primary'
+                  : 'border-transparent text-dark-4 hover:text-dark dark:text-dark-6 dark:hover:text-white'
+                  }`}
               >
                 Fotoğraf Galerisi ({galleryMedia.length})
               </button>
               <button
                 onClick={() => setSelectedMediaCategory('user')}
-                className={`px-4 py-3 font-medium transition-colors border-b-2 ${
-                  selectedMediaCategory === 'user'
-                    ? 'border-primary text-primary dark:text-primary'
-                    : 'border-transparent text-dark-4 hover:text-dark dark:text-dark-6 dark:hover:text-white'
-                }`}
+                className={`px-4 py-3 font-medium transition-colors border-b-2 ${selectedMediaCategory === 'user'
+                  ? 'border-primary text-primary dark:text-primary'
+                  : 'border-transparent text-dark-4 hover:text-dark dark:text-dark-6 dark:hover:text-white'
+                  }`}
               >
                 Yüklediğim Fotoğraflar ({userMedia.length})
               </button>
@@ -2052,8 +2414,8 @@ export default function TemplatePage() {
                         />
                       </svg>
                       <p className="text-dark-4 dark:text-dark-6">
-                        {selectedMediaCategory === 'gallery' 
-                          ? 'Fotoğraf galerisinde henüz fotoğraf yok.' 
+                        {selectedMediaCategory === 'gallery'
+                          ? 'Fotoğraf galerisinde henüz fotoğraf yok.'
                           : 'Henüz yüklediğiniz fotoğraf yok.'}
                       </p>
                       <p className="mt-2 text-sm text-dark-4 dark:text-dark-6">
@@ -2067,122 +2429,122 @@ export default function TemplatePage() {
                 return (
                   <MediaGallery
                     initialData={currentMedia}
-                  showActions={false}
-                  selectionMode={true}
-                  onImageSelect={(imageUrl: string) => {
-                    if (templateId === "template-5") {
-                      if (selectedImageIndex === -1) {
-                        // Template-5 featured product image
-                        setTemplate5FeaturedProduct(prev => ({
+                    showActions={false}
+                    selectionMode={true}
+                    onImageSelect={(imageUrl: string) => {
+                      if (templateId === "template-5") {
+                        if (selectedImageIndex === -1) {
+                          // Template-5 featured product image
+                          setTemplate5FeaturedProduct(prev => ({
+                            ...prev,
+                            productImage: imageUrl
+                          }));
+                        } else if (selectedImageIndex !== null && selectedImageIndex >= 1 && selectedImageIndex <= 8) {
+                          // Template-5 menu item image
+                          setTemplate5MenuItems(prev => prev.map(item =>
+                            item.number === selectedImageIndex
+                              ? { ...item, image: imageUrl }
+                              : item
+                          ));
+                        }
+                      } else if (templateId === "template-6" && selectedImageIndex !== null && selectedImageIndex >= 0 && selectedImageIndex < 9) {
+                        // Template-6 menu item image
+                        setTemplate6MenuItems(prev => {
+                          const newItems = [...prev];
+                          if (newItems[selectedImageIndex]) {
+                            newItems[selectedImageIndex] = {
+                              ...newItems[selectedImageIndex],
+                              image: imageUrl
+                            };
+                          }
+                          return newItems;
+                        });
+                      } else if (templateId === "template-7" && selectedImageIndex === -1) {
+                        // Template-7 hero image
+                        setTemplate7Hero(prev => ({
                           ...prev,
-                          productImage: imageUrl
+                          image: imageUrl
                         }));
-                      } else if (selectedImageIndex !== null && selectedImageIndex >= 1 && selectedImageIndex <= 8) {
-                        // Template-5 menu item image
-                        setTemplate5MenuItems(prev => prev.map(item => 
-                          item.number === selectedImageIndex 
-                            ? { ...item, image: imageUrl }
-                            : item
-                        ));
-                      }
-                    } else if (templateId === "template-6" && selectedImageIndex !== null && selectedImageIndex >= 0 && selectedImageIndex < 9) {
-                      // Template-6 menu item image
-                      setTemplate6MenuItems(prev => {
-                        const newItems = [...prev];
-                        if (newItems[selectedImageIndex]) {
-                          newItems[selectedImageIndex] = {
-                            ...newItems[selectedImageIndex],
-                            image: imageUrl
-                          };
-                        }
-                        return newItems;
-                      });
-                    } else if (templateId === "template-7" && selectedImageIndex === -1) {
-                      // Template-7 hero image
-                      setTemplate7Hero(prev => ({
-                        ...prev,
-                        image: imageUrl
-                      }));
-                    } else if (templateId === "template-7" && selectedImageIndex !== null && selectedImageIndex >= 0 && selectedImageIndex < 6) {
-                      // Template-7 grid item image
-                      setTemplate7GridItems(prev => {
-                        const newItems = [...prev];
-                        if (newItems[selectedImageIndex]) {
-                          newItems[selectedImageIndex] = {
-                            ...newItems[selectedImageIndex],
-                            image: imageUrl
-                          };
-                        }
-                        return newItems;
-                      });
-                    } else if (templateId === "template-4" && selectedImageIndex === -1) {
-                      // Template-4 promo image için
-                      setTemplate4PromoImage(imageUrl);
-                      setTemplate4PromoProduct(prev => ({
-                        ...prev,
-                        image: imageUrl,
-                        // Eğer name yoksa, en azından image kaydedilsin diye bir placeholder ekle
-                        name: prev.name || 'KING DEALS',
-                        price: prev.price || '299',
-                        currency: prev.currency || '₺',
-                        cents: prev.cents || '.95',
-                      }));
-                    } else if (templateId === "template-4" && selectedImageIndex !== null && selectedImageIndex >= 0) {
-                      // Template-4 slot image için
-                      setTemplate4SelectedProducts(prev => {
-                        const newProducts = [...prev];
-                        if (newProducts[selectedImageIndex]) {
-                          newProducts[selectedImageIndex] = {
-                            ...newProducts[selectedImageIndex],
-                            image: imageUrl
-                          };
-                        }
-                        return newProducts;
-                      });
-                      // 1. slot için resim seçildiğinde, promo image'ı da güncelle
-                      if (selectedImageIndex === 0) {
+                      } else if (templateId === "template-7" && selectedImageIndex !== null && selectedImageIndex >= 0 && selectedImageIndex < 6) {
+                        // Template-7 grid item image
+                        setTemplate7GridItems(prev => {
+                          const newItems = [...prev];
+                          if (newItems[selectedImageIndex]) {
+                            newItems[selectedImageIndex] = {
+                              ...newItems[selectedImageIndex],
+                              image: imageUrl
+                            };
+                          }
+                          return newItems;
+                        });
+                      } else if (templateId === "template-4" && selectedImageIndex === -1) {
+                        // Template-4 promo image için
                         setTemplate4PromoImage(imageUrl);
                         setTemplate4PromoProduct(prev => ({
                           ...prev,
                           image: imageUrl,
+                          // Eğer name yoksa, en azından image kaydedilsin diye bir placeholder ekle
+                          name: prev.name || 'KING DEALS',
+                          price: prev.price || '299',
+                          currency: prev.currency || '₺',
+                          cents: prev.cents || '.95',
                         }));
+                      } else if (templateId === "template-4" && selectedImageIndex !== null && selectedImageIndex >= 0) {
+                        // Template-4 slot image için
+                        setTemplate4SelectedProducts(prev => {
+                          const newProducts = [...prev];
+                          if (newProducts[selectedImageIndex]) {
+                            newProducts[selectedImageIndex] = {
+                              ...newProducts[selectedImageIndex],
+                              image: imageUrl
+                            };
+                          }
+                          return newProducts;
+                        });
+                        // 1. slot için resim seçildiğinde, promo image'ı da güncelle
+                        if (selectedImageIndex === 0) {
+                          setTemplate4PromoImage(imageUrl);
+                          setTemplate4PromoProduct(prev => ({
+                            ...prev,
+                            image: imageUrl,
+                          }));
+                        }
+                      } else if (selectedImageIndex !== null && selectedImageCategorySlot === null) {
+                        // Template-1 için
+                        setSelectedProducts(prev => {
+                          const newProducts = [...prev];
+                          if (newProducts[selectedImageIndex]) {
+                            newProducts[selectedImageIndex] = {
+                              ...newProducts[selectedImageIndex],
+                              image: imageUrl
+                            };
+                          }
+                          return newProducts;
+                        });
+                      } else if (selectedImageCategorySlot !== null && selectedImageIndex !== null) {
+                        // Template-2 için
+                        setSelectedProductsByCategory(prev => {
+                          const categoryProducts = [...(prev[selectedImageCategorySlot] || [])];
+                          if (categoryProducts[selectedImageIndex]) {
+                            categoryProducts[selectedImageIndex] = {
+                              ...categoryProducts[selectedImageIndex],
+                              image: imageUrl
+                            };
+                          }
+                          return {
+                            ...prev,
+                            [selectedImageCategorySlot]: categoryProducts
+                          };
+                        });
                       }
-                    } else if (selectedImageIndex !== null && selectedImageCategorySlot === null) {
-                      // Template-1 için
-                      setSelectedProducts(prev => {
-                        const newProducts = [...prev];
-                        if (newProducts[selectedImageIndex]) {
-                          newProducts[selectedImageIndex] = {
-                            ...newProducts[selectedImageIndex],
-                            image: imageUrl
-                          };
-                        }
-                        return newProducts;
-                      });
-                    } else if (selectedImageCategorySlot !== null && selectedImageIndex !== null) {
-                      // Template-2 için
-                      setSelectedProductsByCategory(prev => {
-                        const categoryProducts = [...(prev[selectedImageCategorySlot] || [])];
-                        if (categoryProducts[selectedImageIndex]) {
-                          categoryProducts[selectedImageIndex] = {
-                            ...categoryProducts[selectedImageIndex],
-                            image: imageUrl
-                          };
-                        }
-                        return {
-                          ...prev,
-                          [selectedImageCategorySlot]: categoryProducts
-                        };
-                      });
-                    }
-                    setIsImageSelectorOpen(false);
-                    setSelectedImageIndex(null);
-                    setSelectedImageCategorySlot(null);
-                  }}
-                  gridCols="grid-cols-4 sm:grid-cols-5 md:grid-cols-6"
-                  maxHeight="600px"
-                  disableClick={true}
-                />
+                      setIsImageSelectorOpen(false);
+                      setSelectedImageIndex(null);
+                      setSelectedImageCategorySlot(null);
+                    }}
+                    gridCols="grid-cols-4 sm:grid-cols-5 md:grid-cols-6"
+                    maxHeight="600px"
+                    disableClick={true}
+                  />
                 );
               })()}
             </div>

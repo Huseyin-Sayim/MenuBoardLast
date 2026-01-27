@@ -105,7 +105,7 @@ export default function Template5Content({
     category: "",
     name: "",
     image: "/images/burger_menu.svg",
-    prices: [], // Options yoksa boş kalacak
+    prices: [{ size: "Only", price: "$0.00" }],
     isNew: false
   }));
 
@@ -118,7 +118,7 @@ export default function Template5Content({
       category: "",
       name: "",
       image: "/images/burger_menu.svg",
-      prices: [], // Options yoksa boş kalacak
+      prices: [{ size: "Only", price: "$0.00" }],
       isNew: false
     });
   }
@@ -129,24 +129,24 @@ export default function Template5Content({
       <div className="sidebar">
         {/* Logo Area */}
         <div className="logo-area">
-          <img 
-            src={featured.logoImage || "/images/burger_logo.svg"} 
-            alt="Logo" 
-            className="logo-img" 
+          <img
+            src={featured.logoImage || "/images/burger_logo.svg"}
+            alt="Logo"
+            className="logo-img"
           />
         </div>
 
         {/* Featured Product Image */}
         <div className="featured-image">
           {isEditable ? (
-            <div 
+            <div
               onClick={onFeaturedImageClick}
               style={{ cursor: 'pointer', position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              <img 
-                src={featured.productImage || "/images/burger+patato.png"} 
-                alt="Featured Product" 
-                className="featured-img" 
+              <img
+                src={featured.productImage || "/images/burger+patato.png"}
+                alt="Featured Product"
+                className="featured-img"
               />
               <div style={{
                 position: 'absolute',
@@ -163,10 +163,10 @@ export default function Template5Content({
               </div>
             </div>
           ) : (
-            <img 
-              src={featured.productImage || "/images/burger+patato.png"} 
-              alt="Featured Product" 
-              className="featured-img" 
+            <img
+              src={featured.productImage || "/images/burger+patato.png"}
+              alt="Featured Product"
+              className="featured-img"
             />
           )}
         </div>
@@ -232,7 +232,7 @@ export default function Template5Content({
           ) : (
             <span className="featured-label">{featured.label || "PREMIUM"}</span>
           )}
-          
+
           {!isEditable && <span className="featured-title">{featured.title || "CHEESE"}</span>}
           <h2 className="featured-name">{featured.name || "WHOPPER"}</h2>
 
@@ -250,8 +250,8 @@ export default function Template5Content({
                         onFeaturedPriceTypeSelect(index, e.target.value);
                       }
                     }}
-                    style={{ 
-                      fontSize: '12px', 
+                    style={{
+                      fontSize: '12px',
                       padding: '2px 5px',
                       borderRadius: '3px',
                       border: '1px solid rgba(255,255,255,0.3)',
@@ -347,14 +347,14 @@ function MenuItemComponent({
     <div className={`menu-item ${item.isNew ? 'new-item' : ''}`}>
       <div className="item-image-area">
         {isEditable ? (
-          <div 
+          <div
             onClick={() => onImageClick?.(item.number)}
             style={{ cursor: 'pointer', position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
-            <img 
-              src={item.image || "/images/burger_menu.svg"} 
-              alt={item.name} 
-              className="item-image" 
+            <img
+              src={item.image || "/images/burger_menu.svg"}
+              alt={item.name}
+              className="item-image"
             />
             <div style={{
               position: 'absolute',
@@ -371,10 +371,10 @@ function MenuItemComponent({
             </div>
           </div>
         ) : (
-          <img 
-            src={item.image || "/images/burger_menu.svg"} 
-            alt={item.name} 
-            className="item-image" 
+          <img
+            src={item.image || "/images/burger_menu.svg"}
+            alt={item.name}
+            className="item-image"
           />
         )}
         {item.prices.find(p => p.comboImage) && (
@@ -448,7 +448,7 @@ function MenuItemComponent({
           <div className="item-prices">
             {item.prices.map((price, idx) => (
               <div className="price-row" key={idx}>
-                <span className="size-label">{price.size}</span>
+                {price.size !== 'Only' && <span className="size-label">{price.size}</span>}
                 <span className="price-value">{price.price}</span>
               </div>
             ))}

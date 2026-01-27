@@ -1,0 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Varela+Round:ital,wght@0,400&display=swap');
+
+/* Custom reset from the user snippet, if needed, but handled by Tailwind Preflight usually. 
+   The user had "preflight: false" and added this manually. 
+   Since we keep preflight globally, we might not need this, but adding it to ensure resets happen if preflight doesn't cover something specific 
+   or if we want to enforce 0 border width on everything inside this template (though this is global selector).
+*/
+/* *, *::before, *::after { border-width: 0; } */

@@ -83,6 +83,8 @@ export async function PUT(
     const isTemplate6 = templateId === 'template-6' || templateId?.includes('template-6');
     // Template-7 için özel format kontrolü
     const isTemplate7 = templateId === 'template-7' || templateId?.includes('template-7');
+    // Template-8 için özel format kontrolü
+    const isTemplate8 = templateId === 'template-8' || templateId?.includes('template-8');
 
     let configData: any;
 
@@ -151,6 +153,23 @@ export async function PUT(
         hero: hero || { logo: "/images/burger_logo.svg", titleTop: "GYRO", titleBottom: "FOOD", image: "/images/teavuk_dürüm.svg", promo: { title: "Only Today", value: "20%", label: "OFF" } },
         sidebarItems: sidebarItems || [],
         gridItems: gridItems || []
+      };
+    } else if (isTemplate8) {
+      // Template-8 formatı: { menuItems: Array, hotItems: Array, forYouItems: Array }
+      const { menuItems, hotItems, forYouItems } = configBody;
+
+      if (!menuItems || !Array.isArray(menuItems) || !hotItems || !Array.isArray(hotItems) || !forYouItems || !Array.isArray(forYouItems)) {
+        console.error('Template-8 için geçersiz veri formatı');
+        return NextResponse.json(
+          { message: 'Geçersiz veri formatı: Template-8 listeleri array olmalı' },
+          { status: 400 }
+        );
+      }
+
+      configData = {
+        menuItems: menuItems || [],
+        hotItems: hotItems || [],
+        forYouItems: forYouItems || []
       };
     } else {
       // Template-1, Template-3, Template-4 formatı: { category: string, data: Array }

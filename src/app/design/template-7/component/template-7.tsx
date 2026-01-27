@@ -50,14 +50,16 @@ interface Template7Props {
   isEditable?: boolean;
   // Edit mode props
   availableCategories?: Array<{ _id: string; name: string }>;
-  availableProductsBySlot?: Record<string, Array<{ _id: string; name: string; pricing: any; category: string; image?: string; img?: string; imageUrl?: string; options?: Array<{key: string; name: string; price: number}> }>>;
+  availableProductsBySlot?: Record<string, Array<{ _id: string; name: string; pricing: any; category: string; image?: string; img?: string; imageUrl?: string; options?: Array<{ key: string; name: string; price: number }> }>>;
   onHeroImageClick?: () => void;
   onSidebarItemCategoryChange?: (index: number, categoryId: string) => void;
   onSidebarItemProductSelect?: (index: number, productId: string) => void;
   onSidebarItemImageClick?: (index: number) => void;
+  onSidebarItemOptionSelect?: (index: number, optionKey: string) => void;
   onGridItemCategoryChange?: (index: number, categoryId: string) => void;
   onGridItemProductSelect?: (index: number, productId: string) => void;
   onGridItemImageClick?: (index: number) => void;
+  onGridItemOptionSelect?: (index: number, optionKey: string) => void;
 }
 
 export default function Template7Content({
@@ -72,13 +74,15 @@ export default function Template7Content({
   onSidebarItemCategoryChange,
   onSidebarItemProductSelect,
   onSidebarItemImageClick,
+  onSidebarItemOptionSelect,
   onGridItemCategoryChange,
   onGridItemProductSelect,
   onGridItemImageClick,
+  onGridItemOptionSelect,
 }: Template7Props) {
   // Ensure we have at least 1 sidebar item and 6 grid items
   const displaySidebarItems: SidebarItem[] = sidebarItems.length > 0 ? sidebarItems : [{ title: "", desc: "", price: "" }];
-  const displayGridItems: GridItem[] = Array.from({ length: 6 }, (_, i) => 
+  const displayGridItems: GridItem[] = Array.from({ length: 6 }, (_, i) =>
     gridItems[i] || { title: "", desc: "", price: "", variant: "white", image: "/images/teavuk_dürüm.svg" }
   );
 
@@ -107,7 +111,7 @@ export default function Template7Content({
         <div className="gg-hero-image-area">
           <div
             onClick={() => isEditable && onHeroImageClick?.()}
-            style={isEditable ? { cursor: 'pointer', position: 'relative' } : {}}
+            style={isEditable ? { cursor: 'pointer', position: 'relative', zIndex: 10 } : {}}
           >
             {hero.image ? (
               <Image
@@ -143,9 +147,9 @@ export default function Template7Content({
                     value={item.categoryId || ""}
                     onChange={(e) => onSidebarItemCategoryChange?.(index, e.target.value)}
                     className="mb-1 text-xs"
-                    style={{ 
-                      background: '#004d3d', 
-                      color: '#ffffff', 
+                    style={{
+                      background: '#004d3d',
+                      color: '#ffffff',
                       border: '1px solid rgba(0,0,0,0.2)',
                       padding: '0.2vh 0.3vw',
                       borderRadius: '0.2vw',
@@ -167,9 +171,9 @@ export default function Template7Content({
                       value={item.productId || ""}
                       onChange={(e) => onSidebarItemProductSelect?.(index, e.target.value)}
                       className="mb-1 text-xs"
-                      style={{ 
-                        background: '#004d3d', 
-                        color: '#ffffff', 
+                      style={{
+                        background: '#004d3d',
+                        color: '#ffffff',
                         border: '1px solid rgba(0,0,0,0.2)',
                         padding: '0.2vh 0.3vw',
                         borderRadius: '0.2vw',
@@ -187,63 +191,13 @@ export default function Template7Content({
                       ))}
                     </select>
                   )}
-                </>
-              ) : null}
-              <h3 className="gg-footer-title">{item.title || "Item"}</h3>
-              <p className="gg-footer-desc">{item.desc || ""}</p>
-              <div className="gg-footer-price">{item.price || ""}</div>
-            </div>
-          ))}
-          <div className="gg-phone" style={{ textAlign: 'center', marginTop: 'auto', paddingTop: '20px' }}>
-            {brand.phone || ""}
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="gg-main-content">
-        <div className="gg-grid">
-          {displayGridItems.map((item, index) => {
-            // Variant'ı CSS class'ına uygun hale getir
-            let variantClass = item.variant || "white";
-            if (variantClass === "white blob") {
-              variantClass = "white-blob";
-            }
-            return (
-            <div key={index} className={`gg-card ${variantClass}`}>
-              {isEditable ? (
-                <>
-                  <select
-                    value={item.categoryId || ""}
-                    onChange={(e) => onGridItemCategoryChange?.(index, e.target.value)}
-                    className="mb-1 text-xs"
-                    style={{ 
-                      background: '#004d3d', 
-                      color: '#ffffff', 
-                      border: '1px solid rgba(0,0,0,0.2)',
-                      padding: '0.2vh 0.3vw',
-                      borderRadius: '0.2vw',
-                      fontSize: '0.7vw',
-                      width: '100%',
-                      cursor: 'pointer',
-                      position: 'relative',
-                      zIndex: 20,
-                      pointerEvents: 'auto'
-                    }}
-                  >
-                    <option value="" style={{ background: '#004d3d', color: '#ffffff' }}>Kategori Seç</option>
-                    {availableCategories.map(cat => (
-                      <option key={cat._id} value={cat._id} style={{ background: '#004d3d', color: '#ffffff' }}>{cat.name}</option>
-                    ))}
-                  </select>
-                  {item.categoryId && availableProductsBySlot[`grid-${index}`] && (
+                  {item.productId && availableProductsBySlot[`sidebar-${index}`]?.find(p => p._id === item.productId)?.options?.length ? (
                     <select
-                      value={item.productId || ""}
-                      onChange={(e) => onGridItemProductSelect?.(index, e.target.value)}
+                      onChange={(e) => onSidebarItemOptionSelect?.(index, e.target.value)}
                       className="mb-1 text-xs"
-                      style={{ 
-                        background: '#004d3d', 
-                        color: '#ffffff', 
+                      style={{
+                        background: '#004d3d',
+                        color: '#ffffff',
                         border: '1px solid rgba(0,0,0,0.2)',
                         padding: '0.2vh 0.3vw',
                         borderRadius: '0.2vw',
@@ -255,43 +209,151 @@ export default function Template7Content({
                         pointerEvents: 'auto'
                       }}
                     >
-                      <option value="" style={{ background: '#004d3d', color: '#ffffff' }}>Ürün Seç</option>
-                      {availableProductsBySlot[`grid-${index}`].map(product => (
-                        <option key={product._id} value={product._id} style={{ background: '#004d3d', color: '#ffffff' }}>{product.name}</option>
+                      <option value="" style={{ background: '#004d3d', color: '#ffffff' }}>Seçenek Seç</option>
+                      {availableProductsBySlot[`sidebar-${index}`]?.find(p => p._id === item.productId)?.options?.map(opt => (
+                        <option key={opt.key} value={opt.key} style={{ background: '#004d3d', color: '#ffffff' }}>
+                          {opt.name} - {opt.price}
+                        </option>
                       ))}
                     </select>
-                  )}
+                  ) : null}
                 </>
               ) : null}
-              <h2 className="gg-card-title">{item.title || "Item"}</h2>
-              <p className="gg-card-desc">{item.desc || ""}</p>
-              <div className="gg-card-price">{item.price || ""}</div>
-              <div
-                onClick={() => isEditable && onGridItemImageClick?.(index)}
-                style={isEditable ? { cursor: 'pointer', position: 'relative' } : {}}
-              >
-                {item.image ? (
-                  <Image
-                    src={item.image}
-                    alt={item.title || "Item"}
-                    className="gg-card-img"
-                    width={400}
-                    height={400}
-                    unoptimized
-                  />
-                ) : null}
-                {isEditable && (
-                  <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                    <span className="text-white text-xs">Resim Değiştir</span>
-                  </div>
-                )}
-              </div>
+              <h3 className="gg-footer-title">{item.title || "Item"}</h3>
+              <p className="gg-footer-desc">{item.desc || ""}</p>
+              <div className="gg-footer-price">{item.price || ""}</div>
             </div>
+          ))}
+          <div className="gg-phone" style={{ textAlign: 'center', marginTop: 'auto', paddingTop: '20px' }}>
+            {brand.phone || ""}
+          </div>
+        </div>
+      </aside >
+
+      {/* Main Content */}
+      < main className="gg-main-content" >
+        <div className="gg-grid">
+          {displayGridItems.map((item, index) => {
+            // Variant'ı CSS class'ına uygun hale getir
+            let variantClass = item.variant || "white";
+            if (variantClass === "white blob") {
+              variantClass = "white-blob";
+            }
+            return (
+              <div key={index} className={`gg-card ${variantClass}`}>
+                {isEditable ? (
+                  <>
+                    <select
+                      value={item.categoryId || ""}
+                      onChange={(e) => onGridItemCategoryChange?.(index, e.target.value)}
+                      className="mb-1 text-xs"
+                      style={{
+                        background: '#004d3d',
+                        color: '#ffffff',
+                        border: '1px solid rgba(0,0,0,0.2)',
+                        padding: '0.2vh 0.3vw',
+                        borderRadius: '0.2vw',
+                        fontSize: '0.7vw',
+                        width: '100%',
+                        cursor: 'pointer',
+                        position: 'relative',
+                        zIndex: 20,
+                        pointerEvents: 'auto'
+                      }}
+                    >
+                      <option value="" style={{ background: '#004d3d', color: '#ffffff' }}>Kategori Seç</option>
+                      {availableCategories.map(cat => (
+                        <option key={cat._id} value={cat._id} style={{ background: '#004d3d', color: '#ffffff' }}>{cat.name}</option>
+                      ))}
+                    </select>
+                    {item.categoryId && availableProductsBySlot[`grid-${index}`] && (
+                      <select
+                        value={item.productId || ""}
+                        onChange={(e) => onGridItemProductSelect?.(index, e.target.value)}
+                        className="mb-1 text-xs"
+                        style={{
+                          background: '#004d3d',
+                          color: '#ffffff',
+                          border: '1px solid rgba(0,0,0,0.2)',
+                          padding: '0.2vh 0.3vw',
+                          borderRadius: '0.2vw',
+                          fontSize: '0.7vw',
+                          width: '100%',
+                          cursor: 'pointer',
+                          position: 'relative',
+                          zIndex: 20,
+                          pointerEvents: 'auto'
+                        }}
+                      >
+                        <option value="" style={{ background: '#004d3d', color: '#ffffff' }}>Ürün Seç</option>
+                        {availableProductsBySlot[`grid-${index}`].map(product => (
+                          <option key={product._id} value={product._id} style={{ background: '#004d3d', color: '#ffffff' }}>{product.name}</option>
+                        ))}
+                      </select>
+                    )}
+                    {item.productId && availableProductsBySlot[`grid-${index}`]?.find(p => p._id === item.productId)?.options?.length ? (
+                      <select
+                        onChange={(e) => onGridItemOptionSelect?.(index, e.target.value)}
+                        className="mb-1 text-xs"
+                        style={{
+                          background: '#004d3d',
+                          color: '#ffffff',
+                          border: '1px solid rgba(0,0,0,0.2)',
+                          padding: '0.2vh 0.3vw',
+                          borderRadius: '0.2vw',
+                          fontSize: '0.7vw',
+                          width: '100%',
+                          cursor: 'pointer',
+                          position: 'relative',
+                          zIndex: 20,
+                          pointerEvents: 'auto'
+                        }}
+                      >
+                        <option value="" style={{ background: '#004d3d', color: '#ffffff' }}>Seçenek Seç</option>
+                        {availableProductsBySlot[`grid-${index}`]?.find(p => p._id === item.productId)?.options?.map(opt => (
+                          <option key={opt.key} value={opt.key} style={{ background: '#004d3d', color: '#ffffff' }}>
+                            {opt.name} - {opt.price}
+                          </option>
+                        ))}
+                      </select>
+                    ) : null}
+                  </>
+                ) : null}
+                <h2 className="gg-card-title">{item.title || "Item"}</h2>
+                <p className="gg-card-desc">{item.desc || ""}</p>
+                <div className="gg-card-price">{item.price || ""}</div>
+                <div
+                  onClick={() => isEditable && onGridItemImageClick?.(index)}
+                  className="gg-card-img"
+                  style={{
+                    zIndex: isEditable ? 10 : 3,
+                    cursor: isEditable ? 'pointer' : 'default',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  {item.image ? (
+                    <Image
+                      src={item.image}
+                      alt={item.title || "Item"}
+                      fill
+                      style={{ objectFit: 'contain' }}
+                      unoptimized
+                    />
+                  ) : null}
+                  {isEditable && (
+                    <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none z-20">
+                      <span className="text-white text-xs">Resim Değiştir</span>
+                    </div>
+                  )}
+                </div>
+              </div>
             );
           })}
-        </div>
-      </main>
-    </div>
+        </div >
+      </main >
+    </div >
   );
 }
 

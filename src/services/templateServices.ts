@@ -96,7 +96,7 @@ export async function saveTemplateConfig(
 
         if (template) {
           console.log('Generating snapshot for config:', saveConfig.id);
-          
+
           // Template'e göre doğru path'i belirle
           let templatePath = '/design/configs';
           if (template.component === 'template-4') {
@@ -106,7 +106,7 @@ export async function saveTemplateConfig(
             // Diğer template'ler için configs endpoint'ini kullan
             templatePath = '/design/configs';
           }
-          
+
           const { snapshotUrl, snapshotVersion } = await generateSnapshotForConfig(
             saveConfig.id,
             templatePath,
@@ -368,6 +368,43 @@ export async function acquireTemplate(userId: string, templateId: string) {
           variant: "white",
           image: "/images/teavuk_dürüm.svg"
         }))
+      };
+    } else if (template.component === 'template-8') {
+      defaultConfig = {
+        menuItems: [
+          { name: "Caramel Macchiato", priceSmall: "₺220", priceLarge: "₺300" },
+          { name: "Filtre Kahve", priceSmall: "₺220", priceLarge: "₺300" },
+          { name: "White Mocha", priceSmall: "₺220", priceLarge: "₺300" },
+          { name: "Mocha", priceSmall: "₺220", priceLarge: "₺300" },
+          { name: "Strawbery Macha", priceSmall: "₺220", priceLarge: "₺300" },
+          { name: "SALTED CARAMEL MOCHA", priceSmall: "₺220", priceLarge: "₺300" },
+          { name: "COCONUT MİLK LATTE", priceSmall: "₺220", priceLarge: "₺300" },
+          { name: "CHAI TEA LATTE", priceSmall: "₺220", priceLarge: "₺300" },
+          { name: "GİGİBEBE", priceSmall: "₺220", priceLarge: "₺300" },
+        ],
+        hotItems: [
+          {
+            name: "AMERİCANO",
+            price1Label: "BÜYÜK", price1Value: "₺145",
+            price2Label: "KÜÇÜK", price2Value: "₺185"
+          },
+          {
+            name: "LATTE",
+            price1Label: "BÜYÜK", price1Value: "₺155",
+            price2Label: "KÜÇÜK", price2Value: "₺195"
+          },
+          {
+            name: "ESPRESSO",
+            price1Label: "SİNGLE", price1Value: "₺90",
+            price2Label: "DUBBLE", price2Value: "₺100"
+          }
+        ],
+        forYouItems: [
+          { name: "V60", price: "₺250" },
+          { name: "Chemex", price: "₺250" },
+          { name: "Cold Brew", price: "₺250" },
+          { name: "Syphon", price: "₺250" }
+        ]
       };
     } else {
       defaultConfig = {};

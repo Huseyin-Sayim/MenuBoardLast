@@ -138,7 +138,7 @@
     text-align: center;
     border: calc(4 * var(--scale-x)) dashed white;
     transform: rotate(15deg);
-    z-index: 5;
+    z-index: 50;
 }
 
 .gg-sidebar-footer {
