@@ -56,12 +56,12 @@ export async function GET(
     const protocol = requestUrl.protocol;
     const host = requestUrl.host;
     const fullBaseUrl = `${protocol}//${host}`;
-    
+
     console.log('Device config API - Base URL:', fullBaseUrl);
 
     // İlk template config'i bul (snapshot için)
     const firstTemplateConfig = screenConfigs.find(
-      (config) => config.templateConfigId && config.TemplateConfig
+      (config: any) => config.templateConfigId && config.TemplateConfig
     );
 
     let snapshotUrl: string | null = null;
@@ -69,7 +69,7 @@ export async function GET(
 
     if (firstTemplateConfig?.TemplateConfig) {
       const templateConfig = firstTemplateConfig.TemplateConfig;
-      
+
       // Snapshot URL varsa kullan, yoksa template URL'i kullan
       if (templateConfig.snapshotUrl) {
         snapshotUrl = templateConfig.snapshotUrl.startsWith('http')
@@ -85,7 +85,7 @@ export async function GET(
     }
 
     // Overlay widgets oluştur (tüm config'ler için)
-    const overlayWidgets = screenConfigs.map((config) => {
+    const overlayWidgets = screenConfigs.map((config: any) => {
       const widget: any = {
         id: config.id,
         mediaIndex: config.mediaIndex,
@@ -111,7 +111,7 @@ export async function GET(
       } else if (config.TemplateConfig) {
         widget.type = 'template';
         const templateConfig = config.TemplateConfig;
-        
+
         if (templateConfig.snapshotUrl) {
           widget.snapshot_url = templateConfig.snapshotUrl.startsWith('http')
             ? templateConfig.snapshotUrl

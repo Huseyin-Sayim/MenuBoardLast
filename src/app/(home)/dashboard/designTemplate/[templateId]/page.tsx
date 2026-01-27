@@ -23,6 +23,18 @@ type TemplateConfig = {
   component: React.ReactNode;
 }
 
+type Product = {
+  _id: string;
+  name: string;
+  pricing: any;
+  category: string;
+  description?: string;
+  image?: string;
+  img?: string;
+  imageUrl?: string;
+  options?: any[];
+}
+
 export default function TemplatePage() {
   const params = useParams();
   const router = useRouter();
@@ -68,11 +80,11 @@ export default function TemplatePage() {
 
   // Template 3 - Per slot category and products
   const [template3CategoriesBySlot, setTemplate3CategoriesBySlot] = useState<Record<number, string>>({});
-  const [template3ProductsBySlot, setTemplate3ProductsBySlot] = useState<Record<number, Array<{ _id: string; name: string; pricing: any; category: string; image?: string; img?: string; imageUrl?: string }>>>({});
+  const [template3ProductsBySlot, setTemplate3ProductsBySlot] = useState<Record<number, Array<Product>>>({});
 
   // Template 4 - Per slot category and products (8 slots)
   const [template4CategoriesBySlot, setTemplate4CategoriesBySlot] = useState<Record<number, string>>({});
-  const [template4ProductsBySlot, setTemplate4ProductsBySlot] = useState<Record<number, Array<{ _id: string; name: string; pricing: any; category: string; description?: string; image?: string; img?: string; imageUrl?: string }>>>({});
+  const [template4ProductsBySlot, setTemplate4ProductsBySlot] = useState<Record<number, Array<Product>>>({});
   const [template4SelectedProducts, setTemplate4SelectedProducts] = useState<Array<{
     name: string;
     price: string;
@@ -85,7 +97,7 @@ export default function TemplatePage() {
 
   // Template 4 - Sol taraf (promo) için state
   const [template4PromoCategoryId, setTemplate4PromoCategoryId] = useState<string>("");
-  const [template4PromoProducts, setTemplate4PromoProducts] = useState<Array<{ _id: string; name: string; pricing: any; category: string; image?: string; img?: string; imageUrl?: string }>>([]);
+  const [template4PromoProducts, setTemplate4PromoProducts] = useState<Array<Product>>([]);
   const [template4PromoProduct, setTemplate4PromoProduct] = useState<{
     name?: string;
     price?: string;
