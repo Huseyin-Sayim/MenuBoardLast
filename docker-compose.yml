@@ -26,6 +26,8 @@ services:
       DATABASE_URL: "postgresql://postgres:root@db:5432/menuboard?schema=public"
     depends_on:
       - db
+    volumes:
+      - ./public/uploads:/app/public/uploads
 
 volumes:
   postgres_menuBoard_data:
