@@ -34,7 +34,10 @@ export const getMediaById = async (id: string) => {
 export const createMedia = async (formData: FormData, userId: string, signal?: AbortSignal) =>   {
   const file = formData.get('file') as File;
   const fileExtension = path.extname(file.name);
-  const fileName = file.name;
+  const originalFileName = file.name;
+  // Güvenli dosya adı oluştur (özel karakterleri temizle)
+  const safeFileName = `${Date.now()}-${originalFileName.replace(/[^a-z0-9.]/gi, '_').toLowerCase()}`;
+  
   let subDir = "other";
 
   if (file.type.startsWith('image/')) {
@@ -44,9 +47,14 @@ export const createMedia = async (formData: FormData, userId: string, signal?: A
   }
 
   const uploadDir = path.join(process.cwd(), "public", "uploads", subDir);
+<<<<<<< HEAD
   const filePath = path.join(uploadDir, fileName);
   const relativePath = `/uploads/${subDir}/${fileName}`;
   const publicUrl = `${getBaseUrl()}${relativePath}`;
+=======
+  const filePath = path.join(uploadDir, safeFileName);
+  const publicUrl = `/uploads/${subDir}/${safeFileName}`;
+>>>>>>> b7d827768a1b721937ceeff9c53a170afee27a66
 
   try {
     await fs.mkdir(uploadDir, {recursive: true})
@@ -71,7 +79,7 @@ export const createMedia = async (formData: FormData, userId: string, signal?: A
 
     return await prisma.media.create({
       data: {
-        name: fileName,
+        name: safeFileName,
         user: {
           connect: {id: userId}
         },

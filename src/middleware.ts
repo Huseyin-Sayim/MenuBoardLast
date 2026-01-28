@@ -13,6 +13,11 @@ export default async function middleware(req: NextRequest) {
 
   const publicPaths = ['/api/login', '/api/register', '/api/check-db', '/api/refresh', '/auth/sign-in', '/auth/sign-up', '/auth/forgot-password', '/api/auth/verify', '/api/auth/forgot-password', '/api/auth/verify-code', '/api/auth/reset-password']
 
+  // /uploads path'ini public yap (medya dosyaları için)
+  if (pathname.startsWith('/uploads/')) {
+    return NextResponse.next();
+  }
+
   // ConfigId veya preview ile erişilen design/configs route'unu public yap
   const isPublicConfigsRoute = pathname === '/design/configs' &&
     (searchParams.get('configId') || searchParams.get('preview') === 'true');
