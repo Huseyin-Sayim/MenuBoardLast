@@ -29,7 +29,6 @@ next-env.d.ts
 *.tsbuildinfo
 
 # --- AYARLAR VE GÜVENLİK ---
-.env*.local
 .vercel
 *.pem
 .DS_Store
