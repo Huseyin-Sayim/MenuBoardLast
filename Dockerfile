@@ -13,5 +13,5 @@ RUN npx prisma generate
 RUN npm run build
 
 # 4. Aşama: Çalıştırma
-EXPOSE 3000
+EXPOSE 3005
 CMD ["npm", "start"]

@@ -20,15 +20,18 @@ export async function getAllGalleryImages () {
 export async function createGalleryImage (formData: FormData) {
   const file = formData.get('file') as File;
   const fileExtension = path.extname(file.name);
-  const fileName = file.name
+  const originalFileName = file.name;
+  
+  // Güvenli dosya adı oluştur (özel karakterleri temizle)
+  const safeFileName = `${Date.now()}-${originalFileName.replace(/[^a-z0-9.]/gi, '_').toLowerCase()}`;
 
   if (!file.type.startsWith('image/')) {
     throw new Error('Sadece resim dosyaları eklenebilir.');
   }
 
   const uploadDir = path.join(process.cwd(),"public","uploads","gallery");
-  const filePath = path.join(uploadDir,fileName);
-  const publicUrl = `/uploads/gallery/${fileName}`;
+  const filePath = path.join(uploadDir, safeFileName);
+  const publicUrl = `/uploads/gallery/${safeFileName}`;
 
   try {
     await fs.mkdir(uploadDir, { recursive: true });
@@ -38,7 +41,7 @@ export async function createGalleryImage (formData: FormData) {
 
     return await prisma.gallery.create({
       data: {
-        name: fileName,
+        name: safeFileName,
         extension: fileExtension,
         url: publicUrl
       }
