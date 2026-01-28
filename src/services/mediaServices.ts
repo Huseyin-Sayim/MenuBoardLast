@@ -32,7 +32,6 @@ export const createMedia = async (formData: FormData, userId: string, signal?: A
   const file = formData.get('file') as File;
   const fileExtension = path.extname(file.name);
   const originalFileName = file.name;
-  
   // Güvenli dosya adı oluştur (özel karakterleri temizle)
   const safeFileName = `${Date.now()}-${originalFileName.replace(/[^a-z0-9.]/gi, '_').toLowerCase()}`;
   
