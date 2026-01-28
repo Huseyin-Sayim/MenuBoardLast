@@ -2,7 +2,6 @@
 
 import { TrashIcon } from "@/assets/icons";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { deleteMedia } from "@/services/mediaServices";
 
@@ -235,11 +234,10 @@ export function MediaEditView({
                   }}
                 />
               ) : (
-                <Image
+                <img
                   src={selectedItem.url}
                   alt={selectedItem.name}
-                  fill
-                  className="object-cover"
+                  className="absolute inset-0 h-full w-full object-cover"
                 />
               )}
             </div>
@@ -267,7 +265,7 @@ export function MediaEditView({
                   </button>
                 )}
               </div>
-              
+
               {/* Input Alanı - Sadece düzenleme modunda görünür */}
               {isEditingName && (
                 <div className="flex flex-col gap-2">
@@ -345,11 +343,10 @@ export function MediaEditView({
                   <div className="capitalize relative h-20 w-32 shrink-0 overflow-hidden rounded-lg">
                     {item.type === "video" ? (
                       <>
-                        <Image
+                        <img
                           src={item.thumbnail || item.url}
                           alt={item.name}
-                          fill
-                          className="object-cover"
+                          className="absolute inset-0 h-full w-full object-cover"
                         />
                         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                           <svg
@@ -362,11 +359,10 @@ export function MediaEditView({
                         </div>
                       </>
                     ) : (
-                      <Image
+                      <img
                         src={item.url}
                         alt={item.name}
-                        fill
-                        className="object-cover"
+                        className="absolute inset-0 h-full w-full object-cover"
                       />
                     )}
                   </div>

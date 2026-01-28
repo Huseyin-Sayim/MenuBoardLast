@@ -3,6 +3,9 @@ import prisma from "@/generated/prisma";
 import path from "path";
 import fs from "fs/promises"
 
+// Base URL for media files
+const getBaseUrl = () => process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
 export const getMedia = async (id: string) => {
   try {
     return await prisma.media.findMany({
@@ -42,7 +45,8 @@ export const createMedia = async (formData: FormData, userId: string, signal?: A
 
   const uploadDir = path.join(process.cwd(), "public", "uploads", subDir);
   const filePath = path.join(uploadDir, fileName);
-  const publicUrl = `/uploads/${subDir}/${fileName}`;
+  const relativePath = `/uploads/${subDir}/${fileName}`;
+  const publicUrl = `${getBaseUrl()}${relativePath}`;
 
   try {
     await fs.mkdir(uploadDir, {recursive: true})
@@ -105,11 +109,15 @@ export const getFormattedMedia = async (userId: string) => {
       item.extension.toLowerCase().replace(".", "")
     );
 
+    // URL'yi tam URL formatına dönüştür (eğer zaten tam URL değilse)
+    const baseUrl = getBaseUrl();
+    const fullUrl = item.url.startsWith('http') ? item.url : `${baseUrl}${item.url}`;
+
     return {
       id: item.id,
       name: item.name,
       type: (isVideo ? "video" : "image") as "video" | "image",
-      url: item.url,
+      url: fullUrl,
       uploadedAt: item.createdAt.toLocaleDateString("tr-TR"),
       duration: 0,
     };

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, ChangeEvent, DragEvent } from "react";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 
 type GalleryImage = {
   id: string;
@@ -32,14 +31,20 @@ export function Gallery({ initialData, userRole, showActions = true }: GalleryPr
       const response = await fetch('/api/gallery');
       if (response.ok) {
         const result = await response.json();
-        const formattedData = (result.data || []).map((item: any) => ({
-          id: item.id,
-          name: item.name,
-          type: 'image' as 'image' | 'video',
-          url: item.url,
-          uploadedAt: new Date(item.createdAt).toLocaleDateString("tr-TR"),
-          duration: 0,
-        }));
+        const formattedData = (result.data || []).map((item: any) => {
+          // URL'yi tam formata dönüştür (geriye dönük uyumluluk için)
+          const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+          const fullUrl = item.url.startsWith('http') ? item.url : `${baseUrl}${item.url}`;
+
+          return {
+            id: item.id,
+            name: item.name,
+            type: 'image' as 'image' | 'video',
+            url: fullUrl,
+            uploadedAt: new Date(item.createdAt).toLocaleDateString("tr-TR"),
+            duration: 0,
+          };
+        });
         setImages(formattedData);
       }
     } catch (error) {
@@ -373,11 +378,10 @@ export function Gallery({ initialData, userRole, showActions = true }: GalleryPr
                 key={image.id}
                 className="group relative aspect-square overflow-hidden rounded-lg border border-stroke bg-gray-2 dark:border-stroke-dark dark:bg-dark-2"
               >
-                <Image
+                <img
                   src={image.url}
                   alt={image.name}
-                  fill
-                  className="object-cover transition-transform group-hover:scale-110"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform group-hover:scale-110"
                 />
                 {/* Silme Butonu - Sadece Admin için */}
                 {showActions && userRole === 'admin' && (
