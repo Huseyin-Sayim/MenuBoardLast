@@ -96,22 +96,30 @@ export async function saveTemplateConfig(
 
         if (template) {
           console.log('Generating snapshot for config:', saveConfig.id);
-          
+
           // Template'e göre doğru path'i belirle
           let templatePath = '/design/configs';
+          let snapshotWidth = 1920;
+          let snapshotHeight = 1080;
+
           if (template.component === 'template-4') {
             // Template-4 için kendi sayfasını kullan
             templatePath = '/design/template-4';
+          } else if (template.component === 'template-9') {
+            // Template-9 dikey (portrait) ekran - 9:16 aspect ratio
+            snapshotWidth = 1080;
+            snapshotHeight = 1920;
+
           } else {
             // Diğer template'ler için configs endpoint'ini kullan
             templatePath = '/design/configs';
           }
-          
+
           const { snapshotUrl, snapshotVersion } = await generateSnapshotForConfig(
             saveConfig.id,
             templatePath,
-            1920,
-            1080
+            snapshotWidth,
+            snapshotHeight
           );
 
           // Snapshot bilgilerini güncelle
@@ -368,6 +376,86 @@ export async function acquireTemplate(userId: string, templateId: string) {
           variant: "white",
           image: "/images/teavuk_dürüm.svg"
         }))
+      };
+    } else if (template.component === 'template-8') {
+      defaultConfig = {
+        menuItems: [
+          { name: "Caramel Macchiato", priceSmall: "₺220", priceLarge: "₺300" },
+          { name: "Filtre Kahve", priceSmall: "₺220", priceLarge: "₺300" },
+          { name: "White Mocha", priceSmall: "₺220", priceLarge: "₺300" },
+          { name: "Mocha", priceSmall: "₺220", priceLarge: "₺300" },
+          { name: "Strawbery Macha", priceSmall: "₺220", priceLarge: "₺300" },
+          { name: "SALTED CARAMEL MOCHA", priceSmall: "₺220", priceLarge: "₺300" },
+          { name: "COCONUT MİLK LATTE", priceSmall: "₺220", priceLarge: "₺300" },
+          { name: "CHAI TEA LATTE", priceSmall: "₺220", priceLarge: "₺300" },
+          { name: "GİGİBEBE", priceSmall: "₺220", priceLarge: "₺300" },
+        ],
+        hotItems: [
+          {
+            name: "AMERİCANO",
+            price1Label: "BÜYÜK", price1Value: "₺145",
+            price2Label: "KÜÇÜK", price2Value: "₺185"
+          },
+          {
+            name: "LATTE",
+            price1Label: "BÜYÜK", price1Value: "₺155",
+            price2Label: "KÜÇÜK", price2Value: "₺195"
+          },
+          {
+            name: "ESPRESSO",
+            price1Label: "SİNGLE", price1Value: "₺90",
+            price2Label: "DUBBLE", price2Value: "₺100"
+          }
+        ],
+        forYouItems: [
+          { name: "V60", price: "₺250" },
+          { name: "Chemex", price: "₺250" },
+          { name: "Cold Brew", price: "₺250" },
+          { name: "Syphon", price: "₺250" }
+        ]
+      };
+    } else if (template.component === 'template-9') {
+      defaultConfig = {
+        menuItems: [
+          { name: "Americano", price: "150" },
+          { name: "Latte", price: "120" },
+          { name: "Filtre Kahve", price: "200" },
+          { name: "Risretto", price: "230" },
+          { name: "Caramel Machiatto", price: "140" },
+          { name: "White Mocha", price: "185" },
+          { name: "Mocha", price: "120" },
+          { name: "Cappuchino", price: "150" },
+          { name: "Flat White", price: "170" },
+          { name: "Espresso", price: "100" },
+          { name: "Double Espresso", price: "200" }
+        ],
+        backgroundImage: "/images/chalkboard_bg.png",
+        menuTitle: "Menu"
+      };
+    } else if (template.component === 'template-10') {
+      defaultConfig = {
+        menuItems: [
+          { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce" },
+          { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce" },
+          { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce" },
+          { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce" },
+          { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce" },
+          { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce" },
+          { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce" },
+          { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce" },
+          { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce" }
+        ],
+        featuredProducts: [
+          { image: "/images/template-10-main.png" },
+          { image: "/images/template-10-small.png" },
+          { image: "/images/template-10-small.png" },
+          { image: "/images/template-10-small.png" }
+        ],
+        heroTitle: {
+          line1: "Kıng",
+          line2: "Deals",
+          valueLine: "Valu Menu"
+        }
       };
     } else {
       defaultConfig = {};

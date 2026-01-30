@@ -65,7 +65,7 @@ app.prepare().then(() => {
     
     handle(req, res, parsedUrl);
   });
-  
+
   httpServer.maxHeadersCount = 2000;
 
   const io = new Server(httpServer, {

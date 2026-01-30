@@ -1,5 +1,6 @@
 import { prisma } from "@/generated/prisma";
 import Template4BurgerMenu, { Template4MenuItem } from "./component/template-4";
+import { template4Items } from "../template-data";
 
 type Props = {
   searchParams: Promise<{ configId?: string }>;
@@ -11,7 +12,7 @@ export default async function Template4Page({ searchParams }: Props) {
 
   // Eğer configId yoksa default menuItems ile göster
   if (!configId) {
-    return <Template4BurgerMenu />;
+    return <Template4BurgerMenu items={template4Items} />;
   }
 
   try {
@@ -30,13 +31,13 @@ export default async function Template4Page({ searchParams }: Props) {
     // Prisma'dan gelen configData JSON olabilir, parse et
     let configData: any;
     try {
-      configData = typeof config.configData === 'string' 
-        ? JSON.parse(config.configData) 
+      configData = typeof config.configData === 'string'
+        ? JSON.parse(config.configData)
         : config.configData;
     } catch (e) {
       configData = config.configData;
     }
-    
+
     console.log('Template-4 public route configData:', JSON.stringify(configData, null, 2));
     console.log('Template-4 public route configData type:', typeof config.configData);
     console.log('Template-4 public route configData.promoProduct:', configData?.promoProduct);
@@ -86,14 +87,14 @@ export default async function Template4Page({ searchParams }: Props) {
       console.log('Template-4 public route: No promoProduct in configData');
     }
 
-    console.log('Template-4 public route final props:', { 
-      itemsCount: items.length, 
-      promoProduct: JSON.stringify(promoProduct, null, 2), 
-      promoImage 
+    console.log('Template-4 public route final props:', {
+      itemsCount: items.length,
+      promoProduct: JSON.stringify(promoProduct, null, 2),
+      promoImage
     });
 
     return (
-      <Template4BurgerMenu 
+      <Template4BurgerMenu
         items={items.length > 0 ? items : undefined}
         promoProduct={promoProduct}
         promoImage={promoImage}

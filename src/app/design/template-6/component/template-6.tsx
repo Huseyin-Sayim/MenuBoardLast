@@ -90,7 +90,6 @@ export default function Template6Content({
         <div className="mamas-right">
           {displayItems.map((item, idx) => (
             <div key={idx} className={`menu-card ${item.isRed ? 'card-red' : ''}`}>
-              {item.isNew && <span className="new-badge">NEW</span>}
               {item.hasTopPrice && item.price && (
                 <span className="price-tag-bubble">{item.price}</span>
               )}

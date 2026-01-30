@@ -8,6 +8,11 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ['"Satoshi"', ...defaultTheme.fontFamily.sans],
+        "varela-round": "Varela Round",
+        "fredericka-the-great": "Fredericka the Great",
+        "rubik-dirt": "Rubik Dirt",
+        "bangers": "Bangers",
+        "inter": "Inter",
       },
       screens: {
         "2xsm": "375px",
@@ -18,6 +23,10 @@ const config: Config = {
         current: "currentColor",
         transparent: "transparent",
         white: "#FFFFFF",
+        lightcyan: "#e0ffff",
+        darkolivegreen: "#0e3a16",
+        darkgreen: "#0d671d",
+        black: "#000",
         primary: "#5750F1",
         stroke: "#E6EBF1",
         "stroke-dark": "#27303E",
@@ -98,6 +107,8 @@ const config: Config = {
       fontSize: {
         "heading-1": ["60px", "72px"],
         "heading-2": ["48px", "58px"],
+        "num-40": "2.5rem",
+        "num-35": "2.188rem",
         "heading-3": ["40px", "48px"],
         "heading-4": ["35px", "45px"],
         "heading-5": ["28px", "40px"],
@@ -195,6 +206,9 @@ const config: Config = {
         203: "50.75rem",
         230: "57.5rem",
         242.5: "60.625rem",
+        "num-106": "106px",
+        "num-134_6": "134.6px",
+        "num-130_6": "130.6px",
       },
       maxWidth: {
         2.5: "0.625rem",
@@ -265,6 +279,14 @@ const config: Config = {
       aspectRatio: {
         "4/3": "4 / 3",
         "21/9": "21 / 9",
+      },
+      padding: {
+        "num-2": "2px",
+      },
+      lineHeight: {
+        "num-20": "20px",
+        "num-37": "37px",
+        "num-100": "100px",
       },
       backgroundImage: {
         video: "url('../images/video/video.png')",

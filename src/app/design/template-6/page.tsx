@@ -1,5 +1,6 @@
 import { prisma } from "@/generated/prisma";
 import Template6Content from "./component/template-6";
+import { template6Items } from "../template-data";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -14,7 +15,7 @@ export default async function Template6Page({ searchParams }: Props) {
     // Config yoksa default göster
     return (
       <div className="w-full h-auto">
-        <Template6Content />
+        <Template6Content menuItems={template6Items} />
       </div>
     );
   }

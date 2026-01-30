@@ -1,5 +1,6 @@
 import { prisma } from "@/generated/prisma";
 import Template7Content from "./component/template-7";
+import { template7Grid, template7Hero, template7Sidebar } from "../template-data";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -14,7 +15,11 @@ export default async function Template7Page({ searchParams }: Props) {
     // Config yoksa default göster
     return (
       <div className="w-full h-auto">
-        <Template7Content />
+        <Template7Content
+          hero={template7Hero}
+          sidebarItems={template7Sidebar}
+          gridItems={template7Grid}
+        />
       </div>
     );
   }
