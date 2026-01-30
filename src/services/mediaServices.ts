@@ -3,11 +3,14 @@ import prisma from "@/generated/prisma";
 import path from "path";
 import fs from "fs/promises"
 
+// Base URL for media files
+const getBaseUrl = () => process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
 export const getMedia = async (id: string) => {
   try {
     return await prisma.media.findMany({
       where: {
-        userId : id
+        userId: id
       },
       orderBy: {
         createdAt: "desc"
@@ -21,17 +24,20 @@ export const getMedia = async (id: string) => {
 export const getMediaById = async (id: string) => {
   try {
     return await prisma.media.findFirst({
-      where: {id: id}
+      where: { id: id }
     })
   } catch (error: any) {
     throw new Error('Media verisi getirilmedi' + error.message);
   }
 }
 
-export const createMedia = async (formData: FormData, userId: string, signal?: AbortSignal) =>   {
+export const createMedia = async (formData: FormData, userId: string, signal?: AbortSignal) => {
   const file = formData.get('file') as File;
   const fileExtension = path.extname(file.name);
-  const fileName = file.name;
+  const originalFileName = file.name;
+  // Güvenli dosya adı oluştur (özel karakterleri temizle)
+  const safeFileName = `${Date.now()}-${originalFileName.replace(/[^a-z0-9.]/gi, '_').toLowerCase()}`;
+
   let subDir = "other";
 
   if (file.type.startsWith('image/')) {
@@ -41,35 +47,36 @@ export const createMedia = async (formData: FormData, userId: string, signal?: A
   }
 
   const uploadDir = path.join(process.cwd(), "public", "uploads", subDir);
-  const filePath = path.join(uploadDir, fileName);
-  const publicUrl = `/uploads/${subDir}/${fileName}`;
+  const filePath = path.join(uploadDir, safeFileName);
+  const relativePath = `/uploads/${subDir}/${safeFileName}`;
+  const publicUrl = `${getBaseUrl()}${relativePath}`;
 
   try {
-    await fs.mkdir(uploadDir, {recursive: true})
-    
+    await fs.mkdir(uploadDir, { recursive: true })
+
     // Dosya yazma işlemi
     // Abort signal kontrolü
     if (signal?.aborted) {
       throw new Error('Upload cancelled');
     }
-    
+
     // File'ı stream olarak oku ve yaz
     // Büyük dosyalar için daha verimli
     const arrayBuffer = await file.arrayBuffer();
-    
+
     // Tekrar abort kontrolü
     if (signal?.aborted) {
       throw new Error('Upload cancelled');
     }
-    
+
     const buffer = Buffer.from(arrayBuffer);
     await fs.writeFile(filePath, buffer);
 
     return await prisma.media.create({
       data: {
-        name: fileName,
+        name: safeFileName,
         user: {
-          connect: {id: userId}
+          connect: { id: userId }
         },
         extension: fileExtension,
         url: publicUrl
@@ -78,9 +85,9 @@ export const createMedia = async (formData: FormData, userId: string, signal?: A
   } catch (error: any) {
     // Hata durumunda yüklenen dosyayı temizle
     try {
-      await fs.unlink(filePath).catch(() => {});
-    } catch {}
-    
+      await fs.unlink(filePath).catch(() => { });
+    } catch { }
+
     throw new Error('Media eklenmedi: ' + error.message);
   }
 }
@@ -105,18 +112,22 @@ export const getFormattedMedia = async (userId: string) => {
       item.extension.toLowerCase().replace(".", "")
     );
 
+    // URL'yi tam URL formatına dönüştür (eğer zaten tam URL değilse)
+    const baseUrl = getBaseUrl();
+    const fullUrl = item.url.startsWith('http') ? item.url : `${baseUrl}${item.url}`;
+
     return {
       id: item.id,
       name: item.name,
       type: (isVideo ? "video" : "image") as "video" | "image",
-      url: item.url,
+      url: fullUrl,
       uploadedAt: item.createdAt.toLocaleDateString("tr-TR"),
       duration: 0,
     };
   });
 };
 
-export const deleteMedia = async (id: string)=> {
+export const deleteMedia = async (id: string) => {
   try {
     return await prisma.media.delete({
       where: { id: id }
