@@ -153,11 +153,13 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
     status: "Aktif" | "Pasif",
     location: string,
     playlist: Array<{ id: string; item: any; isDesign: boolean }>,
-    screenConfig: ScreenConfig[]
+    screenConfig: ScreenConfig[],
+    sortmatic: boolean
   ) => {
     console.log(`Ekran ${selectedScreenId} için tasarım ${designId}, durum ${status}, konum ${location} ve playlist kaydedildi`);
     console.log('Playlist:', playlist);
     console.log('Screen Config:', screenConfig);
+    console.log('Sortmatic:', sortmatic);
 
     try {
       // API route üzerinden toplu güncelleme yap
@@ -169,14 +171,14 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
         duration: config.duration
       }));
 
-      console.log("API'ye giden paket: ", JSON.stringify(configsToSave, null, 2));
+      console.log("API'ye giden paket: ", JSON.stringify({ configs: configsToSave, sortmatic }, null, 2));
 
       const response = await fetch(`/api/screens/${selectedScreenId}/config`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ configs: configsToSave }),
+        body: JSON.stringify({ configs: configsToSave, sortmatic }),
       });
 
       if (!response.ok) {

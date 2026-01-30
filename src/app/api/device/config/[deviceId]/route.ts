@@ -131,16 +131,23 @@ export async function GET(
       return widget;
     });
 
+
+    // Sortmatic değerini al (ilk config'den) - PostgreSQL 't'/'f' formatını da destekle
+    const rawSortmatic = screenConfigs.length > 0 ? screenConfigs[0].sortmatic : false;
+    const sortmatic = rawSortmatic === true || rawSortmatic === 't' || rawSortmatic === 'true';
+
     // Response oluştur
     const response = {
       version: snapshotVersion || Date.now().toString(),
       snapshot_url: snapshotUrl,
       refresh_interval: 60, // 60 saniye
       overlay_widgets: overlayWidgets,
+      sortmatic: sortmatic,
     };
 
     console.log('Device config response:', JSON.stringify(response, null, 2));
     console.log('Overlay widgets count:', overlayWidgets.length);
+    console.log('Sortmatic:', sortmatic);
 
     return NextResponse.json(response, { status: 200 });
   } catch (error: any) {

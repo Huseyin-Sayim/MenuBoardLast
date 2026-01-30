@@ -41,10 +41,11 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     }
 
     const body = await req.json();
-    const { configs } = body;
+    const { configs, sortmatic } = body;
 
     console.log('PUT /api/screens/[id]/config - Request body:', JSON.stringify(body, null, 2));
     console.log('PUT /api/screens/[id]/config - Configs:', JSON.stringify(configs, null, 2));
+    console.log('PUT /api/screens/[id]/config - Sortmatic:', sortmatic);
 
     if (!configs || !Array.isArray(configs)) {
       return NextResponse.json({
@@ -53,7 +54,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     }
 
     console.log('PUT /api/screens/[id]/config - Calling updateScreenConfig with screenId:', screenId);
-    const result = await updateScreenConfig(screenId, configs);
+    const result = await updateScreenConfig(screenId, configs, sortmatic || false);
     console.log('PUT /api/screens/[id]/config - updateScreenConfig result:', result);
 
     // Socket ile cihaza bildirim gönder
