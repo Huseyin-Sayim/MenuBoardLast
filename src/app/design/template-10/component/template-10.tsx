@@ -3,6 +3,38 @@
 import { FunctionComponent } from 'react';
 import { template10MenuItems, template10FeaturedProducts } from "../../template-data";
 
+// Default fallback image
+const DEFAULT_IMAGE = "/images/burger_menu.svg";
+
+// Helper function to normalize image URLs
+const normalizeImageUrl = (imageUrl: string | undefined): string => {
+    if (!imageUrl) return DEFAULT_IMAGE;
+
+    // If it's a full URL with localhost, convert to relative path
+    // This fixes Puppeteer snapshot issues where localhost URLs are not accessible
+    if (imageUrl.startsWith('http://localhost') || imageUrl.startsWith('https://localhost')) {
+        try {
+            const url = new URL(imageUrl);
+            return url.pathname; // Returns the path part (e.g., /uploads/images/xxx.png)
+        } catch {
+            // If URL parsing fails, fall through to other checks
+        }
+    }
+
+    // If it's already a full URL (http:// or https://), return as is
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+        return imageUrl;
+    }
+
+    // If it starts with /, it's a relative path - use as is (Next.js will serve from public)
+    if (imageUrl.startsWith('/')) {
+        return imageUrl;
+    }
+
+    // Otherwise, assume it's a relative path and prepend /
+    return `/${imageUrl}`;
+};
+
 interface Template10Props {
     menuItems?: Array<{
         name: string;
@@ -116,7 +148,7 @@ const Template10: FunctionComponent<Template10Props> = ({
                     )}
                     <img
                         className="self-stretch max-w-full max-h-full object-contain cursor-pointer"
-                        src={featuredProducts[0]?.image || "/images/template-10-hero.png"}
+                        src={normalizeImageUrl(featuredProducts[0]?.image)}
                         alt="Main Product"
                         onClick={() => isEditable && onFeaturedImageClick?.(0)}
                     />
@@ -157,7 +189,7 @@ const Template10: FunctionComponent<Template10Props> = ({
                                 )}
                                 <img
                                     className="w-full h-full object-cover"
-                                    src={featuredProducts[idx + 1]?.image || ["/images/image-2.png", "/images/image-3.png", "/images/image-4.png"][idx]}
+                                    src={normalizeImageUrl(featuredProducts[idx + 1]?.image)}
                                     alt={`Featured ${idx + 1}`}
                                 />
                             </div>
@@ -204,7 +236,7 @@ const Template10: FunctionComponent<Template10Props> = ({
                                 <div className="self-stretch h-[184px] flex flex-col items-center justify-center">
                                     <img
                                         className="w-[278px] flex-1 max-h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
-                                        src={item.image || "/images/template-10-item.png"}
+                                        src={normalizeImageUrl(item.image)}
                                         alt={item.name}
                                         onClick={() => isEditable && onMenuItemImageClick?.(index)}
                                     />

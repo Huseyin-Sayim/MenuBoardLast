@@ -40,3 +40,7 @@ yarn-error.log*
 
 # --- PRISMA ---
 /src/generated/prisma
+
+.env
+/public/uploads
+/public/renders

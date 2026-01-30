@@ -135,7 +135,7 @@ export const getScreenByDeviceId = async (deviceId: string) => {
   }
 }
 
-export const updateScreenConfig = async (screenId: string, configs: { mediaId?: string, templateId?: string, templateConfigId?: string, mediaIndex: number, duration: number }[]) => {
+export const updateScreenConfig = async (screenId: string, configs: { mediaId?: string, templateId?: string, templateConfigId?: string, mediaIndex: number, duration: number }[], sortmatic: boolean = false) => {
   try {
     await prisma.screenConfig.deleteMany({
       where: {
@@ -195,7 +195,8 @@ export const updateScreenConfig = async (screenId: string, configs: { mediaId?: 
           connect: { id: screenId }
         },
         mediaIndex: config.mediaIndex,
-        displayDuration: config.duration || 10
+        displayDuration: config.duration || 10,
+        sortmatic: sortmatic
       };
 
       if (config.mediaId) {

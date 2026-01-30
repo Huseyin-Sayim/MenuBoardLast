@@ -238,9 +238,7 @@ export function MediaEditView({
                 <Image
                   src={selectedItem.url}
                   alt={selectedItem.name}
-                  fill
-                  className="object-contain"
-                  unoptimized
+                  className="absolute inset-0 h-full w-full object-cover"
                 />
               )}
             </div>
@@ -346,17 +344,11 @@ export function MediaEditView({
                   <div className="capitalize relative h-20 w-32 shrink-0 overflow-hidden rounded-lg">
                     {item.type === "video" ? (
                       <>
-                        {item.thumbnail ? (
-                          <Image
-                            src={item.thumbnail}
-                            alt={item.name}
-                            fill
-                            className="object-cover"
-                            unoptimized
-                          />
-                        ) : (
-                          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/30" />
-                        )}
+                        <img
+                          src={item.thumbnail || item.url}
+                          alt={item.name}
+                          className="absolute inset-0 h-full w-full object-cover"
+                        />
                         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                           <svg
                             className="size-6 text-white"
@@ -371,9 +363,7 @@ export function MediaEditView({
                       <Image
                         src={item.url}
                         alt={item.name}
-                        fill
-                        className="object-cover"
-                        unoptimized
+                        className="absolute inset-0 h-full w-full object-cover"
                       />
                     )}
                   </div>

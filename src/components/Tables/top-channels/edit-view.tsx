@@ -80,7 +80,7 @@ type EditViewProps = {
   currentLocation?: string;
   screenWidth?: number;
   screenHeight?: number;
-  onSaveAction: (designId: string, status: "Aktif" | "Pasif", location: string, playlist: Array<{ id: string; item: MediaItem | MenuBoardDesign; isDesign: boolean }>, screenConfig: ScreenConfig[]) => void;
+  onSaveAction: (designId: string, status: "Aktif" | "Pasif", location: string, playlist: Array<{ id: string; item: MediaItem | MenuBoardDesign; isDesign: boolean }>, screenConfig: ScreenConfig[], sortmatic: boolean) => void;
   onCancelAction: () => void;
 };
 
@@ -325,6 +325,7 @@ export function EditView({
   const [readyScreenConfig, setReadyScreenConfig] = useState<ScreenConfig[]>(
     [],
   );
+  const [sortmatic, setSortmatic] = useState<boolean>(false);
   const [template1Data, setTemplate1Data] = useState<BurgerItem[]>(defaultBurgers);
   const [template2Data, setTemplate2Data] = useState<MenuItem[]>(menuItems);
   // Playlist: Seçilen medyaların sıralı listesi
@@ -633,6 +634,7 @@ export function EditView({
       selectedLocation,
       playlist,
       readyScreenConfig,
+      sortmatic,
     );
   };
 
@@ -944,19 +946,32 @@ export function EditView({
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-end gap-3 border-t border-stroke px-7.5 py-4 dark:border-stroke-dark">
-        <button
-          onClick={onCancelAction}
-          className="rounded-lg border border-stroke px-4 py-2 font-medium text-dark hover:bg-gray-2 dark:border-stroke-dark dark:text-white dark:hover:bg-dark-2"
-        >
-          İptal
-        </button>
-        <button
-          onClick={handleSave}
-          className="rounded-lg bg-primary px-4 py-2 font-medium text-white hover:bg-primary/90"
-        >
-          Kaydet
-        </button>
+      <div className="flex items-center justify-between gap-3 border-t border-stroke px-7.5 py-4 dark:border-stroke-dark">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={sortmatic}
+            onChange={(e) => setSortmatic(e.target.checked)}
+            className="h-4 w-4 rounded border-stroke accent-primary"
+          />
+          <span className="text-sm font-medium text-dark dark:text-white">
+            Sıramatik Kullan
+          </span>
+        </label>
+        <div className="flex gap-3">
+          <button
+            onClick={onCancelAction}
+            className="rounded-lg border border-stroke px-4 py-2 font-medium text-dark hover:bg-gray-2 dark:border-stroke-dark dark:text-white dark:hover:bg-dark-2"
+          >
+            İptal
+          </button>
+          <button
+            onClick={handleSave}
+            className="rounded-lg bg-primary px-4 py-2 font-medium text-white hover:bg-primary/90"
+          >
+            Kaydet
+          </button>
+        </div>
       </div>
 
       {/* Fiyat Düzenleme Modal */}

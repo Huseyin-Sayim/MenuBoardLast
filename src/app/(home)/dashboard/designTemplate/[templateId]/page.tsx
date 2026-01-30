@@ -2418,7 +2418,7 @@ export default function TemplatePage() {
                 const product = template10ProductsBySlot[index]?.find(p => p._id === productId);
                 if (product) {
                   const price = product.pricing.basePrice?.price || "0";
-                  const productImage = product.image || product.img || product.imageUrl || (index >= 100 ? "/images/template-10-hero.png" : "/images/template-10-item.png");
+                  const productImage = product.image || product.img || product.imageUrl || "/images/burger_menu.svg";
 
                   if (index >= 100) {
                     const featIndex = index - 100;
@@ -2567,7 +2567,7 @@ export default function TemplatePage() {
   }
 
   return (
-    <div className={`fixed inset-0 z-[9999] ${templateId === "template-4" ? "bg-transparent" : "bg-gray-2 dark:bg-[#020d1a]"}`}>
+    <div className={`fixed inset-0 z-[9999] overflow-auto ${templateId === "template-4" ? "bg-transparent" : "bg-gray-2 dark:bg-[#020d1a]"}`}>
       {/* Header */}
       <div className="absolute right-3 top-4 z-50 flex items-center gap-4 justify-end w-full pointer-events-none">
         <button

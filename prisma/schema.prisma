@@ -106,6 +106,7 @@ model ScreenConfig {
   templateConfigId String?
   mediaIndex       Int
   displayDuration  Int?
+  sortmatic        Boolean         @default(false)
   Media            Media?          @relation(fields: [mediaId], references: [id])
   Template         Template?       @relation(fields: [templateId], references: [id])
   TemplateConfig   TemplateConfig? @relation(fields: [templateConfigId], references: [id])

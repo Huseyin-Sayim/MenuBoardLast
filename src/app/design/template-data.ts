@@ -356,22 +356,22 @@ export const template9MenuItems = [
 
 // Template10 (King Deals Value Menu) için default veriler
 export const template10MenuItems = [
-  { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce" },
-  { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce" },
-  { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce" },
-  { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce" },
-  { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce" },
-  { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce" },
-  { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce" },
-  { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce" },
-  { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce" }
+  { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce", image: "/images/burger_menu.svg" },
+  { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce", image: "/images/burger_menu.svg" },
+  { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce", image: "/images/burger_menu.svg" },
+  { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce", image: "/images/burger_menu.svg" },
+  { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce", image: "/images/burger_menu.svg" },
+  { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce", image: "/images/burger_menu.svg" },
+  { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce", image: "/images/burger_menu.svg" },
+  { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce", image: "/images/burger_menu.svg" },
+  { name: "SOUTHWEST BBQ", price: "350₺", description: "romaine, tomatoes, red onions, persian cucumbers, greek pita, housemade yogurt sauce", image: "/images/burger_menu.svg" }
 ];
 
 export const template10FeaturedProducts = [
-  { image: "/images/template-10-hero.png" },
-  { image: "/images/image-2.png" },
-  { image: "/images/image-3.png" },
-  { image: "/images/image-4.png" }
+  { image: "/images/burger_menu.svg" },
+  { image: "/images/burger_menu.svg" },
+  { image: "/images/burger_menu.svg" },
+  { image: "/images/burger_menu.svg" }
 ];
 
 export const template11MenuItems = [
