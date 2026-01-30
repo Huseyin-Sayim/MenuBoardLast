@@ -218,7 +218,7 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
 
   if (isEditing) {
     return (
-      <div className={className}>
+      <div className={cn(className, "max-h-[90vh] overflow-y-auto")}>
         <EditView
           screenName={selectedScreenId}
           currentDesign="1"

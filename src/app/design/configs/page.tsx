@@ -466,6 +466,10 @@ export default async function ConfigsPage({ searchParams }: Props) {
           if (configData.heroTitle) heroTitleData = configData.heroTitle;
         }
 
+        // Debug: Log image URLs
+        console.log('Template-10 menuItems images:', menuItemsData.map((item: any) => item.image));
+        console.log('Template-10 featuredProducts images:', featuredProductsData.map((item: any) => item.image));
+
         return (
           <div className="w-[1920px] h-[1080px] mx-auto overflow-hidden bg-black">
             <Template10Content

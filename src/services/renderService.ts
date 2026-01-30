@@ -27,12 +27,12 @@ export async function renderTemplateSnapshot(
   baseUrl?: string
 ): Promise<string> {
   let browser;
-  
+
   try {
-    // Base URL'i belirle
-    const appBaseUrl = baseUrl || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005';
-    const fullUrl = templateUrl.startsWith('http') 
-      ? templateUrl 
+    // Base URL'i belirle - Puppeteer headless modda localhost yerine 127.0.0.1 kullanmalı
+    const appBaseUrl = baseUrl || process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3005';
+    const fullUrl = templateUrl.startsWith('http')
+      ? templateUrl
       : `${appBaseUrl}${templateUrl}`;
 
     console.log(`Rendering snapshot from URL: ${fullUrl}`);
@@ -54,6 +54,17 @@ export async function renderTemplateSnapshot(
 
     const page = await browser.newPage();
 
+    // Network request debugging - hangi istekler başarısız oluyor görmek için
+    page.on('requestfailed', (request) => {
+      console.log(`[Puppeteer] Request failed: ${request.url()} - ${request.failure()?.errorText}`);
+    });
+
+    page.on('response', (response) => {
+      if (response.url().includes('/uploads/') || response.url().includes('/images/')) {
+        console.log(`[Puppeteer] Image response: ${response.url()} - Status: ${response.status()}`);
+      }
+    });
+
     // Viewport ayarla
     await page.setViewport({
       width,
@@ -67,8 +78,24 @@ export async function renderTemplateSnapshot(
       timeout: 30000,
     });
 
+    // Tüm resimlerin yüklenmesini bekle
+    await page.evaluate(async () => {
+      const images = Array.from(document.querySelectorAll('img'));
+      await Promise.all(
+        images.map((img) => {
+          if (img.complete) return Promise.resolve();
+          return new Promise((resolve) => {
+            img.addEventListener('load', resolve);
+            img.addEventListener('error', resolve);
+            // 5 saniye timeout
+            setTimeout(resolve, 5000);
+          });
+        })
+      );
+    });
+
     // Ekstra bekleme süresi (animasyonlar ve dinamik içerik için)
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     // Screenshot al (WebP formatında)
     const screenshot = await page.screenshot({
