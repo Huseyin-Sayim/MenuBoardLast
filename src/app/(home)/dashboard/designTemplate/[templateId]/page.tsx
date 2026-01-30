@@ -11,8 +11,9 @@ import Template7Content from "@/app/design/template-7/component/template-7";
 import Template8 from "@/app/design/template-8/component/template-8";
 import Template9 from "@/app/design/template-9/component/template-9";
 import Template10 from "@/app/design/template-10/component/template-10";
+import Template11 from "@/app/design/template-11/component/template-11";
 
-import { defaultBurgers, menuItems, winterFavorites, template8MenuItems as defaultT8Menu, template8HotItems as defaultT8Hot, template8ForYouItems as defaultT8ForYou, template8Aromas, template9MenuItems as defaultT9Menu, template10MenuItems as defaultT10Menu, template10FeaturedProducts as defaultT10Featured } from "@/app/design/template-data";
+import { defaultBurgers, menuItems, winterFavorites, template8MenuItems as defaultT8Menu, template8HotItems as defaultT8Hot, template8ForYouItems as defaultT8ForYou, template8Aromas, template9MenuItems as defaultT9Menu, template10MenuItems as defaultT10Menu, template10FeaturedProducts as defaultT10Featured, template11MenuItems as defaultT11Menu, template11FeaturedImages as defaultT11Images } from "@/app/design/template-data";
 import { useEffect, useState } from "react";
 import { useTemplateConfig, useUpdateTemplateConfig } from "@/hooks/use-template-config";
 import { MediaGallery, MediaItem } from "@/app/(home)/dashboard/media/_components/media-gallery";
@@ -294,6 +295,17 @@ export default function TemplatePage() {
     valueLine: "Valu Menu"
   });
   const [template10ProductsBySlot, setTemplate10ProductsBySlot] = useState<Record<number, Array<{ _id: string; name: string; pricing: any; category: string; image?: string; img?: string; imageUrl?: string; options?: Array<{ key: string; name: string; price: number }> }>>>({});
+
+  // Template 11
+  const [template11MenuItems, setTemplate11MenuItems] = useState<Array<{
+    name: string;
+    price: string;
+    categoryId?: string;
+    productId?: string;
+    options?: { name: string; price: string }[];
+  }>>(defaultT11Menu);
+  const [template11FeaturedImages, setTemplate11FeaturedImages] = useState<string[]>(defaultT11Images);
+  const [template11ProductsBySlot, setTemplate11ProductsBySlot] = useState<Record<number, Array<{ _id: string; name: string; pricing: any; category: string; image?: string; img?: string; imageUrl?: string; options?: Array<{ key: string; name: string; price: number }> }>>>({});
 
   const [apiBaseUrl, setApiBaseUrl] = useState<string>("http://localhost:5000");
 
@@ -850,6 +862,33 @@ export default function TemplatePage() {
             }
           } catch (error) {
             console.error('Template-10 ürünler çekilirken hata:', error);
+          }
+        };
+        restoreItems();
+      } else if (templateId === "template-11") {
+        const config = configData as any;
+        console.log('Template-11 config loading:', config);
+        if (config?.menuItems) setTemplate11MenuItems(config.menuItems);
+        if (config?.featuredImages) setTemplate11FeaturedImages(config.featuredImages);
+
+        const restoreItems = async () => {
+          try {
+            const response = await fetch(`${apiBaseUrl}/api/products`);
+            if (response.ok) {
+              const data = await response.json();
+              const products = data.data || [];
+              const productsBySlot: Record<number, any[]> = {};
+
+              config.menuItems?.forEach((item: any, index: number) => {
+                if (item.categoryId) {
+                  const filteredProducts = products.filter((p: any) => p.category === item.categoryId);
+                  productsBySlot[index] = filteredProducts;
+                }
+              });
+              setTemplate11ProductsBySlot(productsBySlot);
+            }
+          } catch (error) {
+            console.error('Template-11 ürünler çekilirken hata:', error);
           }
         };
         restoreItems();
@@ -2429,6 +2468,82 @@ export default function TemplatePage() {
         </div>
       ),
     },
+    "template-11": {
+      id: "template-11",
+      name: "Şablon 11",
+      component: (
+        <div className="absolute inset-0 overflow-auto bg-black flex items-center justify-center">
+          <div
+            className="origin-center"
+            style={{
+              width: '1080px',
+              height: '1920px',
+              transform: 'scale(0.5)',
+            }}
+          >
+            <Template11
+              leftItems={template11MenuItems.slice(0, 8)}
+              rightItems={template11MenuItems.slice(8, 16)}
+              featuredImages={template11FeaturedImages}
+              isEditable={true}
+              availableCategories={availableCategories}
+              availableProductsBySlot={template11ProductsBySlot}
+              onCategoryChange={(index, categoryId) => {
+                setTemplate11MenuItems(prev => {
+                  const newItems = [...prev];
+                  if (newItems[index]) {
+                    newItems[index] = { ...newItems[index], categoryId, productId: undefined };
+                  }
+                  return newItems;
+                });
+                // Fetch products for this slot
+                const fetchSlotProducts = async () => {
+                  try {
+                    const response = await fetch(`${apiBaseUrl}/api/products`);
+                    if (response.ok) {
+                      const data = await response.json();
+                      const products = data.data || [];
+                      const filteredProducts = products.filter((p: any) => p.category === categoryId);
+                      setTemplate11ProductsBySlot(prev => ({ ...prev, [index]: filteredProducts }));
+                    }
+                  } catch (error) {
+                    console.error('Error fetching slot products:', error);
+                  }
+                };
+                fetchSlotProducts();
+              }}
+              onProductSelect={(index, productId) => {
+                const product = template11ProductsBySlot[index]?.find(p => p._id === productId);
+                if (product) {
+                  const price = String(product.pricing.basePrice?.price || "0");
+                  const priceFormatted = new Intl.NumberFormat('tr-TR').format(parseFloat(price.replace(/[^\d.]/g, '')));
+                  const formattedWithSymbol = `${priceFormatted}₺`;
+
+                  setTemplate11MenuItems(prev => {
+                    const newItems = [...prev];
+
+                    if (newItems[index]) {
+                      newItems[index] = {
+                        ...newItems[index],
+                        productId,
+                        name: product.name,
+                        price: formattedWithSymbol,
+                      };
+                    }
+                    return newItems;
+                  });
+                }
+              }}
+              onImageClick={(index) => {
+                setSelectedImageIndex(index);
+                setSelectedImageCategorySlot('template11');
+                setIsImageSelectorOpen(true);
+              }}
+            />
+          </div>
+        </div>
+      ),
+    },
   }
 
   const selectedTemplate = templateConfigs[templateId];
@@ -2535,10 +2650,15 @@ export default function TemplatePage() {
                                 featuredProducts: template10FeaturedProducts,
                                 heroTitle: template10HeroTitle
                               }
-                              : {
-                                category: selectedCategory || "",
-                                data: (selectedProducts.length > 0 ? selectedProducts : [])
-                              };
+                              : templateId === "template-11"
+                                ? {
+                                  menuItems: template11MenuItems,
+                                  featuredImages: template11FeaturedImages
+                                }
+                                : {
+                                  category: selectedCategory || "",
+                                  data: (selectedProducts.length > 0 ? selectedProducts : [])
+                                };
 
               // Debug: Template-4 için configData'yı log'la
               if (templateId === "template-4") {
@@ -2555,8 +2675,8 @@ export default function TemplatePage() {
                   onSuccess: (data) => {
                     const savedConfigId = data?.data?.id || currentConfigId;
 
-                    // Eğer yeni config oluşturulduysa (currentConfigId yoktu), configId ile sayfayı yenile
-                    if (!currentConfigId && savedConfigId) {
+                    // Eğer yeni config oluşturulduysa veya configId değiştiyse (stale ID durumu), sayfayı yenile/güncelle
+                    if (savedConfigId && savedConfigId !== currentConfigId) {
                       router.push(`/dashboard/designTemplate/${templateId}?configId=${savedConfigId}`);
                     } else {
                       alert('Başarıyla kaydedildi!');
@@ -2826,6 +2946,12 @@ export default function TemplatePage() {
                             };
                           }
                           return newProducts;
+                        });
+                      } else if (selectedImageCategorySlot === 'template11' && selectedImageIndex !== null) {
+                        setTemplate11FeaturedImages(prev => {
+                          const newImages = [...prev];
+                          newImages[selectedImageIndex] = imageUrl;
+                          return newImages;
                         });
                       } else if (selectedImageCategorySlot !== null && selectedImageIndex !== null) {
                         // Template-2 için

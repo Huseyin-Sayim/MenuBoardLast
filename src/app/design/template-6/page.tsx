@@ -47,3 +47,4 @@ export default async function Template6Page({ searchParams }: Props) {
 }
 
 
+

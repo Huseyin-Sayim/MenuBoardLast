@@ -198,6 +198,19 @@ export async function PUT(
           valueLine: "Valu Menu"
         }
       };
+    } else if (templateId === 'template-11' || templateId?.includes('template-11')) {
+      // Template-11 formatı: { menuItems: Array, featuredImages: Array }
+      const { menuItems, featuredImages } = configBody;
+      if (!menuItems || !Array.isArray(menuItems)) {
+        return NextResponse.json(
+          { message: 'Geçersiz veri formatı: Template-11 için menuItems bir array olmalı' },
+          { status: 400 }
+        );
+      }
+      configData = {
+        menuItems: menuItems || [],
+        featuredImages: featuredImages || []
+      };
     } else {
       // Template-1, Template-3, Template-4 formatı: { category: string, data: Array }
       const { category, data } = configBody;

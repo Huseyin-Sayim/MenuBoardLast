@@ -12,6 +12,7 @@ import Template9Content from "../template-9/component/template-9";
 
 import { defaultBurgers, menuItems, winterFavorites, template8MenuItems, template8HotItems, template8ForYouItems, template8Aromas, template9MenuItems, template10MenuItems, template10FeaturedProducts } from "../template-data";
 import Template10Content from "../template-10/component/template-10";
+import Template11Content from "../template-11/component/template-11";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -472,6 +473,48 @@ export default async function ConfigsPage({ searchParams }: Props) {
               menuItems={menuItemsData}
               featuredProducts={featuredProductsData}
               heroTitle={heroTitleData}
+            />
+          </div>
+        );
+      }
+
+      case 'template-11': {
+        // Template 11 defaults
+        let menuItemsData: any[] = [
+          { name: "ESPRESSO SİNGLE", price: "200₺" },
+          { name: "CAPPUCCİNO", price: "200₺" },
+          { name: "AMERICANO", price: "150₺" },
+          { name: "RISRETTO", price: "200₺" },
+          { name: "CORTADO", price: "195₺" },
+          { name: "TÜRK KAHVESİ", price: "100₺" },
+          { name: "DUBLE TÜRK KAHVESİ", price: "200₺" },
+          { name: "FİLTRE KAHVE", price: "140₺" },
+          { name: "ESPRESSO SİNGLE", price: "200₺" },
+          { name: "CAPPUCCİNO", price: "185₺" },
+          { name: "AMERICANO", price: "150₺" },
+          { name: "RISRETTO", price: "200₺" },
+          { name: "CORTADO", price: "195₺" },
+          { name: "TÜRK KAHVESİ", price: "100₺" },
+          { name: "DUBLE TÜRK KAHVESİ", price: "200₺" },
+          { name: "FİLTRE KAHVE", price: "140₺" },
+        ];
+        let featuredImagesData = [
+          "/images/placeholder.png",
+          "/images/placeholder-2.png"
+        ];
+
+
+        if (configData) {
+          if (configData.menuItems) menuItemsData = configData.menuItems;
+          if (configData.featuredImages) featuredImagesData = configData.featuredImages;
+        }
+
+        return (
+          <div className="w-[1080px] h-[1920px] mx-auto overflow-hidden">
+            <Template11Content
+              leftItems={menuItemsData.slice(0, 8)}
+              rightItems={menuItemsData.slice(8, 16)}
+              featuredImages={featuredImagesData}
             />
           </div>
         );

@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { MediaEditView } from "./media-edit-view";
 import { MediaUploadView } from "./media-upload-view";
@@ -293,13 +292,11 @@ export function MediaGallery({ showActions = true, className, initialData, gridC
                       <VideoDuration url={item.url} itemId={item.id} />
                     </>
                   ) : (
-                    /* FOTOĞRAF İÇİN: Normal Image */
-                    <Image
+                    /* FOTOĞRAF İÇİN: Normal img etiketi - doğrudan URL kullanılıyor */
+                    <img
                       src={item.url}
                       alt={item.name}
-                      fill
-                      className="object-cover"
-                      unoptimized
+                      className="absolute inset-0 h-full w-full object-cover"
                     />
                   )}
                 </div>

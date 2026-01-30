@@ -2,9 +2,9 @@
 
 import { TrashIcon } from "@/assets/icons";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { deleteMedia } from "@/services/mediaServices";
+import Image from "next/image";
 
 type MediaItem = {
   id: string;
