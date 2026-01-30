@@ -171,6 +171,33 @@ export async function PUT(
         hotItems: hotItems || [],
         forYouItems: forYouItems || []
       };
+    } else if (templateId === 'template-9' || templateId?.includes('template-9')) {
+      const { menuItems } = configBody;
+      if (!menuItems || !Array.isArray(menuItems)) {
+        return NextResponse.json(
+          { message: 'Geçersiz veri formatı: Template-9 için menuItems bir array olmalı' },
+          { status: 400 }
+        );
+      }
+      configData = { menuItems };
+    } else if (templateId === 'template-10' || templateId?.includes('template-10')) {
+      // Template-10 formatı: { menuItems: Array, featuredProducts: Array, heroTitle: Object }
+      const { menuItems, featuredProducts, heroTitle } = configBody;
+      if (!menuItems || !Array.isArray(menuItems)) {
+        return NextResponse.json(
+          { message: 'Geçersiz veri formatı: Template-10 için menuItems bir array olmalı' },
+          { status: 400 }
+        );
+      }
+      configData = {
+        menuItems: menuItems || [],
+        featuredProducts: featuredProducts || [],
+        heroTitle: heroTitle || {
+          line1: "Kıng",
+          line2: "Deals",
+          valueLine: "Valu Menu"
+        }
+      };
     } else {
       // Template-1, Template-3, Template-4 formatı: { category: string, data: Array }
       const { category, data } = configBody;

@@ -7,9 +7,11 @@ import Template4BurgerMenu from "../template-4/component/template-4";
 import Template5Content from "../template-5/component/template-5";
 import Template6Content from "../template-6/component/template-6";
 import Template7Content from "../template-7/component/template-7";
+import Template8Content from "../template-8/component/template-8";
+import Template9Content from "../template-9/component/template-9";
 
-import { defaultBurgers, winterFavorites } from "../template-data";
-import { menuItems } from "../template-data";
+import { defaultBurgers, menuItems, winterFavorites, template8MenuItems, template8HotItems, template8ForYouItems, template8Aromas, template9MenuItems, template10MenuItems, template10FeaturedProducts } from "../template-data";
+import Template10Content from "../template-10/component/template-10";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -225,8 +227,8 @@ export default async function ConfigsPage({ searchParams }: Props) {
         }
 
         return (
-          <Template4BurgerMenu 
-            variant="preview" 
+          <Template4BurgerMenu
+            variant="preview"
             items={items.length > 0 ? items : undefined}
             promoProduct={promoProduct}
             promoImage={promoImage}
@@ -333,12 +335,12 @@ export default async function ConfigsPage({ searchParams }: Props) {
 
       case 'template-7': {
         let brand = { shortName: "LA", fullName: "gyrogreek", phone: "(818)356-9676", logoImg: "" };
-        let hero = { 
-          logo: "/images/burger_logo.svg", 
-          titleTop: "GYRO", 
-          titleBottom: "FOOD", 
-          image: "/images/teavuk_dürüm.svg", 
-          promo: { title: "Only Today", value: "20%", label: "OFF" } 
+        let hero = {
+          logo: "/images/burger_logo.svg",
+          titleTop: "GYRO",
+          titleBottom: "FOOD",
+          image: "/images/teavuk_dürüm.svg",
+          promo: { title: "Only Today", value: "20%", label: "OFF" }
         };
         let sidebarItems: Array<any> = [{ title: "", desc: "", price: "" }];
         let gridItems: Array<any> = Array.from({ length: 6 }, (_, i) => ({
@@ -383,6 +385,93 @@ export default async function ConfigsPage({ searchParams }: Props) {
               hero={hero}
               sidebarItems={sidebarItems}
               gridItems={gridItems}
+            />
+          </div>
+        );
+      }
+
+      case 'template-8': {
+        let menuItemsData = template8MenuItems;
+        let hotItemsData = template8HotItems;
+        let forYouItemsData = template8ForYouItems;
+        let aromaItemsData = template8Aromas;
+
+        if (configData) {
+          if (configData.menuItems && Array.isArray(configData.menuItems)) {
+            menuItemsData = configData.menuItems;
+          }
+          if (configData.hotItems && Array.isArray(configData.hotItems)) {
+            hotItemsData = configData.hotItems;
+          }
+          if (configData.forYouItems && Array.isArray(configData.forYouItems)) {
+            forYouItemsData = configData.forYouItems;
+          }
+          if (configData.aromaItems && Array.isArray(configData.aromaItems)) {
+            aromaItemsData = configData.aromaItems;
+          }
+        }
+
+        return (
+          <div className="w-full h-auto rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
+            <Template8Content
+              menuItems={menuItemsData}
+              hotItems={hotItemsData}
+              forYouItems={forYouItemsData}
+              aromaItems={aromaItemsData}
+            />
+          </div>
+        );
+      }
+
+      case 'template-9': {
+        let menuItemsData = template9MenuItems;
+        let backgroundImage = "/images/chalkboard_bg.png";
+        let menuTitle = "Menu";
+
+        if (configData) {
+          if (configData.menuItems && Array.isArray(configData.menuItems)) {
+            menuItemsData = configData.menuItems;
+          }
+          if (configData.backgroundImage) {
+            backgroundImage = configData.backgroundImage;
+          }
+          if (configData.menuTitle) {
+            menuTitle = configData.menuTitle;
+          }
+        }
+
+        return (
+          <div className="w-[1080px] h-[1920px] mx-auto overflow-hidden">
+            <Template9Content
+              menuItems={menuItemsData}
+              backgroundImage={backgroundImage}
+              menuTitle={menuTitle}
+            />
+          </div>
+        );
+      }
+
+      case 'template-10': {
+        let menuItemsData = template10MenuItems;
+        let featuredProductsData = template10FeaturedProducts;
+        let heroTitleData = {
+          line1: "Kıng",
+          line2: "Deals",
+          valueLine: "Valu Menu"
+        };
+
+        if (configData) {
+          if (configData.menuItems) menuItemsData = configData.menuItems;
+          if (configData.featuredProducts) featuredProductsData = configData.featuredProducts;
+          if (configData.heroTitle) heroTitleData = configData.heroTitle;
+        }
+
+        return (
+          <div className="w-[1920px] h-[1080px] mx-auto overflow-hidden bg-black">
+            <Template10Content
+              menuItems={menuItemsData}
+              featuredProducts={featuredProductsData}
+              heroTitle={heroTitleData}
             />
           </div>
         );

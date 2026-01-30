@@ -9,6 +9,10 @@ const config: Config = {
       fontFamily: {
         sans: ['"Satoshi"', ...defaultTheme.fontFamily.sans],
         "varela-round": "Varela Round",
+        "fredericka-the-great": "Fredericka the Great",
+        "rubik-dirt": "Rubik Dirt",
+        "bangers": "Bangers",
+        "inter": "Inter",
       },
       screens: {
         "2xsm": "375px",

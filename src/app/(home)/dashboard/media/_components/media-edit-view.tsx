@@ -239,7 +239,7 @@ export function MediaEditView({
                   src={selectedItem.url}
                   alt={selectedItem.name}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   unoptimized
                 />
               )}
