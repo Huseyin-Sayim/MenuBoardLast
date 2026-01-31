@@ -83,6 +83,19 @@ const Template11: FunctionComponent<Template11Props> = ({
 
     return (
         <div className="w-full h-[120.313rem] relative overflow-hidden flex flex-col items-start bg-cover bg-no-repeat bg-[top] text-left text-[6rem] text-tan-200 font-jua" style={{ backgroundImage: "url('/images/template-11.png')" }}>
+            {/* Logo sağ alt köşe */}
+            <img
+                src="/images/ntx-white.png"
+                alt="Logo"
+                style={{
+                    position: 'absolute',
+                    bottom: '25px',
+                    right: '40px',
+                    height: '70px',
+                    objectFit: 'contain',
+                    zIndex: 50
+                }}
+            />
             <div className="self-stretch h-[13.75rem] flex flex-col items-center justify-center gap-[0.625rem]">
                 <div className="relative">{`COFFEE & TEA`}</div>
                 <div className="self-stretch h-[0.125rem] relative border-white border-solid border-t-[2px] box-border" />

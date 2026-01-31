@@ -211,6 +211,20 @@ export async function PUT(
         menuItems: menuItems || [],
         featuredImages: featuredImages || []
       };
+    } else if (templateId === 'template-12' || templateId?.includes('template-12')) {
+      // Template-12 formatı: { menuItems: Array, headerTitle: string, footerNote: string }
+      const { menuItems, headerTitle, footerNote } = configBody;
+      if (!menuItems || !Array.isArray(menuItems)) {
+        return NextResponse.json(
+          { message: 'Geçersiz veri formatı: Template-12 için menuItems bir array olmalı' },
+          { status: 400 }
+        );
+      }
+      configData = {
+        menuItems: menuItems || [],
+        headerTitle: headerTitle || "TAVUK MENÜLERİ",
+        footerNote: footerNote || "FİYATLARIMIZ KDV DAHİLDİR."
+      };
     } else {
       // Template-1, Template-3, Template-4 formatı: { category: string, data: Array }
       const { category, data } = configBody;

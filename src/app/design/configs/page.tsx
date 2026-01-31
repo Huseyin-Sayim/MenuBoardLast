@@ -10,9 +10,10 @@ import Template7Content from "../template-7/component/template-7";
 import Template8Content from "../template-8/component/template-8";
 import Template9Content from "../template-9/component/template-9";
 
-import { defaultBurgers, menuItems, winterFavorites, template8MenuItems, template8HotItems, template8ForYouItems, template8Aromas, template9MenuItems, template10MenuItems, template10FeaturedProducts } from "../template-data";
+import { defaultBurgers, menuItems, winterFavorites, template8MenuItems, template8HotItems, template8ForYouItems, template8Aromas, template9MenuItems, template10MenuItems, template10FeaturedProducts, template12MenuItems } from "../template-data";
 import Template10Content from "../template-10/component/template-10";
 import Template11Content from "../template-11/component/template-11";
+import Template12Content from "../template-12/component/template-12";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -519,6 +520,28 @@ export default async function ConfigsPage({ searchParams }: Props) {
               leftItems={menuItemsData.slice(0, 8)}
               rightItems={menuItemsData.slice(8, 16)}
               featuredImages={featuredImagesData}
+            />
+          </div>
+        );
+      }
+
+      case 'template-12': {
+        let menuItemsData = template12MenuItems;
+        let headerTitle = "TAVUK MENÜLERİ";
+        let footerNote = "FİYATLARIMIZ KDV DAHİLDİR.";
+
+        if (configData) {
+          if (configData.menuItems) menuItemsData = configData.menuItems;
+          if (configData.headerTitle) headerTitle = configData.headerTitle;
+          if (configData.footerNote) footerNote = configData.footerNote;
+        }
+
+        return (
+          <div className="w-[1920px] h-[1080px] mx-auto overflow-hidden">
+            <Template12Content
+              menuItems={menuItemsData}
+              headerTitle={headerTitle}
+              footerNote={footerNote}
             />
           </div>
         );

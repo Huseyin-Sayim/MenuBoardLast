@@ -43,6 +43,20 @@ const Template9: FunctionComponent<Template9Props> = ({
             {/* Dark Overlay */}
             <div className="absolute inset-0 bg-black/40 z-[0]" />
 
+            {/* Logo sağ alt köşe */}
+            <img
+                src="/images/ntx-white.png"
+                alt="Logo"
+                style={{
+                    position: 'absolute',
+                    bottom: '50px',
+                    right: '50px',
+                    height: '70px',
+                    objectFit: 'contain',
+                    zIndex: 50
+                }}
+            />
+
             {/* Spacer - Top */}
             <div className="flex-[0.5]" />
 
