@@ -16,11 +16,11 @@ app.prepare().then(() => {
   const httpServer = createServer((req, res) => {
     req.setTimeout(300000);
     const parsedUrl = parse(req.url, true);
-    
+
     // /uploads path'ine gelen istekleri yakala ve dosyaları serve et
     if (parsedUrl.pathname && parsedUrl.pathname.startsWith('/uploads/')) {
       const filePath = path.join(process.cwd(), 'public', parsedUrl.pathname);
-      
+
       // Dosya var mı kontrol et
       fs.access(filePath, fs.constants.F_OK, (err) => {
         if (err) {
@@ -28,7 +28,7 @@ app.prepare().then(() => {
           res.end('File not found');
           return;
         }
-        
+
         // Content-Type belirle
         const ext = path.extname(filePath).toLowerCase();
         const contentTypes = {
@@ -44,7 +44,7 @@ app.prepare().then(() => {
           '.webm': 'video/webm'
         };
         const contentType = contentTypes[ext] || 'application/octet-stream';
-        
+
         // Dosyayı oku ve gönder
         fs.readFile(filePath, (err, data) => {
           if (err) {
@@ -52,8 +52,8 @@ app.prepare().then(() => {
             res.end('Error reading file');
             return;
           }
-          
-          res.writeHead(200, { 
+
+          res.writeHead(200, {
             'Content-Type': contentType,
             'Cache-Control': 'public, max-age=31536000'
           });
@@ -62,7 +62,49 @@ app.prepare().then(() => {
       });
       return;
     }
-    
+
+    // /renders path'ine gelen istekleri yakala ve dosyaları serve et
+    if (parsedUrl.pathname && parsedUrl.pathname.startsWith('/renders/')) {
+      const filePath = path.join(process.cwd(), 'public', parsedUrl.pathname);
+
+      // Dosya var mı kontrol et
+      fs.access(filePath, fs.constants.F_OK, (err) => {
+        if (err) {
+          console.error(`[Renders] File not found: ${filePath}`);
+          res.writeHead(404, { 'Content-Type': 'text/plain' });
+          res.end('File not found');
+          return;
+        }
+
+        // Content-Type belirle
+        const ext = path.extname(filePath).toLowerCase();
+        const contentTypes = {
+          '.jpg': 'image/jpeg',
+          '.jpeg': 'image/jpeg',
+          '.png': 'image/png',
+          '.gif': 'image/gif',
+          '.webp': 'image/webp'
+        };
+        const contentType = contentTypes[ext] || 'application/octet-stream';
+
+        // Dosyayı oku ve gönder
+        fs.readFile(filePath, (err, data) => {
+          if (err) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('Error reading file');
+            return;
+          }
+
+          res.writeHead(200, {
+            'Content-Type': contentType,
+            'Cache-Control': 'public, max-age=31536000'
+          });
+          res.end(data);
+        });
+      });
+      return;
+    }
+
     handle(req, res, parsedUrl);
   });
 
