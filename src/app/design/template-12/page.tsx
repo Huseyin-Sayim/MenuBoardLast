@@ -1,11 +1,11 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Template12 from "./component/template-12";
 import { template12MenuItems } from "../template-data";
 
-export default function Template12Page() {
+function Template12Content() {
     const searchParams = useSearchParams();
     const configId = searchParams.get("configId");
 
@@ -50,5 +50,13 @@ export default function Template12Page() {
                 footerNote={footerNote}
             />
         </div>
+    );
+}
+
+export default function Template12Page() {
+    return (
+        <Suspense fallback={<div className="w-[1920px] h-[1080px] flex items-center justify-center bg-black text-white">Yükleniyor...</div>}>
+            <Template12Content />
+        </Suspense>
     );
 }
