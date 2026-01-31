@@ -1,11 +1,11 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Template9 from "./component/template-9";
 import { template9MenuItems } from "../template-data";
 
-export default function Template9Page() {
+function Template9Content() {
     const searchParams = useSearchParams();
     const configId = searchParams.get("configId");
 
@@ -53,5 +53,13 @@ export default function Template9Page() {
                 />
             </div>
         </div>
+    );
+}
+
+export default function Template9Page() {
+    return (
+        <Suspense fallback={<div className="w-full min-h-screen flex items-center justify-center bg-black text-white">Yükleniyor...</div>}>
+            <Template9Content />
+        </Suspense>
     );
 }

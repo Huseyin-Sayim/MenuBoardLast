@@ -1,11 +1,11 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Template10 from "./component/template-10";
 import { template10MenuItems, template10FeaturedProducts } from "../template-data";
 
-export default function Template10Page() {
+function Template10Content() {
     const searchParams = useSearchParams();
     const configId = searchParams.get("configId");
 
@@ -55,5 +55,13 @@ export default function Template10Page() {
                 heroTitle={heroTitle}
             />
         </div>
+    );
+}
+
+export default function Template10Page() {
+    return (
+        <Suspense fallback={<div className="w-[1920px] h-[1080px] flex items-center justify-center bg-black text-white">Yükleniyor...</div>}>
+            <Template10Content />
+        </Suspense>
     );
 }

@@ -1,11 +1,11 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Template8 from "./component/template-8";
 import { template8MenuItems, template8HotItems, template8ForYouItems, template8Aromas } from "../template-data";
 
-export default function Template8Page() {
+function Template8Content() {
     const searchParams = useSearchParams();
     const configId = searchParams.get("configId");
 
@@ -55,5 +55,13 @@ export default function Template8Page() {
                 aromaItems={template8Aromas}
             />
         </div>
+    );
+}
+
+export default function Template8Page() {
+    return (
+        <Suspense fallback={<div className="w-full h-screen flex items-center justify-center bg-black text-white">Yükleniyor...</div>}>
+            <Template8Content />
+        </Suspense>
     );
 }

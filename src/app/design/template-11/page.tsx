@@ -1,10 +1,10 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Template11 from "./component/template-11";
 
-export default function Template11Page() {
+function Template11Content() {
     const searchParams = useSearchParams();
     const configId = searchParams.get("configId");
 
@@ -20,12 +20,19 @@ export default function Template11Page() {
         }
     }, [configId]);
 
-
     return (
         <div className="w-full min-h-screen overflow-hidden flex items-center justify-center bg-black">
             <div className="w-full max-w-[1080px] max-h-[1920px] mx-auto" style={{ aspectRatio: '9/16' }}>
                 <Template11 />
             </div>
         </div>
+    );
+}
+
+export default function Template11Page() {
+    return (
+        <Suspense fallback={<div className="w-full min-h-screen flex items-center justify-center bg-black text-white">Yükleniyor...</div>}>
+            <Template11Content />
+        </Suspense>
     );
 }
