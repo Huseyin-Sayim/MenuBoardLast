@@ -91,6 +91,19 @@ const Template10: FunctionComponent<Template10Props> = ({
                 backgroundColor: '#cc2027',
             }}
         >
+            {/* Logo sağ alt köşe */}
+            <img
+                src="/images/ntx.png"
+                alt="Logo"
+                style={{
+                    position: 'absolute',
+                    bottom: '20px',
+                    right: '20px',
+                    height: '80px',
+                    objectFit: 'contain',
+                    zIndex: 50
+                }}
+            />
             {/* Sol Panel - Hero Bölümü */}
             <div className="self-stretch w-[602px] shrink-0 flex flex-col items-center justify-center py-6 px-0 overflow-hidden">
                 {/* Hero Başlık ve Logo */}

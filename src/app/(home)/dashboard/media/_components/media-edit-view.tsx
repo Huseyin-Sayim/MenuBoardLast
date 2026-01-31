@@ -4,6 +4,7 @@ import { TrashIcon } from "@/assets/icons";
 import { cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
 import { deleteMedia } from "@/services/mediaServices";
+import Image from "next/image";
 
 type MediaItem = {
   id: string;
@@ -234,7 +235,7 @@ export function MediaEditView({
                   }}
                 />
               ) : (
-                <img
+                <Image
                   src={selectedItem.url}
                   alt={selectedItem.name}
                   className="absolute inset-0 h-full w-full object-cover"
@@ -359,7 +360,7 @@ export function MediaEditView({
                         </div>
                       </>
                     ) : (
-                      <img
+                      <Image
                         src={item.url}
                         alt={item.name}
                         className="absolute inset-0 h-full w-full object-cover"

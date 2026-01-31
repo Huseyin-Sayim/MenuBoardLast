@@ -13,6 +13,7 @@ const config: Config = {
         "rubik-dirt": "Rubik Dirt",
         "bangers": "Bangers",
         "inter": "Inter",
+        "jua": "Jua",
       },
       screens: {
         "2xsm": "375px",
@@ -102,6 +103,10 @@ const config: Config = {
             DEFAULT: "#FCD34D",
             4: "#FFFBEB",
           },
+        },
+        "tan": {
+          "100": "#deaa8b",
+          "200": "#cead99",
         },
       },
       fontSize: {

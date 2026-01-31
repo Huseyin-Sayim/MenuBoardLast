@@ -373,3 +373,37 @@ export const template10FeaturedProducts = [
   { image: "/images/burger_menu.svg" },
   { image: "/images/burger_menu.svg" }
 ];
+
+export const template11MenuItems = [
+  { name: "ESPRESSO SİNGLE", price: "200₺" },
+  { name: "CAPPUCCİNO", price: "200₺" },
+  { name: "AMERICANO", price: "150₺" },
+  { name: "RISRETTO", price: "200₺" },
+  { name: "CORTADO", price: "195₺" },
+  { name: "TÜRK KAHVESİ", price: "100₺" },
+  { name: "DUBLE TÜRK KAHVESİ", price: "200₺" },
+  { name: "FİLTRE KAHVE", price: "140₺" },
+  { name: "ESPRESSO SİNGLE", price: "200₺" },
+  { name: "CAPPUCCİNO", price: "185₺" },
+  { name: "AMERICANO", price: "150₺" },
+  { name: "RISRETTO", price: "200₺" },
+  { name: "CORTADO", price: "195₺" },
+  { name: "TÜRK KAHVESİ", price: "100₺" },
+  { name: "DUBLE TÜRK KAHVESİ", price: "200₺" },
+  { name: "FİLTRE KAHVE", price: "140₺" },
+];
+
+export const template11FeaturedImages = [
+  "/images/placeholder.png",
+  "/images/placeholder-2.png"
+];
+
+// Template12 (Tavuk Menüleri - Chicken Menu) için default veriler
+export const template12MenuItems = [
+  { name: "CHICKEN BURGER", price: "200", image: "/images/burger_menu.svg" },
+  { name: "CHICKEN BURGER", price: "200", image: "/images/burger_menu.svg" },
+  { name: "CHICKEN BURGER", price: "200", image: "/images/burger_menu.svg" },
+  { name: "CHICKEN BURGER", price: "200", image: "/images/burger_menu.svg" },
+  { name: "CHICKEN BURGER", price: "200", image: "/images/burger_menu.svg" },
+  { name: "CHICKEN BURGER", price: "200", image: "/images/burger_menu.svg" },
+];
