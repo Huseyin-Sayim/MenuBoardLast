@@ -1,6 +1,6 @@
 "use client";
 
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useState, useRef, useEffect } from 'react';
 import { template12MenuItems } from "../../template-data";
 
 // Default fallback image
@@ -48,6 +48,7 @@ interface Template12Props {
     onCategoryChange?: (index: number, categoryId: string) => void;
     onProductSelect?: (index: number, productId: string) => void;
     onMenuItemImageClick?: (index: number) => void;
+    onHeaderTitleChange?: (newTitle: string) => void;
 }
 
 const Template12: FunctionComponent<Template12Props> = ({
@@ -60,7 +61,47 @@ const Template12: FunctionComponent<Template12Props> = ({
     onCategoryChange,
     onProductSelect,
     onMenuItemImageClick,
+    onHeaderTitleChange,
 }) => {
+    const [isEditingTitle, setIsEditingTitle] = useState(false);
+    const [editedTitle, setEditedTitle] = useState(headerTitle);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    // Başlık değiştiğinde state'i güncelle
+    useEffect(() => {
+        setEditedTitle(headerTitle);
+    }, [headerTitle]);
+
+    // Input açıldığında focus yap
+    useEffect(() => {
+        if (isEditingTitle && inputRef.current) {
+            inputRef.current.focus();
+            inputRef.current.select();
+        }
+    }, [isEditingTitle]);
+
+    const handleTitleClick = () => {
+        if (isEditable) {
+            setIsEditingTitle(true);
+        }
+    };
+
+    const handleTitleSave = () => {
+        if (editedTitle.trim() && editedTitle !== headerTitle) {
+            onHeaderTitleChange?.(editedTitle.trim());
+        }
+        setIsEditingTitle(false);
+    };
+
+    const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            handleTitleSave();
+        } else if (e.key === 'Escape') {
+            setEditedTitle(headerTitle);
+            setIsEditingTitle(false);
+        }
+    };
+
     // 6 items for 3x2 grid
     const displayItems = [...menuItems.slice(0, 6)];
 
@@ -142,13 +183,14 @@ const Template12: FunctionComponent<Template12Props> = ({
             >
                 {/* Product Name */}
                 <div
-                    className="font-montserrat"
+                    className="font-nunito"
                     style={{
-                        fontSize: '42px',
-                        fontWeight: 600,
+                        fontSize: '32px',
+                        fontWeight: 500,
                         color: '#000',
                         maxWidth: '380px',
-                        lineHeight: 1.1
+                        lineHeight: 1.1,
+                        letterSpacing: '1px'
                     }}
                 >
                     {item.name}
@@ -185,7 +227,7 @@ const Template12: FunctionComponent<Template12Props> = ({
             {/* Header */}
             <div
                 style={{
-                    height: '194px',
+                    height: '130px',
                     backgroundColor: '#f9b841',
                     borderBottom: '3px solid #ffa500',
                     display: 'flex',
@@ -195,21 +237,61 @@ const Template12: FunctionComponent<Template12Props> = ({
                     flexShrink: 0
                 }}
             >
-                <div
-                    className="font-nunito"
-                    style={{
-                        fontSize: '100px',
-                        fontWeight: 900,
-                        color: '#fff'
-                    }}
-                >
-                    {headerTitle}
-                </div>
+                {isEditingTitle ? (
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        value={editedTitle}
+                        onChange={(e) => setEditedTitle(e.target.value)}
+                        onBlur={handleTitleSave}
+                        onKeyDown={handleTitleKeyDown}
+                        className="montserrat"
+                        style={{
+                            fontSize: '50px',
+                            fontWeight: 600,
+                            color: '#fff',
+                            textShadow: '2px 4px 6px rgba(0, 0, 0, 0.3)',
+                            backgroundColor: 'rgba(0,0,0,0.2)',
+                            border: '2px solid #fff',
+                            borderRadius: '8px',
+                            padding: '5px 15px',
+                            outline: 'none',
+                            width: 'auto',
+                            minWidth: '300px'
+                        }}
+                    />
+                ) : (
+                    <div
+                        className="montserrat"
+                        style={{
+                            fontSize: '50px',
+                            fontWeight: 600,
+                            color: '#fff',
+                            textShadow: '2px 4px 6px rgba(0, 0, 0, 0.3)',
+                            cursor: isEditable ? 'pointer' : 'default',
+                            padding: '5px 15px',
+                            borderRadius: '8px',
+                            transition: 'background-color 0.2s'
+                        }}
+                        onClick={handleTitleClick}
+                        onMouseEnter={(e) => {
+                            if (isEditable) {
+                                e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.1)';
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                        }}
+                        title={isEditable ? "Düzenlemek için tıklayın" : undefined}
+                    >
+                        {headerTitle}
+                    </div>
+                )}
                 <img
                     src="/images/ntx.png"
                     alt="Logo"
                     style={{
-                        height: '90px',
+                        height: '70px',
                         objectFit: 'contain'
                     }}
                 />
@@ -272,3 +354,4 @@ const Template12: FunctionComponent<Template12Props> = ({
 };
 
 export default Template12;
+

@@ -24,6 +24,7 @@ export async function GET(req: Request) {
         id: true,
         createdAt: true,
         updatedAt: true,
+        snapshotUrl: true, // Snapshot URL'ini de al
         Template: {
           select: {
             id: true,
@@ -45,22 +46,23 @@ export async function GET(req: Request) {
       const templateKey = config.Template.component || config.Template.id;
       const currentCount = (templateConfigCounts.get(templateKey) || 0) + 1;
       templateConfigCounts.set(templateKey, currentCount);
-      
+
       // Her config için benzersiz isim oluştur
       const baseName = config.Template.name;
-      const configName = currentCount > 1 
-        ? `${baseName} - Config ${currentCount}` 
+      const configName = currentCount > 1
+        ? `${baseName} - Config ${currentCount}`
         : baseName;
-      
+
       return {
-      id: config.id, // Config ID'si - unique key için
-      templateId: config.Template.id, // Template ID'si
+        id: config.id, // Config ID'si - unique key için
+        templateId: config.Template.id, // Template ID'si
         name: configName, // Her config için benzersiz isim
-      path: config.Template.path,
-      component: config.Template.component,
-      configId: config.id, // Config ID'si (referans için)
-      createdAt: config.createdAt,
-      updatedAt: config.updatedAt,
+        path: config.Template.path,
+        component: config.Template.component,
+        configId: config.id, // Config ID'si (referans için)
+        snapshotUrl: config.snapshotUrl, // Snapshot URL'i
+        createdAt: config.createdAt,
+        updatedAt: config.updatedAt,
       };
     });
 

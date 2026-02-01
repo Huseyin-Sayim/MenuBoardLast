@@ -2701,6 +2701,9 @@ export default function TemplatePage() {
                 setSelectedImageCategorySlot('template12');
                 setIsImageSelectorOpen(true);
               }}
+              onHeaderTitleChange={(newTitle) => {
+                setTemplate12HeaderTitle(newTitle);
+              }}
             />
           </div>
         </div>

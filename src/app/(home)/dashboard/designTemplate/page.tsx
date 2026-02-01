@@ -10,6 +10,7 @@ type Template = {
   path: string;
   component: string;
   configId: string;
+  snapshotUrl?: string; // Snapshot resmi URL'i
   createdAt: string;
   updatedAt: string;
 };
@@ -80,20 +81,32 @@ export default function DesignTemplatePage() {
                 className="group cursor-pointer overflow-hidden rounded-lg border border-stroke bg-white shadow-sm transition-all hover:shadow-lg dark:border-stroke-dark dark:bg-gray-dark"
                 onClick={() => handleTemplateClick(template.component, template.configId)}
               >
-                {/* Önizleme */}
-                <div className="relative aspect-video w-full overflow-hidden bg-gray-2 dark:bg-dark-2">
-                  <iframe
-                    src={`${template.path}${template.path.includes('?') ? '&' : '?'}configId=${template.configId}`}
-                    className="absolute inset-0 border-0"
-                    style={{
-                      transform: `scale(${Math.min(450 / 1920, 275 / 1080)})`,
-                      transformOrigin: "top left",
-                      width: "1920px",
-                      height: "1080px",
-                    }}
-                    title={`${template.name} Önizleme`}
-                    scrolling="no"
-                  />
+                {/* Önizleme - Snapshot veya Canlı iframe */}
+                <div
+                  className="relative w-full bg-gray-2 dark:bg-dark-2"
+                  style={{ aspectRatio: '16/9', overflow: 'hidden' }}
+                >
+                  {template.snapshotUrl ? (
+                    <img
+                      src={template.snapshotUrl}
+                      alt={template.name}
+                      className="absolute inset-0 h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                    />
+                  ) : (
+                    /* Snapshot yoksa canlı iframe önizleme */
+                    <iframe
+                      src={`${template.path}?preview=true&configId=${template.configId}`}
+                      className="absolute top-0 left-0 border-0 pointer-events-none"
+                      style={{
+                        transform: 'scale(0.2)',
+                        transformOrigin: 'top left',
+                        width: '1920px',
+                        height: '1080px',
+                      }}
+                      title={template.name}
+                      scrolling="no"
+                    />
+                  )}
                 </div>
 
                 {/* Bilgi */}
@@ -113,3 +126,4 @@ export default function DesignTemplatePage() {
     </div>
   );
 }
+

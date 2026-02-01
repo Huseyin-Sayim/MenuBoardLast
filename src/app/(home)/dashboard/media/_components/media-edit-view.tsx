@@ -4,7 +4,6 @@ import { TrashIcon } from "@/assets/icons";
 import { cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
 import { deleteMedia } from "@/services/mediaServices";
-import Image from "next/image";
 
 type MediaItem = {
   id: string;
@@ -182,7 +181,7 @@ export function MediaEditView({
             Önizleme
           </h3>
           <div className="flex-1 rounded-lg border-4 border-gray-4 bg-gray-2 p-4 dark:border-dark-3 dark:bg-dark-2">
-            <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-white shadow-lg">
+            <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-black shadow-lg">
               {selectedItem.type === "video" ? (
                 <video
                   ref={videoRef}
@@ -235,10 +234,10 @@ export function MediaEditView({
                   }}
                 />
               ) : (
-                <Image
+                <img
                   src={selectedItem.url}
                   alt={selectedItem.name}
-                  className="absolute inset-0 h-full w-full object-cover"
+                  className="absolute inset-0 h-full w-full object-contain"
                 />
               )}
             </div>
@@ -360,7 +359,7 @@ export function MediaEditView({
                         </div>
                       </>
                     ) : (
-                      <Image
+                      <img
                         src={item.url}
                         alt={item.name}
                         className="absolute inset-0 h-full w-full object-cover"

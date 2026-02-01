@@ -11,7 +11,7 @@ export default async function middleware(req: NextRequest) {
   let token = headerToken || cookieToken;
   let newTokenCreated = false;
 
-  const publicPaths = ['/api/login', '/api/register', '/api/check-db', '/api/refresh', '/auth/sign-in', '/auth/sign-up', '/auth/forgot-password', '/api/auth/verify', '/api/auth/forgot-password', '/api/auth/verify-code', '/api/auth/reset-password']
+  const publicPaths = ['/api/login', '/api/register', '/api/check-db', '/api/refresh', '/auth/sign-in', '/auth/sign-up', '/auth/forgot-password', '/api/auth/verify', '/api/auth/forgot-password', '/api/auth/verify-code', '/api/auth/reset-password', '/api/templates/generate-previews', '/api/templates/seed']
 
   // /uploads path'ini public yap (medya dosyaları için)
   if (pathname.startsWith('/uploads/')) {
@@ -23,8 +23,9 @@ export default async function middleware(req: NextRequest) {
     (searchParams.get('configId') || searchParams.get('preview') === 'true');
 
   // ConfigId ile erişilen design/template-X route'larını public yap (snapshot için gerekli)
+  // Preview parametresi ile de erişilebilir (otomatik önizleme üretimi için)
   const isPublicTemplateRoute = pathname.startsWith('/design/template-') &&
-    searchParams.get('configId') !== null;
+    (searchParams.get('configId') !== null || searchParams.get('preview') === 'true');
 
   // Büyük dosya yüklemeleri için media API'sini bypass et (body parsing limitini aşmak için)
   if (pathname === '/api/media' && req.method === 'POST') {

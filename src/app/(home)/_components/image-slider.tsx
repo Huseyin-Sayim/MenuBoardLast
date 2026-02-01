@@ -10,6 +10,8 @@ type Template = {
   name: string;
   path: string;
   component: string;
+  snapshotUrl?: string; // Template config'den gelen snapshot
+  previewImage?: string; // Varsayılan önizleme resmi
 };
 
 type ImageSliderProps = {
@@ -31,14 +33,37 @@ export function ImageSlider({ images, templates, className }: ImageSliderProps) 
   const items = templates || images || [];
   const isTemplateMode = !!templates;
 
-  // Preview URL oluştur
-  const getPreviewUrl = (path: string) => {
-    return `${path}?preview=true`;
+  // Template için önizleme resmi al
+  const getTemplatePreviewImage = (template: Template) => {
+    // Önce snapshotUrl, sonra previewImage, en son varsayılan resim
+    if (template.snapshotUrl) return template.snapshotUrl;
+    if (template.previewImage) return template.previewImage;
+
+    // Varsayılan önizleme resimleri
+    // NOT: Gerçek template screenshot'ları /images/templates/ klasörüne eklenmelidir
+    const defaultPreviews: Record<string, string> = {
+      'template-1': '/images/templates/template-1-preview.png',
+      'template-2': '/images/templates/template-2-preview.png',
+      'template-3': '/images/templates/template-3-preview.png',
+      'template-4': '/images/templates/template-4-preview.png',
+      'template-5': '/images/templates/template-5-preview.png',
+      'template-6': '/images/templates/template-6-preview.png',
+      'template-7': '/images/templates/template-7-preview.png',
+      'template-8': '/images/templates/template-8-preview.png',
+      'template-9': '/images/templates/template-9-preview.png',
+      'template-10': '/images/templates/template-10-preview.png',
+      'template-11': '/images/templates/template-11-preview.png',
+      'template-12': '/images/templates/template-12-preview.png',
+      'template-13': '/images/templates/template-13-preview.png',
+    };
+
+    // Eğer varsayılan resim yoksa genel placeholder kullan
+    return defaultPreviews[template.component] || '/images/placeholder.png';
   };
 
   useEffect(() => {
     if (items.length === 0) return;
-    
+
     // Otomatik geçiş için interval
     intervalRef.current = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % items.length);
@@ -55,19 +80,19 @@ export function ImageSlider({ images, templates, className }: ImageSliderProps) 
   useEffect(() => {
     const activeThumbnail = thumbnailRefs.current[currentIndex];
     const container = thumbnailContainerRef.current;
-    
+
     if (activeThumbnail && container) {
       const containerRect = container.getBoundingClientRect();
       const thumbnailRect = activeThumbnail.getBoundingClientRect();
-      
+
       const scrollLeft = container.scrollLeft;
       const thumbnailLeft = thumbnailRect.left - containerRect.left + scrollLeft;
       const thumbnailWidth = thumbnailRect.width;
       const containerWidth = containerRect.width;
-      
+
       // Thumbnail'ı ortala
       const targetScroll = thumbnailLeft - containerWidth / 2 + thumbnailWidth / 2;
-      
+
       container.scrollTo({
         left: targetScroll,
         behavior: "smooth",
@@ -80,10 +105,10 @@ export function ImageSlider({ images, templates, className }: ImageSliderProps) 
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-    
+
     // Yeni index'i ayarla
     setCurrentIndex(index);
-    
+
     // Yeni interval başlat
     intervalRef.current = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % items.length);
@@ -169,17 +194,20 @@ export function ImageSlider({ images, templates, className }: ImageSliderProps) 
         {isTemplateMode && templates ? (
           <button
             onClick={() => handleImageClick(getImageIndex(-1))}
-            className="relative h-32 w-24 shrink-0 overflow-hidden rounded-lg opacity-60 transition-all duration-300 ease-in-out hover:opacity-80 hover:scale-105 active:scale-95 md:h-40 md:w-32 bg-gray-2 dark:bg-dark-2"
+            className="relative shrink-0 rounded-lg opacity-60 transition-all duration-300 ease-in-out hover:opacity-80 hover:scale-105 active:scale-95 bg-gray-2 dark:bg-dark-2"
+            style={{ width: '134px', height: '75px', overflow: 'hidden' }}
           >
             <iframe
-              src={getPreviewUrl(templates[getImageIndex(-1)].path)}
-              className="absolute inset-0 border-0 pointer-events-none"
+              src={`${templates[getImageIndex(-1)].path}?preview=true`}
+              className="absolute top-0 left-0 border-0 pointer-events-none"
               style={{
-                transform: 'scale(0.15)',
+                transform: 'scale(0.07)',
                 transformOrigin: 'top left',
-                width: '667%',
-                height: '667%'
+                width: '1920px',
+                height: '1080px',
               }}
+              title={templates[getImageIndex(-1)].name}
+              scrolling="no"
             />
           </button>
         ) : images ? (
@@ -197,35 +225,40 @@ export function ImageSlider({ images, templates, className }: ImageSliderProps) 
         ) : null}
 
         {/* Ortadaki ana preview */}
-        <div className="relative h-64 w-full max-w-2xl overflow-hidden rounded-lg shadow-lg md:h-80 bg-gray-2 dark:bg-dark-2">
+        <div
+          className="relative rounded-lg shadow-lg bg-gray-2 dark:bg-dark-2"
+          style={{ width: '538px', height: '302px', overflow: 'hidden' }}
+        >
           <div className="relative h-full w-full">
             {isTemplateMode && templates ? (
               templates.map((template, index) => {
                 const isActive = index === currentIndex;
                 const offset = ((index - currentIndex + templates.length) % templates.length);
                 const isNext = offset === 1;
-                
+
                 return (
                   <div
                     key={template.id}
                     className={cn(
                       "absolute inset-0 transition-all duration-700 ease-in-out",
-                      isActive 
-                        ? "z-10 opacity-100 translate-x-0 scale-100" 
+                      isActive
+                        ? "z-10 opacity-100 translate-x-0 scale-100"
                         : isNext
-                        ? "z-0 opacity-0 translate-x-12 scale-105"
-                        : "z-0 opacity-0 -translate-x-12 scale-95"
+                          ? "z-0 opacity-0 translate-x-12 scale-105"
+                          : "z-0 opacity-0 -translate-x-12 scale-95"
                     )}
                   >
                     <iframe
-                      src={getPreviewUrl(template.path)}
-                      className="absolute inset-0 border-0 pointer-events-none"
+                      src={`${template.path}?preview=true`}
+                      className="absolute top-0 left-0 border-0 pointer-events-none"
                       style={{
-                        transform: 'scale(0.33)',
+                        transform: 'scale(0.28)',
                         transformOrigin: 'top left',
-                        width: '303%',
-                        height: '303%'
+                        width: '1920px',
+                        height: '1080px',
                       }}
+                      title={template.name}
+                      scrolling="no"
                     />
                   </div>
                 );
@@ -235,17 +268,17 @@ export function ImageSlider({ images, templates, className }: ImageSliderProps) 
                 const isActive = index === currentIndex;
                 const offset = ((index - currentIndex + images.length) % images.length);
                 const isNext = offset === 1;
-                
+
                 return (
                   <div
                     key={index}
                     className={cn(
                       "absolute inset-0 transition-all duration-700 ease-in-out",
-                      isActive 
-                        ? "z-10 opacity-100 translate-x-0 scale-100" 
+                      isActive
+                        ? "z-10 opacity-100 translate-x-0 scale-100"
                         : isNext
-                        ? "z-0 opacity-0 translate-x-12 scale-105"
-                        : "z-0 opacity-0 -translate-x-12 scale-95"
+                          ? "z-0 opacity-0 translate-x-12 scale-105"
+                          : "z-0 opacity-0 -translate-x-12 scale-95"
                     )}
                   >
                     <Image
@@ -266,17 +299,20 @@ export function ImageSlider({ images, templates, className }: ImageSliderProps) 
         {isTemplateMode && templates ? (
           <button
             onClick={() => handleImageClick(getImageIndex(1))}
-            className="relative h-32 w-24 shrink-0 overflow-hidden rounded-lg opacity-60 transition-all duration-300 ease-in-out hover:opacity-80 hover:scale-105 active:scale-95 md:h-40 md:w-32 bg-gray-2 dark:bg-dark-2"
+            className="relative shrink-0 rounded-lg opacity-60 transition-all duration-300 ease-in-out hover:opacity-80 hover:scale-105 active:scale-95 bg-gray-2 dark:bg-dark-2"
+            style={{ width: '134px', height: '75px', overflow: 'hidden' }}
           >
             <iframe
-              src={getPreviewUrl(templates[getImageIndex(1)].path)}
-              className="absolute inset-0 border-0 pointer-events-none"
+              src={`${templates[getImageIndex(1)].path}?preview=true`}
+              className="absolute top-0 left-0 border-0 pointer-events-none"
               style={{
-                transform: 'scale(0.15)',
+                transform: 'scale(0.07)',
                 transformOrigin: 'top left',
-                width: '667%',
-                height: '667%'
+                width: '1920px',
+                height: '1080px',
               }}
+              title={templates[getImageIndex(1)].name}
+              scrolling="no"
             />
           </button>
         ) : images ? (
@@ -341,14 +377,16 @@ export function ImageSlider({ images, templates, className }: ImageSliderProps) 
                   )}
                 >
                   <iframe
-                    src={getPreviewUrl(template.path)}
+                    src={`${template.path}?preview=true`}
                     className="absolute inset-0 border-0 pointer-events-none"
                     style={{
-                      transform: 'scale(0.1)',
+                      transform: 'scale(0.04)',
                       transformOrigin: 'top left',
-                      width: '1000%',
-                      height: '1000%'
+                      width: '1920px',
+                      height: '1080px',
                     }}
+                    title={template.name}
+                    scrolling="no"
                   />
                   {isActive && (
                     <div className="absolute inset-0 bg-primary/20" />
