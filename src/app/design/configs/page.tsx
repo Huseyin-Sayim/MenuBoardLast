@@ -10,10 +10,11 @@ import Template7Content from "../template-7/component/template-7";
 import Template8Content from "../template-8/component/template-8";
 import Template9Content from "../template-9/component/template-9";
 
-import { defaultBurgers, menuItems, winterFavorites, template8MenuItems, template8HotItems, template8ForYouItems, template8Aromas, template9MenuItems, template10MenuItems, template10FeaturedProducts, template12MenuItems } from "../template-data";
+import { defaultBurgers, menuItems, winterFavorites, template8MenuItems, template8HotItems, template8ForYouItems, template8Aromas, template9MenuItems, template10MenuItems, template10FeaturedProducts, template12MenuItems, template13MenuItems, template13ExtraItems } from "../template-data";
 import Template10Content from "../template-10/component/template-10";
 import Template11Content from "../template-11/component/template-11";
 import Template12Content from "../template-12/component/template-12";
+import Template13Content from "../template-13/component/template-13";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -542,6 +543,28 @@ export default async function ConfigsPage({ searchParams }: Props) {
               menuItems={menuItemsData}
               headerTitle={headerTitle}
               footerNote={footerNote}
+            />
+          </div>
+        );
+      }
+
+      case 'template-13': {
+        let menuItemsData = template13MenuItems;
+        let extraItemsData = template13ExtraItems;
+        let extraTitle = "EKSTRALAR";
+
+        if (configData) {
+          if (configData.menuItems) menuItemsData = configData.menuItems;
+          if (configData.extraItems) extraItemsData = configData.extraItems;
+          if (configData.extraTitle) extraTitle = configData.extraTitle;
+        }
+
+        return (
+          <div className="w-[1920px] h-[1080px] mx-auto overflow-hidden">
+            <Template13Content
+              menuItems={menuItemsData}
+              extraItems={extraItemsData}
+              extraTitle={extraTitle}
             />
           </div>
         );

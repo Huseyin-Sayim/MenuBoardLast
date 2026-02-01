@@ -407,3 +407,23 @@ export const template12MenuItems = [
   { name: "CHICKEN BURGER", price: "200", image: "/images/burger_menu.svg" },
   { name: "CHICKEN BURGER", price: "200", image: "/images/burger_menu.svg" },
 ];
+
+// Template13 için default veriler
+export const template13MenuItems = [
+  { name: "SPECIAL", image: "/images/burger_menu.svg", sizes: [{ label: "KÜÇÜK", price: "200" }, { label: "ORTA", price: "250" }, { label: "BÜYÜK", price: "300" }] },
+  { name: "SPECIAL", image: "/images/burger_menu.svg", sizes: [{ label: "KÜÇÜK", price: "200" }, { label: "ORTA", price: "250" }, { label: "BÜYÜK", price: "300" }] },
+  { name: "SPECIAL", image: "/images/burger_menu.svg", sizes: [{ label: "KÜÇÜK", price: "200" }, { label: "ORTA", price: "250" }, { label: "BÜYÜK", price: "300" }] },
+  { name: "SPECIAL", image: "/images/burger_menu.svg", sizes: [{ label: "KÜÇÜK", price: "200" }, { label: "ORTA", price: "250" }, { label: "BÜYÜK", price: "300" }] },
+  { name: "SPECIAL", image: "/images/burger_menu.svg", sizes: [{ label: "KÜÇÜK", price: "200" }, { label: "ORTA", price: "250" }, { label: "BÜYÜK", price: "300" }] },
+  { name: "SPECIAL", image: "/images/burger_menu.svg", sizes: [{ label: "KÜÇÜK", price: "200" }, { label: "ORTA", price: "250" }, { label: "BÜYÜK", price: "300" }] },
+  { name: "SPECIAL", image: "/images/burger_menu.svg", sizes: [{ label: "KÜÇÜK", price: "200" }, { label: "ORTA", price: "250" }, { label: "BÜYÜK", price: "300" }] },
+  { name: "SPECIAL", image: "/images/burger_menu.svg", sizes: [{ label: "KÜÇÜK", price: "200" }, { label: "ORTA", price: "250" }, { label: "BÜYÜK", price: "300" }] },
+];
+
+export const template13ExtraItems = [
+  { name: "PATATES KIZARTMASI", price: "50₺" },
+  { name: "SOĞAN HALKASI", price: "60₺" },
+  { name: "MOZERELLA ÇUBUKLARI", price: "60₺" },
+  { name: "TAVUK NUGGET", price: "70₺" },
+];
+

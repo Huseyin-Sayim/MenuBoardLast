@@ -13,8 +13,9 @@ import Template9 from "@/app/design/template-9/component/template-9";
 import Template10 from "@/app/design/template-10/component/template-10";
 import Template11 from "@/app/design/template-11/component/template-11";
 import Template12 from "@/app/design/template-12/component/template-12";
+import Template13 from "@/app/design/template-13/component/template-13";
 
-import { defaultBurgers, menuItems, winterFavorites, template8MenuItems as defaultT8Menu, template8HotItems as defaultT8Hot, template8ForYouItems as defaultT8ForYou, template8Aromas, template9MenuItems as defaultT9Menu, template10MenuItems as defaultT10Menu, template10FeaturedProducts as defaultT10Featured, template11MenuItems as defaultT11Menu, template11FeaturedImages as defaultT11Images, template12MenuItems as defaultT12Menu } from "@/app/design/template-data";
+import { defaultBurgers, menuItems, winterFavorites, template8MenuItems as defaultT8Menu, template8HotItems as defaultT8Hot, template8ForYouItems as defaultT8ForYou, template8Aromas, template9MenuItems as defaultT9Menu, template10MenuItems as defaultT10Menu, template10FeaturedProducts as defaultT10Featured, template11MenuItems as defaultT11Menu, template11FeaturedImages as defaultT11Images, template12MenuItems as defaultT12Menu, template13MenuItems as defaultT13Menu, template13ExtraItems as defaultT13Extras } from "@/app/design/template-data";
 import { useEffect, useState } from "react";
 import { useTemplateConfig, useUpdateTemplateConfig } from "@/hooks/use-template-config";
 import { MediaGallery, MediaItem } from "@/app/(home)/dashboard/media/_components/media-gallery";
@@ -319,6 +320,19 @@ export default function TemplatePage() {
   const [template12HeaderTitle, setTemplate12HeaderTitle] = useState<string>("TAVUK MENÜLERİ");
   const [template12FooterNote, setTemplate12FooterNote] = useState<string>("FİYATLARIMIZ KDV DAHİLDİR.");
   const [template12ProductsBySlot, setTemplate12ProductsBySlot] = useState<Record<number, Array<{ _id: string; name: string; pricing: any; category: string; image?: string; img?: string; imageUrl?: string; options?: Array<{ key: string; name: string; price: number }> }>>>({});
+
+  // Template 13 - Special Menu (16:9)
+  const [template13MenuItems, setTemplate13MenuItems] = useState<Array<{
+    name: string;
+    image?: string;
+    sizes?: Array<{ label: string; price: string }>;
+    categoryId?: string;
+    productId?: string;
+  }>>(defaultT13Menu);
+  const [template13ExtraItems, setTemplate13ExtraItems] = useState<Array<{ name: string; price: string }>>(defaultT13Extras);
+  const [template13ExtraTitle, setTemplate13ExtraTitle] = useState<string>("EKSTRALAR");
+  const [template13SideImage, setTemplate13SideImage] = useState<string>("/images/template-13-side.png");
+  const [template13ProductsBySlot, setTemplate13ProductsBySlot] = useState<Record<number, Array<{ _id: string; name: string; pricing: any; category: string; image?: string; img?: string; imageUrl?: string; options?: Array<{ key: string; name: string; price: number }> }>>>({});
 
   const [apiBaseUrl, setApiBaseUrl] = useState<string>("http://localhost:5000");
 
@@ -930,6 +944,35 @@ export default function TemplatePage() {
             }
           } catch (error) {
             console.error('Template-12 ürünler çekilirken hata:', error);
+          }
+        };
+        restoreItems();
+      } else if (templateId === "template-13") {
+        const config = configData as any;
+        console.log('Template-13 config loading:', config);
+        if (config?.menuItems) setTemplate13MenuItems(config.menuItems);
+        if (config?.extraItems) setTemplate13ExtraItems(config.extraItems);
+        if (config?.extraTitle) setTemplate13ExtraTitle(config.extraTitle);
+        if (config?.sideImage) setTemplate13SideImage(config.sideImage);
+
+        const restoreItems = async () => {
+          try {
+            const response = await fetch(`${apiBaseUrl}/api/products`);
+            if (response.ok) {
+              const data = await response.json();
+              const products = data.data || [];
+              const productsBySlot: Record<number, any[]> = {};
+
+              config.menuItems?.forEach((item: any, index: number) => {
+                if (item.categoryId) {
+                  const filteredProducts = products.filter((p: any) => p.category === item.categoryId);
+                  productsBySlot[index] = filteredProducts;
+                }
+              });
+              setTemplate13ProductsBySlot(productsBySlot);
+            }
+          } catch (error) {
+            console.error('Template-13 ürünler çekilirken hata:', error);
           }
         };
         restoreItems();
@@ -2663,6 +2706,121 @@ export default function TemplatePage() {
         </div>
       ),
     },
+    "template-13": {
+      id: "template-13",
+      name: "Şablon 13",
+      component: (
+        <div className="absolute inset-0 overflow-auto bg-black flex items-center justify-center">
+          <div
+            className="origin-center"
+            style={{
+              width: '1920px',
+              height: '1080px',
+              transform: 'scale(0.75)',
+              margin: 0,
+              padding: 0,
+            }}
+          >
+            <Template13
+              menuItems={template13MenuItems}
+              extraItems={template13ExtraItems}
+              extraTitle={template13ExtraTitle}
+              sideImage={template13SideImage}
+              isEditable={true}
+              availableCategories={availableCategories}
+              availableProductsBySlot={template13ProductsBySlot}
+              onCategoryChange={(index, categoryId) => {
+                setTemplate13MenuItems(prev => {
+                  const newItems = [...prev];
+                  if (newItems[index]) {
+                    newItems[index] = { ...newItems[index], categoryId, productId: undefined };
+                  }
+                  return newItems;
+                });
+                // Fetch products for this slot
+                const fetchSlotProducts = async () => {
+                  try {
+                    const response = await fetch(`${apiBaseUrl}/api/products`);
+                    if (response.ok) {
+                      const data = await response.json();
+                      const products = data.data || [];
+                      const filteredProducts = products.filter((p: any) => p.category === categoryId);
+                      setTemplate13ProductsBySlot(prev => ({ ...prev, [index]: filteredProducts }));
+                    }
+                  } catch (error) {
+                    console.error('Error fetching slot products:', error);
+                  }
+                };
+                fetchSlotProducts();
+              }}
+              onProductSelect={(index, productId) => {
+                const product = template13ProductsBySlot[index]?.find(p => p._id === productId);
+                if (product) {
+                  const imageUrl = product.image || product.img || product.imageUrl;
+
+                  // Ürün options/fiyatlarını al
+                  let sizes: Array<{ label: string; price: string }> = [];
+
+                  if (product.options && Array.isArray(product.options) && product.options.length > 0) {
+                    // API'den gelen options dizisini kullan
+                    sizes = product.options.map((opt: any) => ({
+                      label: opt.name || opt.key || "Standart",
+                      price: String(opt.price || 0)
+                    }));
+                  } else if (product.pricing) {
+                    // Options yoksa pricing'den fiyat al
+                    const basePrice = String(product.pricing.basePrice?.price || product.pricing.price || "0");
+                    const priceFormatted = new Intl.NumberFormat('tr-TR').format(parseFloat(basePrice.replace(/[^\d.]/g, '')));
+                    sizes = [
+                      { label: "STANDART", price: priceFormatted }
+                    ];
+                  }
+
+                  setTemplate13MenuItems(prev => {
+                    const newItems = [...prev];
+                    if (newItems[index]) {
+                      newItems[index] = {
+                        ...newItems[index],
+                        productId,
+                        name: product.name,
+                        image: imageUrl,
+                        sizes: sizes.length > 0 ? sizes : newItems[index].sizes,
+                      };
+                    }
+                    return newItems;
+                  });
+                }
+              }}
+              onMenuItemImageClick={(index) => {
+                setSelectedImageIndex(index);
+                setSelectedImageCategorySlot('template13');
+                setIsImageSelectorOpen(true);
+              }}
+              onSideImageClick={() => {
+                setSelectedImageIndex(100);
+                setSelectedImageCategorySlot('template13-side');
+                setIsImageSelectorOpen(true);
+              }}
+              onExtraItemChange={(index, field, value) => {
+                setTemplate13ExtraItems(prev => {
+                  const newItems = [...prev];
+                  if (newItems[index]) {
+                    newItems[index] = {
+                      ...newItems[index],
+                      [field]: value
+                    };
+                  }
+                  return newItems;
+                });
+              }}
+              onExtraTitleChange={(value) => {
+                setTemplate13ExtraTitle(value);
+              }}
+            />
+          </div>
+        </div>
+      ),
+    },
   }
 
   const selectedTemplate = templateConfigs[templateId];
@@ -2780,10 +2938,17 @@ export default function TemplatePage() {
                                     headerTitle: template12HeaderTitle,
                                     footerNote: template12FooterNote
                                   }
-                                  : {
-                                    category: selectedCategory || "",
-                                    data: (selectedProducts.length > 0 ? selectedProducts : [])
-                                  };
+                                  : templateId === "template-13"
+                                    ? {
+                                      menuItems: template13MenuItems,
+                                      extraItems: template13ExtraItems,
+                                      extraTitle: template13ExtraTitle,
+                                      sideImage: template13SideImage
+                                    }
+                                    : {
+                                      category: selectedCategory || "",
+                                      data: (selectedProducts.length > 0 ? selectedProducts : [])
+                                    };
 
               // Debug: Template-4 için configData'yı log'la
               if (templateId === "template-4") {
@@ -3087,6 +3252,18 @@ export default function TemplatePage() {
                           }
                           return newItems;
                         });
+                      } else if (selectedImageCategorySlot === 'template13' && selectedImageIndex !== null) {
+                        // Template-13 menu item images
+                        setTemplate13MenuItems(prev => {
+                          const newItems = [...prev];
+                          if (newItems[selectedImageIndex]) {
+                            newItems[selectedImageIndex] = { ...newItems[selectedImageIndex], image: imageUrl };
+                          }
+                          return newItems;
+                        });
+                      } else if (selectedImageCategorySlot === 'template13-side') {
+                        // Template-13 side image
+                        setTemplate13SideImage(imageUrl);
                       } else if (selectedImageCategorySlot !== null && selectedImageIndex !== null) {
                         // Template-2 için
                         setSelectedProductsByCategory(prev => {

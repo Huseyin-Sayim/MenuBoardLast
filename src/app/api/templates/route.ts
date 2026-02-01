@@ -74,6 +74,29 @@ const getDefaultConfig = (component: string) => {
       footerNote: "FİYATLARIMIZ KDV DAHİLDİR."
     }
   }
+  if (component === 'template-13') {
+    return {
+      category: "Special Menu",
+      menuItems: [
+        { name: 'SPECIAL', image: "/images/burger_menu.svg", sizes: [{ label: 'KÜÇÜK', price: '200' }, { label: 'ORTA', price: '250' }, { label: 'BÜYÜK', price: '300' }] },
+        { name: 'SPECIAL', image: "/images/burger_menu.svg", sizes: [{ label: 'KÜÇÜK', price: '200' }, { label: 'ORTA', price: '250' }, { label: 'BÜYÜK', price: '300' }] },
+        { name: 'SPECIAL', image: "/images/burger_menu.svg", sizes: [{ label: 'KÜÇÜK', price: '200' }, { label: 'ORTA', price: '250' }, { label: 'BÜYÜK', price: '300' }] },
+        { name: 'SPECIAL', image: "/images/burger_menu.svg", sizes: [{ label: 'KÜÇÜK', price: '200' }, { label: 'ORTA', price: '250' }, { label: 'BÜYÜK', price: '300' }] },
+        { name: 'SPECIAL', image: "/images/burger_menu.svg", sizes: [{ label: 'KÜÇÜK', price: '200' }, { label: 'ORTA', price: '250' }, { label: 'BÜYÜK', price: '300' }] },
+        { name: 'SPECIAL', image: "/images/burger_menu.svg", sizes: [{ label: 'KÜÇÜK', price: '200' }, { label: 'ORTA', price: '250' }, { label: 'BÜYÜK', price: '300' }] },
+        { name: 'SPECIAL', image: "/images/burger_menu.svg", sizes: [{ label: 'KÜÇÜK', price: '200' }, { label: 'ORTA', price: '250' }, { label: 'BÜYÜK', price: '300' }] },
+        { name: 'SPECIAL', image: "/images/burger_menu.svg", sizes: [{ label: 'KÜÇÜK', price: '200' }, { label: 'ORTA', price: '250' }, { label: 'BÜYÜK', price: '300' }] },
+      ],
+      extraItems: [
+        { name: 'PATATES KIZARTMASI', price: '50₺' },
+        { name: 'SOĞAN HALKASI', price: '60₺' },
+        { name: 'MOZERELLA ÇUBUKLARI', price: '60₺' },
+        { name: 'TAVUK NUGGET', price: '70₺' },
+      ],
+      extraTitle: "EKSTRALAR",
+      sideImage: "/images/template-13-side.png"
+    }
+  }
   return {
     category: '',
     data: []
