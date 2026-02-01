@@ -94,9 +94,13 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   } catch (err: any) {
     console.error('Screen config güncellenirken hata:', err);
     console.error('Hata stack:', err.stack);
+    console.error('Prisma error code:', err.code);
+    console.error('Prisma error meta:', err.meta);
     return NextResponse.json({
       message: 'Screen config güncellenemedi: ' + err.message,
       error: err.message,
+      code: err.code,
+      meta: err.meta,
       stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     }, { status: 500 })
   }

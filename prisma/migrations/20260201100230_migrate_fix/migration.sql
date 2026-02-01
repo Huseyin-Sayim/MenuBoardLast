@@ -8,7 +8,16 @@ CREATE TABLE "User" (
     "email" TEXT NOT NULL,
     "phoneNumber" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "address" TEXT,
+    "businessName" TEXT,
+    "branchCount" INTEGER NOT NULL DEFAULT 1,
+    "isValidate" BOOLEAN NOT NULL DEFAULT false,
     "role" "Role" NOT NULL DEFAULT 'user',
+    "verifyToken" TEXT,
+    "resetCode" TEXT,
+    "resetCodeExpires" TIMESTAMP(3),
+    "estimatedScreen" INTEGER NOT NULL DEFAULT 1,
+    "ip" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -47,6 +56,8 @@ CREATE TABLE "TemplateConfig" (
     "userId" TEXT NOT NULL,
     "templateId" TEXT NOT NULL,
     "configData" JSONB NOT NULL,
+    "snapshotUrl" TEXT,
+    "snapshotVersion" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -87,6 +98,7 @@ CREATE TABLE "ScreenConfig" (
     "templateConfigId" TEXT,
     "mediaIndex" INTEGER NOT NULL,
     "displayDuration" INTEGER,
+    "sortmatic" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "ScreenConfig_pkey" PRIMARY KEY ("id")
 );
@@ -149,7 +161,7 @@ ALTER TABLE "RefreshToken" ADD CONSTRAINT "RefreshToken_userId_fkey" FOREIGN KEY
 ALTER TABLE "Media" ADD CONSTRAINT "Media_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ScreenConfig" ADD CONSTRAINT "ScreenConfig_screenId_fkey" FOREIGN KEY ("screenId") REFERENCES "Screen"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ScreenConfig" ADD CONSTRAINT "ScreenConfig_screenId_fkey" FOREIGN KEY ("screenId") REFERENCES "Screen"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ScreenConfig" ADD CONSTRAINT "ScreenConfig_mediaId_fkey" FOREIGN KEY ("mediaId") REFERENCES "Media"("id") ON DELETE SET NULL ON UPDATE CASCADE;

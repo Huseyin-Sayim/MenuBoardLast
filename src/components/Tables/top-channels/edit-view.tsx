@@ -62,6 +62,7 @@ type Template = {
   path: string;
   configId?: string; // TemplateConfig ID'si
   component?: string; // Template component (template-1, template-2, vs.)
+  snapshotUrl?: string; // Snapshot resmi URL'i
 };
 
 type PlaylistItemType = {
@@ -398,9 +399,10 @@ export function EditView({
             id: t.configId || t.id, // Config ID'sini kullan (her config ayrı)
             name: t.name,
             path: t.path,
-            preview: t.path, // Path'i preview olarak kullan
+            preview: t.snapshotUrl || t.path, // snapshotUrl varsa onu kullan, yoksa path
             configId: t.configId || t.id, // Config ID'si
             component: t.component, // Component bilgisi
+            snapshotUrl: t.snapshotUrl, // Snapshot URL'i
           }));
           setTemplates(formattedTemplates);
         } else {
@@ -668,22 +670,23 @@ export function EditView({
               >
                 {activeTemplate ? (
                   <div className="absolute inset-0 flex items-center justify-center" style={{ overflow: 'hidden' }}>
-                    <iframe
-                      src={activeTemplate.configId
-                        ? `${activeTemplate.path}?configId=${activeTemplate.configId}`
-                        : activeTemplate.path}
-                      className="border-0"
-                      style={{
-                        width: `${screenWidth}px`,
-                        height: `${screenHeight}px`,
-                        transform: `scale(${previewScale})`,
-                        transformOrigin: "center center",
-                        flexShrink: 0,
-                      }}
-                      title={`${activeTemplate.name} Önizleme`}
-                      scrolling="no"
-                      allowFullScreen
-                    />
+                    {activeTemplate.snapshotUrl ? (
+                      <Image
+                        src={activeTemplate.snapshotUrl}
+                        alt={activeTemplate.name}
+                        fill
+                        className="object-contain"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-center p-4">
+                        <p className="text-dark-4 dark:text-dark-6 text-sm font-medium">
+                          Şablon önizlemesi bulunamadı
+                        </p>
+                        <p className="text-dark-5 dark:text-dark-7 text-xs mt-1">
+                          Lütfen şablon yapılandırmasından snapshot oluşturun
+                        </p>
+                      </div>
+                    )}
                   </div>
                 ) : activeMedia ? (
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -868,20 +871,20 @@ export function EditView({
                       )}
                     >
                       <div className="relative aspect-video w-full overflow-hidden bg-gray-2 dark:bg-dark-2">
-                        <iframe
-                          src={template.configId
-                            ? `${template.path}?configId=${template.configId}`
-                            : template.path}
-                          className="absolute inset-0 border-0"
-                          style={{
-                            transform: `scale(${Math.min(280 / screenWidth, 160 / screenHeight, 1)})`,
-                            transformOrigin: "top left",
-                            width: `${screenWidth}px`,
-                            height: `${screenHeight}px`,
-                          }}
-                          title={`${template.name} Önizleme`}
-                          scrolling="no"
-                        />
+                        {template.snapshotUrl ? (
+                          <Image
+                            src={template.snapshotUrl}
+                            alt={template.name}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <svg className="w-8 h-8 text-dark-4 dark:text-dark-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                        )}
                       </div>
                       <div className="border-t border-stroke bg-white px-3 py-2 dark:border-stroke-dark dark:bg-gray-dark">
                         <p className="truncate text-sm font-medium text-dark dark:text-white">

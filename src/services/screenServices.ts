@@ -253,7 +253,11 @@ export const updateScreenConfig = async (screenId: string, configs: { mediaId?: 
     console.error('Error stack:', error.stack);
     console.error('Error code:', error.code);
     console.error('Error meta:', error.meta);
-    throw new Error('Screen config güncellenemedi: ' + error.message);
+    // Preserve Prisma error properties
+    const newError: any = new Error('Screen config güncellenemedi: ' + error.message);
+    newError.code = error.code;
+    newError.meta = error.meta;
+    throw newError;
   }
 }
 

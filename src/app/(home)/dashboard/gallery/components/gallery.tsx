@@ -23,6 +23,7 @@ export function Gallery({ initialData, userRole, showActions = true }: GalleryPr
   const [images, setImages] = useState<GalleryImage[]>(initialData);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
 
   // Galeri resimlerini yeniden yükle
   const refreshGallery = async () => {
@@ -89,6 +90,18 @@ export function Gallery({ initialData, userRole, showActions = true }: GalleryPr
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // ESC tuşu ile modal'ı kapat
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && selectedImage) {
+        setSelectedImage(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedImage]);
 
   // Dosya seçildiğinde
   const handleFileSelect = (file: File) => {
@@ -183,6 +196,11 @@ export function Gallery({ initialData, userRole, showActions = true }: GalleryPr
     fileInputRef.current?.click();
   };
 
+  // Fotoğrafa tıklama
+  const handleImageClick = (image: GalleryImage) => {
+    setSelectedImage(image);
+  };
+
   return (
     <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card h-[75vh] overflow-y-auto flex flex-col">
       {/* Başlık ve Admin Butonu */}
@@ -209,6 +227,46 @@ export function Gallery({ initialData, userRole, showActions = true }: GalleryPr
           </button>
         )}
       </div>
+
+      {/* Fotoğraf Görüntüleme Modal */}
+      {selectedImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div
+            className="relative max-h-[90vh] max-w-[90vw]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Kapatma Butonu */}
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute -right-4 -top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white text-dark shadow-lg transition-all hover:bg-gray-100 dark:bg-gray-dark dark:text-white dark:hover:bg-dark-2"
+            >
+              <svg
+                className="size-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            {/* Resim */}
+            <img
+              src={selectedImage.url}
+              alt={selectedImage.name}
+              className="max-h-[85vh] max-w-[85vw] rounded-lg object-contain shadow-2xl"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Upload Modal (SADECE ADMIN) */}
       {isUploadModalOpen && userRole === 'admin' && (
@@ -376,17 +434,41 @@ export function Gallery({ initialData, userRole, showActions = true }: GalleryPr
             {images.map((image) => (
               <div
                 key={image.id}
-                className="group relative aspect-square overflow-hidden rounded-lg border border-stroke bg-gray-2 dark:border-stroke-dark dark:bg-dark-2"
+                onClick={() => handleImageClick(image)}
+                className="group relative aspect-square cursor-pointer overflow-hidden rounded-lg border border-stroke bg-gray-2 dark:border-stroke-dark dark:bg-dark-2"
               >
                 <img
                   src={image.url}
                   alt={image.name}
                   className="absolute inset-0 h-full w-full object-cover transition-transform group-hover:scale-110"
                 />
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-black/0 transition-all group-hover:bg-black/20" />
+                {/* Büyütme İkonu */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
+                  <div className="rounded-full bg-white/90 p-2 shadow-lg">
+                    <svg
+                      className="size-5 text-dark"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
+                      />
+                    </svg>
+                  </div>
+                </div>
                 {/* Silme Butonu - Sadece Admin için */}
                 {showActions && userRole === 'admin' && (
                   <button
-                    onClick={() => handleDelete(image.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(image.id);
+                    }}
                     className="absolute right-2 top-2 rounded-full bg-red-500 p-2 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
                     title="Sil"
                   >

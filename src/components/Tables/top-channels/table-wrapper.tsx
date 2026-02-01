@@ -182,12 +182,16 @@ export function TableWrapper({ data, initialMedia, className, showActions = true
       });
 
       if (!response.ok) {
-        throw new Error('Playlist kaydedilemedi');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('API hata detayı:', errorData);
+        throw new Error(`Playlist kaydedilemedi: ${errorData.message || response.statusText}`);
       }
 
       console.log('Playlist başarıyla kaydedildi');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Playlist kaydedilirken hata:', error);
+      alert(`Playlist kaydedilemedi: ${error.message}`);
+      return; // Hata durumunda ekran açık kalsın
     }
 
     setScreens((prev) =>
