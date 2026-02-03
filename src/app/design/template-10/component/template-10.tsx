@@ -88,7 +88,7 @@ const Template10: FunctionComponent<Template10Props> = ({
             style={{
                 width: '1920px',
                 height: '1080px',
-                backgroundColor: '#cc2027',
+                backgroundColor: '#ffff',
             }}
         >
             {/* Logo sağ alt köşe */}
@@ -111,7 +111,7 @@ const Template10: FunctionComponent<Template10Props> = ({
                 <div className="self-stretch h-[380px] relative overflow-hidden">
                     {featuredProducts[0]?.name ? (
                         <div
-                            className="absolute top-[58px] left-[23px] text-white uppercase"
+                            className="absolute top-[58px] left-[23px] text-black uppercase"
                             style={{ fontSize: '80px', lineHeight: '0.9', maxWidth: '350px' }}
                         >
                             {featuredProducts[0].name.split(' ').map((word, i) => (
@@ -120,7 +120,7 @@ const Template10: FunctionComponent<Template10Props> = ({
                         </div>
                     ) : (
                         <div
-                            className="absolute top-[58px] left-[23px] text-white"
+                            className="absolute top-[58px] left-[23px] text-black"
                             style={{ fontSize: '96px', lineHeight: '1.1' }}
                         >
                             <span>{heroTitle.line1}</span><br />
@@ -175,7 +175,7 @@ const Template10: FunctionComponent<Template10Props> = ({
                             <div
                                 key={idx}
                                 className="flex-1 rounded-[20px] overflow-hidden flex flex-col items-center justify-center py-1 px-0 cursor-pointer relative group"
-                                style={{ backgroundColor: '#fb333b' }}
+                                style={{ backgroundColor: '#FFF' }}
                                 onClick={() => isEditable && onFeaturedImageClick?.(idx + 1)}
                             >
                                 {isEditable && (
@@ -259,7 +259,7 @@ const Template10: FunctionComponent<Template10Props> = ({
                                 <div className="self-stretch h-[86px] flex items-start">
                                     <div className="w-[207px] flex flex-col items-start">
                                         <div
-                                            className="self-stretch text-white uppercase"
+                                            className="self-stretch text-black uppercase"
                                             style={{ fontSize: '40px', lineHeight: '1.1' }}
                                         >
                                             {item.name.split(' ').slice(0, 2).join(' ')}<br />
@@ -279,7 +279,7 @@ const Template10: FunctionComponent<Template10Props> = ({
                                 </div>
 
                                 {/* Ürün Açıklaması */}
-                                {item.description && (
+                                {/* {item.description && (
                                     <div className="self-stretch h-[60px] flex flex-col items-start font-inter">
                                         <div
                                             className="w-[303px] capitalize font-semibold"
@@ -288,7 +288,7 @@ const Template10: FunctionComponent<Template10Props> = ({
                                             {item.description}
                                         </div>
                                     </div>
-                                )}
+                                )} */}
                             </div>
                         );
                     })}
