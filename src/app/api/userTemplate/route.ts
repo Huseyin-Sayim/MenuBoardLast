@@ -24,7 +24,7 @@ export async function GET(req: Request) {
         id: true,
         createdAt: true,
         updatedAt: true,
-        snapshotUrl: true, // Snapshot URL'ini de al
+        snapshotUrl: true,
         Template: {
           select: {
             id: true,
