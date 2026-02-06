@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 
 interface ProductOption {
     key: string;
@@ -274,11 +273,10 @@ export default function Template3Content({
                                     className={`relative w-40 h-40 flex-shrink-0 ${isEditable ? 'cursor-pointer group' : ''}`}
                                     onClick={() => isEditable && onImageClick?.(index)}
                                 >
-                                    <Image
+                                    <img
                                         src={imageSource}
                                         alt={item.name || "Ürün"}
-                                        fill
-                                        className="object-cover"
+                                        className="absolute inset-0 w-full h-full object-cover"
                                     />
                                     {/* Edit Overlay */}
                                     {isEditable && (
@@ -336,11 +334,10 @@ export default function Template3Content({
                                                 onGalleryClose?.();
                                             }}
                                         >
-                                            <Image
+                                            <img
                                                 src={img.url}
                                                 alt={img.name}
-                                                fill
-                                                className="object-cover"
+                                                className="absolute inset-0 w-full h-full object-cover"
                                             />
                                         </div>
                                     ))}

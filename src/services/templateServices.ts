@@ -136,6 +136,39 @@ export async function saveTemplateConfig(
           });
 
           console.log('Snapshot generated and saved:', { snapshotUrl, snapshotVersion });
+
+          // Bu template config'i kullanan screen'leri bul ve cihazlara bildirim gönder
+          try {
+            const screenConfigs = await prisma.screenConfig.findMany({
+              where: { templateConfigId: saveConfig.id },
+              include: { screen: { select: { deviceId: true } } }
+            });
+
+            // Benzersiz deviceId'leri al
+            const deviceIds = [...new Set(screenConfigs.map((sc: { screen: { deviceId: string } }) => sc.screen.deviceId))];
+
+            if (deviceIds.length > 0) {
+              // @ts-ignore
+              const io = global.io;
+              if (io) {
+                deviceIds.forEach(deviceId => {
+                  io.to(deviceId).emit('SCREEN_CONFIG_UPDATE', {
+                    type: 'TEMPLATE_CONFIG_UPDATED',
+                    templateConfigId: saveConfig.id,
+                    snapshotUrl,
+                    snapshotVersion,
+                    timestamp: Date.now()
+                  });
+                  console.log(`> [Socket] Template config güncelleme bildirimi gönderildi: ${deviceId}`);
+                });
+              } else {
+                console.warn('> [Socket] Socket.IO sunucusu bulunamadı');
+              }
+            }
+          } catch (socketError) {
+            console.error('Socket bildirimi gönderilirken hata:', socketError);
+            // Socket hatası ana işlemi etkilememeli
+          }
         }
       } catch (snapshotError: any) {
         // Snapshot hatası config kaydını engellemez, sadece log'lanır

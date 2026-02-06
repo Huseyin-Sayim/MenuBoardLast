@@ -1,7 +1,6 @@
 import Signin from "@/components/Auth/Signin";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -25,14 +24,14 @@ export default function SignIn() {
           <div className="w-full p-7.5 xl:block xl:w-1/2">
             <div className="custom-gradient-1 overflow-hidden rounded-2xl px-12.5 pt-12.5 dark:!bg-dark-2 dark:bg-none">
               <Link className="mb-10 flex w-full justify-center" href="/">
-                <Image
+                <img
                   className="hidden dark:block"
                   src={"/images/logo/ntx.png"}
                   alt="Logo"
                   width={176}
                   height={32}
                 />
-                <Image
+                <img
                   className="dark:hidden"
                   src={"/images/logo/ntx.png"}
                   alt="Logo"
@@ -53,7 +52,7 @@ export default function SignIn() {
               </p>
 
               <div className="mt-31">
-                <Image
+                <img
                   src={"/images/grids/grid-02.svg"}
                   alt="Logo"
                   width={405}

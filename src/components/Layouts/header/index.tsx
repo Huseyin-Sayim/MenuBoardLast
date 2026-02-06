@@ -1,7 +1,6 @@
 "use client";
 
 import { SearchIcon } from "@/assets/icons";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSidebarContext } from "../sidebar/sidebar-context";
@@ -12,7 +11,7 @@ import { UserInfo } from "./user-info";
 export function Header() {
   const { toggleSidebar, isMobile } = useSidebarContext();
   const pathname = usePathname();
-  
+
   // Şablon düzenleme sayfasında header'ı gizle
   const isTemplateEditPage = pathname?.startsWith("/dashboard/designTemplate/");
 
@@ -32,7 +31,7 @@ export function Header() {
 
       {isMobile && (
         <Link href={"/"} className="ml-2 max-[430px]:hidden min-[375px]:ml-4">
-          <Image
+          <img
             src={"/images/logo/ntx.png"}
             width={120}
             height={32}

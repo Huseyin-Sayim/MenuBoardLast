@@ -2,7 +2,6 @@
 
 import { ArrowLeftIcon } from "@/assets/icons";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 type Template = {
@@ -215,11 +214,10 @@ export function ImageSlider({ images, templates, className }: ImageSliderProps) 
             onClick={() => handleImageClick(getImageIndex(-1))}
             className="relative h-32 w-24 shrink-0 overflow-hidden rounded-lg opacity-60 transition-all duration-300 ease-in-out hover:opacity-80 hover:scale-105 active:scale-95 md:h-40 md:w-32"
           >
-            <Image
+            <img
               src={images[getImageIndex(-1)]}
               alt={`Previous ${getImageIndex(-1) + 1}`}
-              fill
-              className="object-cover"
+              className="absolute inset-0 w-full h-full object-cover"
             />
           </button>
         ) : null}
@@ -281,12 +279,10 @@ export function ImageSlider({ images, templates, className }: ImageSliderProps) 
                           : "z-0 opacity-0 -translate-x-12 scale-95"
                     )}
                   >
-                    <Image
+                    <img
                       src={image}
                       alt={`Slide ${index + 1}`}
-                      fill
-                      className="object-cover"
-                      priority={isActive}
+                      className="absolute inset-0 w-full h-full object-cover"
                     />
                   </div>
                 );
@@ -320,11 +316,10 @@ export function ImageSlider({ images, templates, className }: ImageSliderProps) 
             onClick={() => handleImageClick(getImageIndex(1))}
             className="relative h-32 w-24 shrink-0 overflow-hidden rounded-lg opacity-60 transition-all duration-300 ease-in-out hover:opacity-80 hover:scale-105 active:scale-95 md:h-40 md:w-32"
           >
-            <Image
+            <img
               src={images[getImageIndex(1)]}
               alt={`Next ${getImageIndex(1) + 1}`}
-              fill
-              className="object-cover"
+              className="absolute inset-0 w-full h-full object-cover"
             />
           </button>
         ) : null}
@@ -414,11 +409,10 @@ export function ImageSlider({ images, templates, className }: ImageSliderProps) 
                       : "border-stroke opacity-70 hover:opacity-100 dark:border-stroke-dark"
                   )}
                 >
-                  <Image
+                  <img
                     src={image}
                     alt={`Thumbnail ${index + 1}`}
-                    fill
-                    className="object-cover"
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
                   {isActive && (
                     <div className="absolute inset-0 bg-primary/20" />

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 
@@ -21,7 +20,7 @@ export default function LandingPage() {
       <header className="border-b border-stroke dark:border-dark-3">
         <div className="mx-auto flex max-w-screen-2xl items-center justify-between px-4 py-3 sm:py-4 md:px-6 2xl:px-10">
           <div className="flex-1 max-w-[150px] sm:max-w-[200px] h-10 sm:h-12">
-              <Logo />
+            <Logo />
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <Link
@@ -69,12 +68,10 @@ export default function LandingPage() {
           </div>
           <div className="relative order-1 lg:order-2 mb-8 lg:mb-0">
             <div className="relative aspect-square overflow-hidden rounded-xl sm:rounded-2xl">
-              <Image
+              <img
                 src="/images/grids/grid-02.svg"
                 alt="Dashboard Preview"
-                fill
-                className="object-cover dark:opacity-30"
-                priority
+                className="absolute inset-0 w-full h-full object-cover dark:opacity-30"
               />
             </div>
           </div>

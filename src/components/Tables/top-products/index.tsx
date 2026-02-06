@@ -6,7 +6,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import Image from "next/image";
 import { getTopProducts } from "../fetch";
 
 export async function TopProducts() {
@@ -42,7 +41,7 @@ export async function TopProducts() {
               key={product.name + product.profit}
             >
               <TableCell className="flex min-w-fit items-center gap-3 pl-5 sm:pl-6 xl:pl-7.5">
-                <Image
+                <img
                   src={product.image}
                   className="aspect-[6/5] w-15 rounded-[5px] object-cover"
                   width={60}

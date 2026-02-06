@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 import { Logo } from "@/components/logo";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { EmailIcon, NameIcon, PhoneNumberIcon, PasswordIcon, AddressIcon, PencilSquareIcon, TrendingUpIcon, ScreenIcon } from "@/assets/icons";
@@ -270,13 +269,12 @@ export default function HomePage() {
                 transition={{ ...transition, delay: 0.2 }}
                 className="mb-8"
               >
-                <Image
+                <img
                   src="/images/logo/ntx.png"
                   alt="NTX Logo"
                   width={400}
                   height={120}
                   className="mx-auto dark:opacity-90"
-                  priority
                 />
               </motion.div>
               <motion.div

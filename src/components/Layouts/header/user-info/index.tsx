@@ -7,7 +7,6 @@ import {
   DropdownTrigger,
 } from "@/components/ui/dropdown";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { LogOutIcon, SettingsIcon } from "./icons";

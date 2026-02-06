@@ -1,7 +1,6 @@
 // "use client";
 
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import { MEDIA_ITEMS, type MediaItem } from "@/app/(home)/dashboard/media/_components/media-gallery";
 import {
@@ -209,11 +208,10 @@ function SortableItem({ id, item, isDesign, duration, onDurationChange, onRemove
             scrolling="no"
           />
         ) : (
-          <Image
+          <img
             src={thumbnail}
             alt={name}
-            fill
-            className="object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
           />
         )}
       </div>
@@ -671,11 +669,10 @@ export function EditView({
                 {activeTemplate ? (
                   <div className="absolute inset-0 flex items-center justify-center" style={{ overflow: 'hidden' }}>
                     {activeTemplate.snapshotUrl ? (
-                      <Image
+                      <img
                         src={activeTemplate.snapshotUrl}
                         alt={activeTemplate.name}
-                        fill
-                        className="object-contain"
+                        className="absolute inset-0 w-full h-full object-contain"
                       />
                     ) : (
                       <div className="flex flex-col items-center justify-center text-center p-4">
@@ -700,11 +697,10 @@ export function EditView({
                         style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
                       />
                     ) : (
-                      <Image
+                      <img
                         src={activeMedia.thumbnail || activeMedia.url}
                         alt={activeMedia.name}
-                        fill
-                        className="object-contain"
+                        className="absolute inset-0 w-full h-full object-contain"
                       />
                     )}
                   </div>
@@ -832,11 +828,10 @@ export function EditView({
                         )}
                       >
                         <div className="relative aspect-video w-full bg-gray-2 dark:bg-dark-2">
-                          <Image
+                          <img
                             src={item.thumbnail || item.url}
                             alt={item.name}
-                            fill
-                            className="object-cover"
+                            className="absolute inset-0 w-full h-full object-cover"
                           />
                         </div>
                         <div className="border-t border-stroke bg-white px-3 py-2 dark:border-stroke-dark dark:bg-gray-dark">
@@ -872,11 +867,10 @@ export function EditView({
                     >
                       <div className="relative aspect-video w-full overflow-hidden bg-gray-2 dark:bg-dark-2">
                         {template.snapshotUrl ? (
-                          <Image
+                          <img
                             src={template.snapshotUrl}
                             alt={template.name}
-                            fill
-                            className="object-cover"
+                            className="absolute inset-0 w-full h-full object-cover"
                           />
                         ) : (
                           <div className="absolute inset-0 flex items-center justify-center">

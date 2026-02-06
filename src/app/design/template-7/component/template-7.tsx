@@ -1,7 +1,6 @@
 "use client";
 
 import "../../styles/gyrogreek.css";
-import Image from "next/image";
 
 interface Brand {
   shortName?: string;
@@ -92,13 +91,12 @@ export default function Template7Content({
       <aside className="gg-sidebar">
         <div className="gg-hero-text">
           {hero.logo ? (
-            <Image
+            <img
               src={hero.logo}
               alt="Brand Logo"
               className="gg-hero-logo"
               width={400}
               height={180}
-              unoptimized
             />
           ) : (
             <>
@@ -114,13 +112,12 @@ export default function Template7Content({
             style={isEditable ? { cursor: 'pointer', position: 'relative', zIndex: 10 } : {}}
           >
             {hero.image ? (
-              <Image
+              <img
                 src={hero.image}
                 alt="Hero"
                 className="gg-hero-img"
                 width={400}
                 height={450}
-                unoptimized
               />
             ) : null}
             {isEditable && (
@@ -334,12 +331,10 @@ export default function Template7Content({
                   }}
                 >
                   {item.image ? (
-                    <Image
+                    <img
                       src={item.image}
                       alt={item.title || "Item"}
-                      fill
-                      style={{ objectFit: 'contain' }}
-                      unoptimized
+                      className="absolute inset-0 w-full h-full object-contain"
                     />
                   ) : null}
                   {isEditable && (

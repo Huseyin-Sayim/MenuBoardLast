@@ -1,7 +1,6 @@
 import { DotIcon } from "@/assets/icons";
 import { formatMessageTime } from "@/lib/format-message-time";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import Link from "next/link";
 import { getChatsData } from "../fetch";
 
@@ -22,7 +21,7 @@ export async function ChatsCard() {
               className="flex items-center gap-4.5 px-7.5 py-3 outline-none hover:bg-gray-2 focus-visible:bg-gray-2 dark:hover:bg-dark-2 dark:focus-visible:bg-dark-2"
             >
               <div className="relative shrink-0">
-                <Image
+                <img
                   src={chat.profile}
                   width={56}
                   height={56}
